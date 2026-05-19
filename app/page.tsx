@@ -1,65 +1,133 @@
-import Image from "next/image";
+import Link from "next/link";
+import { DestinationTabs } from "./components/DestinationTabs";
+import { PackageCarousel } from "./components/PackageCarousel";
+import { PostCard } from "./components/PostCard";
+import { SiteHeader } from "./components/SiteHeader";
+import {
+  allPackages,
+  destinations,
+  packageCollections,
+  posts,
+  tripStyles,
+} from "./data/travel";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main>
+      <section className="hero-section">
+        <SiteHeader variant="hero" />
+
+        <div className="hero-content" id="top">
+          <p className="eyebrow">Blog du lịch & hành trình chọn lọc</p>
+          <h2>Những chuyến đi Việt Nam được kể bằng trải nghiệm thật.</h2>
+          <p className="hero-copy">
+            Blog du lịch hiện đại dành cho người muốn tìm cảm hứng, 
+            đọc kinh nghiệm thực tế và để lại thông tin khi cần gợi ý lịch trình phù hợp.
+          </p>
+          <div className="hero-actions">
+            <a className="primary-action" href="#travel-packages">
+              Đọc bài mới
+            </a>
+            <Link className="secondary-action" href="/goi-du-lich">
+              Xem gói du lịch
+            </Link>
+          </div>
+          <form className="hero-search" action="/goi-du-lich">
+            <label>
+              Điểm đến
+              <input name="destination" placeholder="Bạn muốn đi đâu?" />
+            </label>
+            <label>
+              Phong cách
+              <select name="style" defaultValue="">
+                <option value="">Chọn trải nghiệm</option>
+                <option value="family">Gia đình</option>
+                <option value="friends">Nhóm bạn</option>
+                <option value="resort">Nghỉ dưỡng</option>
+                <option value="photo">Chụp ảnh</option>
+              </select>
+            </label>
+            <label>
+              Thời gian
+              <input name="date" type="month" />
+            </label>
+            <button type="submit">Tìm chuyến đi</button>
+          </form>
+        </div>
+      </section>
+
+      <section className="package-showcase" id="travel-packages">
+        <div className="package-showcase-heading">
+          <h2>Chọn hành trình theo người đi cùng bạn</h2>
+          <Link href="/goi-du-lich">Xem tất cả gói du lịch</Link>
+        </div>
+
+        <div className="collection-stack">
+          {packageCollections.map((collection) => (
+            <section
+              className={`package-collection ${collection.accent}`}
+              key={collection.title}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+              <div className="collection-copy">
+                <p className="eyebrow">{collection.eyebrow}</p>
+                <h3>{collection.title}</h3>
+                <p>{collection.description}</p>
+                <Link href="/lien-he">Nhận tư vấn nhóm gói này</Link>
+              </div>
+              <PackageCarousel items={collection.items} />
+            </section>
+          ))}
+        </div>
+      </section>
+
+      <section className="feature-band" id="destinations">
+        <div className="feature-copy">
+          <p className="slogan-kicker">VietVista journeys</p>
+          <h2>
+            Chọn điểm đến theo cảm xúc,
+            <span>không chỉ theo địa danh.</span>
+          </h2>
+          <p>Vì đó là kỉ niệm mà bạn sẽ đem theo mãi bên mình.</p>
+        </div>
+        <DestinationTabs destinations={destinations} packages={allPackages} />
+      </section>
+
+      <section className="section-shell">
+        <div className="section-heading compact">
+          <p className="eyebrow">Trải nghiệm và Lợi ích của 1 chuyến đi đem lại</p>
+        </div>
+        <div className="style-grid">
+          {tripStyles.map((item) => (
+            <article key={item.title}>
+              <div
+                className="style-image"
+                style={{ backgroundImage: `url(${item.image})` }}
+              />
+              <h3>{item.title}</h3>
+              <p>{item.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="news-section" id="stories">
+        <div className="news-heading">
+          <div>
+            <p className="eyebrow">Câu chuyện du lịch</p>
+            <h2>Bài viết nổi bật</h2>
+          </div>
+          <p>
+            Những bài viết được chọn để gợi ý lịch trình, mùa đi đẹp và trải
+            nghiệm bản địa trước khi bạn để lại thông tin tư vấn.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="post-grid news-grid">
+          {posts.slice(0, 3).map((post) => (
+            <PostCard post={post} key={post.id} />
+          ))}
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }
