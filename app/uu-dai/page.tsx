@@ -5,7 +5,7 @@ import { offers } from "../data/travel";
 export default function OffersPage() {
   return (
     <main>
-      <SiteHeader />
+      <SiteHeader variant="hero" />
       <section className="page-hero offers-hero">
         <p className="eyebrow">Ưu đãi</p>
         <h1>Chương trình nổi bật cho mùa du lịch mới.</h1>
@@ -20,12 +20,19 @@ export default function OffersPage() {
         <div className="offer-grid">
           {offers.map((offer) => (
             <article className="offer-card" key={offer.id}>
-              <span>{offer.tag}</span>
-              <h2>{offer.title}</h2>
-              <p>{offer.description}</p>
-              <div className="offer-footer">
-                <strong>Hiệu lực đến {offer.validUntil}</strong>
-                <Link href="/#consult">Nhận thông tin</Link>
+              <div
+                className="offer-image"
+                style={{ backgroundImage: `url(${offer.image})` }}
+              >
+                <span>{offer.tag}</span>
+              </div>
+              <div className="offer-body">
+                <h2>{offer.title}</h2>
+                <p>{offer.description}</p>
+                <div className="offer-footer">
+                  <strong>Hiệu lực đến {offer.validUntil}</strong>
+                  <Link href="/#consult">Nhận thông tin</Link>
+                </div>
               </div>
             </article>
           ))}

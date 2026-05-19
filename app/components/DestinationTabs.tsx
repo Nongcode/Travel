@@ -56,7 +56,7 @@ export function DestinationTabs({ destinations, packages }: DestinationTabsProps
 
           return (
             <div className="destination-tab-item" key={destination}>
-              <input
+              <input suppressHydrationWarning
                 defaultChecked={index === 0}
                 id={tabId}
                 name="destination-tab"

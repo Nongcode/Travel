@@ -156,9 +156,9 @@ export function AdminPanel() {
             <span>Quản lý tin tức</span>
           </div>
           <form className="admin-form" onSubmit={addPost}>
-            <input name="title" placeholder="Tiêu đề bài viết" required />
-            <input name="category" placeholder="Chuyên mục" required />
-            <select name="status" defaultValue="Bản nháp">
+            <input suppressHydrationWarning name="title" placeholder="Tiêu đề bài viết" required />
+            <input suppressHydrationWarning name="category" placeholder="Chuyên mục" required />
+            <select suppressHydrationWarning name="status" defaultValue="Bản nháp">
               <option>Bản nháp</option>
               <option>Đã xuất bản</option>
             </select>
@@ -188,11 +188,11 @@ export function AdminPanel() {
             <span>Quản lý sản phẩm</span>
           </div>
           <form className="admin-form product-form" onSubmit={addPackage}>
-            <input name="name" placeholder="Tên gói du lịch" required />
-            <input name="destination" placeholder="Điểm đến" required />
-            <input name="duration" placeholder="Thời lượng" />
-            <input name="price" placeholder="Giá tham khảo" />
-            <select name="status" defaultValue="Đang mở">
+            <input suppressHydrationWarning name="name" placeholder="Tên gói du lịch" required />
+            <input suppressHydrationWarning name="destination" placeholder="Điểm đến" required />
+            <input suppressHydrationWarning name="duration" placeholder="Thời lượng" />
+            <input suppressHydrationWarning name="price" placeholder="Giá tham khảo" />
+            <select suppressHydrationWarning name="status" defaultValue="Đang mở">
               <option>Đang mở</option>
               <option>Sắp hết chỗ</option>
               <option>Tạm dừng</option>

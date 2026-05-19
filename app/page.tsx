@@ -19,7 +19,7 @@ export default function Home() {
 
         <div className="hero-content" id="top">
           <p className="eyebrow">Blog du lịch & hành trình chọn lọc</p>
-          <h2>Những chuyến đi Việt Nam được kể bằng trải nghiệm thật.</h2>
+          <h2>Những chuyến đi theo bạn như một kí ức đẹp không thể quên.</h2>
           <p className="hero-copy">
             Blog du lịch hiện đại dành cho người muốn tìm cảm hứng, 
             đọc kinh nghiệm thực tế và để lại thông tin khi cần gợi ý lịch trình phù hợp.
@@ -32,14 +32,14 @@ export default function Home() {
               Xem gói du lịch
             </Link>
           </div>
-          <form className="hero-search" action="/goi-du-lich">
+          <form className="hero-search" id="trip-search" action="/goi-du-lich">
             <label>
               Điểm đến
-              <input name="destination" placeholder="Bạn muốn đi đâu?" />
+              <input suppressHydrationWarning name="destination" placeholder="Bạn muốn đi đâu?" />
             </label>
             <label>
               Phong cách
-              <select name="style" defaultValue="">
+              <select suppressHydrationWarning name="style" defaultValue="">
                 <option value="">Chọn trải nghiệm</option>
                 <option value="family">Gia đình</option>
                 <option value="friends">Nhóm bạn</option>
@@ -49,7 +49,7 @@ export default function Home() {
             </label>
             <label>
               Thời gian
-              <input name="date" type="month" />
+              <input suppressHydrationWarning name="date" type="month" />
             </label>
             <button type="submit">Tìm chuyến đi</button>
           </form>

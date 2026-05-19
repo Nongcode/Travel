@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const footerLinks = [
@@ -14,8 +15,8 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="footer-main">
         <div>
-          <Link className="footer-brand" href="/">
-            VietVista
+          <Link className="footer-brand" href="/" aria-label="Về trang chủ">
+            <Image src="/vietvista-logo.png" alt="VietVista Travel & Discover" width={180} height={118} />
           </Link>
           <p>
             Blog du lịch và kênh tư vấn hành trình Việt Nam. Website chỉ thu
