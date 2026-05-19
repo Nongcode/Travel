@@ -4,7 +4,7 @@ import { SiteHeader } from "../components/SiteHeader";
 export default function AdminPage() {
   return (
     <main>
-      <SiteHeader />
+      <SiteHeader variant="hero" />
       <section className="page-hero admin-hero">
         <p className="eyebrow">Admin</p>
         <h1>Quản lý bài viết và gói du lịch.</h1>

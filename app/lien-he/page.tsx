@@ -5,7 +5,7 @@ import { destinations } from "../data/travel";
 export default function ContactPage() {
   return (
     <main>
-      <SiteHeader />
+      <SiteHeader variant="hero" />
       <section className="contact-hero">
         <div className="contact-hero-copy">
           <p className="eyebrow">Liên hệ tư vấn</p>
@@ -15,9 +15,6 @@ export default function ContactPage() {
             đi bạn mong muốn. Chúng tôi sẽ liên hệ lại để gợi ý lịch trình phù
             hợp, không yêu cầu thanh toán trực tuyến.
           </p>
-        </div>
-        <div className="contact-card">
-          <LeadForm destinations={destinations} />
         </div>
       </section>
 
@@ -37,6 +34,27 @@ export default function ContactPage() {
           <h2>Không thanh toán online</h2>
           <p>Website chỉ thu thập thông tin liên hệ để tư vấn và xác nhận nhu cầu.</p>
         </article>
+      </section>
+
+      <section className="contact-form-section">
+        <div className="contact-form-wrapper">
+          <div className="contact-form-header">
+            <h2>Gửi yêu cầu tư vấn hành trình</h2>
+            <p>
+              Hãy điền thông tin của bạn dưới đây. Các chuyên gia hành trình của
+              chúng tôi sẽ liên hệ tư vấn và thiết kế lịch trình miễn phí trong
+              vòng 24 giờ.
+            </p>
+          </div>
+          <div className="contact-form-content">
+            <div className="contact-form-container">
+              <LeadForm destinations={destinations} />
+            </div>
+            <div className="contact-form-image">
+              <img src="/vietnam-map-light.png" alt="Bản đồ điểm đến VietVista" />
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -9,7 +10,6 @@ const navItems = [
   { href: "/goi-du-lich", label: "Gói du lịch" },
   { href: "/uu-dai", label: "Ưu đãi" },
   { href: "/lien-he", label: "Liên hệ" },
-  { href: "/admin", label: "Admin" },
 ];
 
 type SiteHeaderProps = {
@@ -26,7 +26,9 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
     }
 
     const updateHeaderState = () => {
-      const heroSection = document.querySelector<HTMLElement>(".hero-section");
+      const heroSection = document.querySelector<HTMLElement>(
+        ".hero-section, .page-hero, .contact-hero, .package-detail-hero",
+      );
       const triggerPoint = heroSection ? heroSection.offsetHeight - 96 : 160;
       setHasScrolledPastHero(window.scrollY > triggerPoint);
     };
@@ -52,7 +54,7 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
   return (
     <header className={headerClassName}>
       <Link className="brand" href="/" aria-label="Về trang chủ">
-        VietVista
+        <Image src="/vietvista-logo.png" alt="VietVista Travel & Discover" width={152} height={100} priority />
       </Link>
       <nav aria-label="Điều hướng chính">
         {navItems.map((item) => (
@@ -60,6 +62,9 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
             {item.label}
           </Link>
         ))}
+        <Link className="search-nav" href="/#trip-search" aria-label="Tìm chuyến đi">
+          <span className="search-icon" aria-hidden="true" />
+        </Link>
       </nav>
     </header>
   );

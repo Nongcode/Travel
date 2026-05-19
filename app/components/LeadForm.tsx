@@ -19,11 +19,11 @@ export function LeadForm({ destinations }: LeadFormProps) {
     <form className="lead-form" onSubmit={handleSubmit}>
       <label>
         Họ và tên
-        <input name="name" type="text" placeholder="Nguyễn Minh Anh" required />
+        <input suppressHydrationWarning name="name" type="text" placeholder="Nguyễn Minh Anh" required />
       </label>
       <label>
         Email hoặc số điện thoại
-        <input
+        <input suppressHydrationWarning
           name="contact"
           type="text"
           placeholder="email@example.com / 09xx xxx xxx"
@@ -32,7 +32,7 @@ export function LeadForm({ destinations }: LeadFormProps) {
       </label>
       <label>
         Điểm đến quan tâm
-        <select name="destination" defaultValue="">
+        <select suppressHydrationWarning name="destination" defaultValue="">
           <option value="" disabled>
             Chọn điểm đến
           </option>
@@ -45,7 +45,7 @@ export function LeadForm({ destinations }: LeadFormProps) {
       </label>
       <label>
         Ghi chú ngắn
-        <textarea
+        <textarea suppressHydrationWarning
           name="message"
           rows={4}
           placeholder="Thời gian dự kiến, số người, phong cách mong muốn..."

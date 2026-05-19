@@ -68,6 +68,7 @@ export const offers = [
       "Áp dụng cho nhóm từ 4 khách, khởi hành trong tháng 6 và tháng 7, ưu tiên resort gần biển.",
     tag: "Biển đảo",
     validUntil: "30/06/2026",
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
   },
   {
     id: 2,
@@ -76,6 +77,7 @@ export const offers = [
       "Phù hợp cặp đôi và nhóm bạn cần lịch trình nhẹ, có gợi ý quán ăn địa phương riêng.",
     tag: "Di sản",
     validUntil: "15/07/2026",
+    image: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1000&q=80",
   },
   {
     id: 3,
@@ -84,6 +86,34 @@ export const offers = [
       "Nhận file lịch trình mẫu, điểm dừng chân và các lưu ý an toàn khi đi cung đường núi.",
     tag: "Núi rừng",
     validUntil: "31/08/2026",
+    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    id: 4,
+    title: "Mùa hoa Đà Lạt: ưu đãi 10% homestay ngắm thung lũng",
+    description:
+      "Tặng kèm bản đồ cà phê ngắm hoàng hôn độc quyền, áp dụng khi đặt trước 15 ngày khởi hành.",
+    tag: "Núi rừng",
+    validUntil: "30/09/2026",
+    image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    id: 5,
+    title: "Quy Nhơn trọn gói: miễn phí xe đưa đón sân bay Phù Cát",
+    description:
+      "Áp dụng cho mọi booking từ 3 ngày 2 đêm trở lên trong suốt mùa hè này, hỗ trợ xe riêng 4-7 chỗ.",
+    tag: "Biển đảo",
+    validUntil: "15/08/2026",
+    image: "https://images.unsplash.com/photo-1542259009477-d625272157b7?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    id: 6,
+    title: "Ninh Bình mùa lúa chín: tặng vé chèo kayak Tràng An",
+    description:
+      "Dành cho các booking tour trải nghiệm Tràng An - Bái Đính dịp cuối tuần, số lượng giới hạn.",
+    tag: "Di sản",
+    validUntil: "31/07/2026",
+    image: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1000&q=80",
   },
 ];
 

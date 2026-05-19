@@ -47,7 +47,7 @@ export default async function PackageDetailPage({ params }: PackageDetailPagePro
 
   return (
     <main>
-      <SiteHeader />
+      <SiteHeader variant="hero" />
       <section className="package-detail-hero">
         <div className="detail-hero-copy">
           <p className="eyebrow">{item.destination}</p>

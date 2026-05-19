@@ -8,7 +8,7 @@ export default function NewsPage() {
 
   return (
     <main>
-      <SiteHeader />
+      <SiteHeader variant="hero" />
       <section className="page-hero news-hero">
         <p className="eyebrow">Tin tức & cẩm nang</p>
         <h1>Góc đọc trước khi lên đường.</h1>
