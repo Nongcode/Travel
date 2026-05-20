@@ -10,12 +10,12 @@ export default function ContactPage() {
 
       <section className="contact-hero">
         <div className="contact-hero-copy">
-          <p className="eyebrow">Lien he tu van</p>
-          <h1>Bat dau chuyen di bang mot cuoc tro chuyen ro rang.</h1>
+          <p className="eyebrow">Liên hệ tư vấn</p>
+          <h1>Bắt đầu chuyến đi của bạn ngay từ bây giờ nhé!.</h1>
           <p>
-            Cho VietVista biet diem den, thoi gian du kien va phong cach chuyen
-            di ban mong muon. Chung toi se lien he lai de goi y lich trinh phu
-            hop, khong yeu cau thanh toan truc tuyen.
+            Cho VietVista biết điểm đến, thời gian du lịch và phong cách chuyến đi
+            bạn mong muốn. Chúng tôi sẽ liên hệ lại để gợi ý lịch trình phù hợp,
+            không yêu cầu thanh toán trực tuyến.
           </p>
         </div>
       </section>
@@ -23,29 +23,29 @@ export default function ContactPage() {
       <section className="contact-info-band">
         <article>
           <span>01</span>
-          <h2>Phan hoi trong 24h</h2>
-          <p>Doi ngu tu van se lien he qua email hoac so dien thoai ban de lai.</p>
+          <h2>Phản hồi trong 24h</h2>
+          <p>Đội ngũ tư vấn sẽ liên hệ qua email hoặc số điện thoại bạn để lại.</p>
         </article>
         <article>
           <span>02</span>
-          <h2>Lich trinh linh hoat</h2>
-          <p>Goi y co the dieu chinh theo so nguoi, ngan sach va nhip nghi mong muon.</p>
+          <h2>Lịch trình linh hoạt</h2>
+          <p>Khuyến nghị có thể điều chỉnh theo số người, ngân sách và nhịp nghỉ mong muốn.</p>
         </article>
         <article>
           <span>03</span>
-          <h2>Khong thanh toan online</h2>
-          <p>Website chi thu thap thong tin lien he de tu van va xac nhan nhu cau.</p>
+          <h2>Không cần thanh toán online</h2>
+          <p>Website chỉ thu thập thông tin liên hệ để tư vấn và xác nhận nhu cầu.</p>
         </article>
       </section>
 
       <section className="contact-form-section">
         <div className="contact-form-wrapper">
           <div className="contact-form-header">
-            <h2>Gui yeu cau tu van hanh trinh</h2>
+            <h2>Gửi yêu cầu tư vấn hành trình</h2>
             <p>
-              Hay dien thong tin cua ban duoi day. Cac chuyen gia hanh trinh cua
-              chung toi se lien he tu van va thiet ke lich trinh mien phi trong
-              vong 24 gio.
+              Hãy điền thông tin dưới đây. 
+              Các chuyên gia hành trình của VietVista sẽ 
+              liên hệ lại để gợi ý lịch trình phù hợp với nhu cầu thực tế của bạn.
             </p>
           </div>
 
