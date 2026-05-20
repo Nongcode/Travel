@@ -1,4 +1,3 @@
-import { LeadForm } from "../components/LeadForm";
 import { PackageExplorer } from "../components/PackageExplorer";
 import { SiteHeader } from "../components/SiteHeader";
 import { allPackages, destinations, packageCollections } from "../data/travel";

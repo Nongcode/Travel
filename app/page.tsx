@@ -2,6 +2,7 @@ import Link from "next/link";
 import { DestinationTabs } from "./components/DestinationTabs";
 import { PackageCarousel } from "./components/PackageCarousel";
 import { PostCard } from "./components/PostCard";
+import { CustomSelect } from "./components/CustomSelect";
 import { SiteHeader } from "./components/SiteHeader";
 import {
   allPackages,
@@ -37,16 +38,21 @@ export default function Home() {
               Điểm đến
               <input suppressHydrationWarning name="destination" placeholder="Bạn muốn đi đâu?" />
             </label>
-            <label>
-              Phong cách
-              <select suppressHydrationWarning name="style" defaultValue="">
-                <option value="">Chọn trải nghiệm</option>
-                <option value="family">Gia đình</option>
-                <option value="friends">Nhóm bạn</option>
-                <option value="resort">Nghỉ dưỡng</option>
-                <option value="photo">Chụp ảnh</option>
-              </select>
-            </label>
+            <div className="hero-search-field">
+              <span className="hero-search-label">Phong cách</span>
+              <CustomSelect
+                name="style"
+                defaultValue=""
+                placeholder="Chọn trải nghiệm"
+                options={[
+                  { value: "", label: "Chọn trải nghiệm" },
+                  { value: "family", label: "Gia đình" },
+                  { value: "friends", label: "Nhóm bạn" },
+                  { value: "resort", label: "Nghỉ dưỡng" },
+                  { value: "photo", label: "Chụp ảnh" },
+                ]}
+              />
+            </div>
             <label>
               Thời gian
               <input suppressHydrationWarning name="date" type="month" />
