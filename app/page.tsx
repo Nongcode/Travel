@@ -19,8 +19,8 @@ export default function Home() {
         <SiteHeader variant="hero" />
 
         <div className="hero-content" id="top">
-          <p className="eyebrow">Blog du lịch & hành trình chọn lọc test CI/CD 1234567890</p>
-          <h2>Những chuyến đi theo bạn cùng năm tháng như một kí ức đẹp không thể quên.</h2>
+          <p className="eyebrow">Blog du lịch & hành trình chọn lọc</p>
+          <h2>Những chuyến đi cùng bạn như một kí ức đẹp không thể quên.</h2>
           <p className="hero-copy">
             Blog du lịch hiện đại dành cho người muốn tìm cảm hứng, 
             đọc kinh nghiệm thực tế và để lại thông tin khi cần gợi ý lịch trình phù hợp.
