@@ -74,6 +74,7 @@ export function CustomSelect({
       <input type="hidden" name={name} value={selectedValue} />
 
       <button
+        suppressHydrationWarning
         type="button"
         className={`custom-select-trigger ${isOpen ? "open" : ""}`}
         onClick={handleToggle}
