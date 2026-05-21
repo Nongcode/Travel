@@ -286,7 +286,7 @@ export const packageCollections = [
   },
   {
     eyebrow: "Điểm đến đẹp nhất Việt Nam",
-    title: "Những hành trình biểu tượng cho lần đầu khám phá Việt Nam",
+    title: "Những hành trình khám phá Việt Nam",
     description:
       "Tuyển chọn các điểm đến có cảnh quan nổi bật, phù hợp khách lần đầu đi hoặc khách cần lịch trình dễ tư vấn.",
     accent: "vietnam",
