@@ -19,7 +19,7 @@ export default function Home() {
         <SiteHeader variant="hero" />
 
         <div className="hero-content" id="top">
-          <p className="eyebrow">Blog du lịch & hành trình chọn lọc</p>
+          <p className="eyebrow">Blog du lịch & hành trình chọn lọc test CI/CD hệ thống</p>
           <h2>Những chuyến đi theo bạn như một kí ức đẹp không thể quên.</h2>
           <p className="hero-copy">
             Blog du lịch hiện đại dành cho người muốn tìm cảm hứng, 
