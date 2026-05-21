@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const footerLinks = [
   { href: "/", label: "Trang chủ" },
@@ -11,6 +14,12 @@ const footerLinks = [
 ];
 
 export function SiteFooter() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   return (
     <footer className="site-footer">
       <div className="footer-main">
