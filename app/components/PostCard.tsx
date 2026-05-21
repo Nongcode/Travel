@@ -2,6 +2,7 @@ import Link from "next/link";
 
 type PostCardProps = {
   post: {
+    id: number;
     category: string;
     title: string;
     excerpt: string;
@@ -25,7 +26,7 @@ export function PostCard({ post }: PostCardProps) {
         </div>
         <h3>{post.title}</h3>
         <p>{post.excerpt}</p>
-        <Link href="/tin-tuc" aria-label={`Đọc tiếp ${post.title}`}>
+        <Link href={`/tin-tuc/${post.id}`} aria-label={`Đọc tiếp ${post.title}`}>
           Đọc tiếp
         </Link>
       </div>
