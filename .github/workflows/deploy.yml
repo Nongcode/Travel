@@ -16,4 +16,4 @@ jobs:
           git pull origin main
           npm install
           npm run build
-          # Thêm lệnh khởi động lại server nếu cần (vd: pm2 restart travel)
+          pm2 restart travel
