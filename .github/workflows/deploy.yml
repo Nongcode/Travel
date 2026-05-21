@@ -1,30 +1,19 @@
-name: Deploy Frontend to Server
+name: Deploy Frontend to Server (Self-hosted)
 
 on:
   push:
-    branches: [ "main" ] # Kích hoạt tự động khi bạn push lên nhánh Long
+    branches: [ "main" ] # Hoặc "Long" tùy vào nhánh bạn đang dùng
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted # Đây là lệnh gọi con bot trên máy chủ của bạn
+
     steps:
-      - name: Deploy to Server via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            # 1. Chuyển sang ổ D và di chuyển vào thư mục code trên Windows Server
-            d:
-            cd D:\Travel
-            
-            # 2. Kéo code mới nhất từ GitHub về server
-            git pull origin main
-            
-            # 3. Cài đặt lại thư viện nếu có thay đổi và tiến hành build code mới
-            npm install
-            npm run build
-            
-            # 4. Lệnh khởi động lại ứng dụng (Nếu bạn đang dùng PM2 để chạy Next.js)
-            # pm2 restart travel
+      - name: Cap nhat code va Build
+        run: |
+          d:
+          cd D:\Travel
+          git pull origin main
+          npm install
+          npm run build
+          # Thêm lệnh khởi động lại server nếu cần (vd: pm2 restart travel)
