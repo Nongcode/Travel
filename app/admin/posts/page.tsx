@@ -5,13 +5,20 @@ import { useAdmin } from "../../components/admin/AdminContext";
 import { useRouter } from "next/navigation";
 
 export default function PostsAdminPage() {
-  const { posts, isAuthenticated, addPost, updatePost, removePost } = useAdmin();
+  const { posts, isAuthenticated, addPost, updatePost, removePost, postCategories } = useAdmin();
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Tất cả");
   const [postTitle, setPostTitle] = useState("");
-  const [postCategory, setPostCategory] = useState("Vịnh Hạ Long");
+  const [postCategory, setPostCategory] = useState("");
+
+  // Set default category when categories load
+  useEffect(() => {
+    if (postCategories.length > 0 && !postCategory) {
+      setPostCategory(postCategories[0].name);
+    }
+  }, [postCategories, postCategory]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -20,9 +27,6 @@ export default function PostsAdminPage() {
   }, [isAuthenticated, router]);
 
   if (!isAuthenticated) return null;
-
-  // Categories list
-  const categories = ["Tất cả", "Vịnh Hạ Long", "Đà Nẵng - Hội An", "Phú Quốc", "Hà Giang", "Sapa", "Nha Trang"];
 
   // Filter logic
   const filteredPosts = posts.filter((post) => {
@@ -37,7 +41,7 @@ export default function PostsAdminPage() {
     if (!postTitle.trim()) return;
     addPost({
       title: postTitle,
-      category: postCategory,
+      category: postCategory || (postCategories[0]?.name ?? "Chưa phân loại"),
       status: "Bản nháp",
     });
     setPostTitle("");
@@ -54,7 +58,7 @@ export default function PostsAdminPage() {
       {/* Header */}
       <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Quản lý bài viết</h1>
+          <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Quản lý bài viết</h2>
           <p className="text-xs text-slate-500 mt-1">Đăng tải, chỉnh sửa bài viết cẩm nang du lịch và tin tức lữ hành.</p>
         </div>
       </section>
@@ -84,8 +88,8 @@ export default function PostsAdminPage() {
                   onChange={(e) => setPostCategory(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold text-slate-700"
                 >
-                  {categories.filter(c => c !== "Tất cả").map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
+                  {postCategories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
                   ))}
                 </select>
               </div>
@@ -107,7 +111,7 @@ export default function PostsAdminPage() {
             
             {/* Category Filter */}
             <div className="flex gap-1.5 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
-               {categories.map((cat) => (
+               {["Tất cả", ...postCategories.map(c => c.name)].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}

@@ -42,7 +42,7 @@ export default function ControlAdminPage() {
       
       {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Hệ thống Control Panel</h1>
+        <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Hệ thống Control Panel</h2>
         <p className="text-sm text-slate-500 mt-1">Cấu hình cấp cao cho nhà phát triển và quản trị viên hệ thống VietVista.</p>
       </div>
 

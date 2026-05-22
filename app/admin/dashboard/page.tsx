@@ -107,7 +107,7 @@ export default function DashboardPage() {
           <span className="text-xs tracking-widest uppercase font-extrabold text-emerald-400 bg-emerald-900/50 px-2.5 py-1 rounded-full w-fit mb-3 block">
             Hệ thống VietVista
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mb-2">Thống kê tổng quan</h1>
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white mb-2">Thống kê tổng quan</h2>
           <p className="text-sm text-emerald-100/70 max-w-xl font-medium leading-relaxed">
             Chào mừng bạn quay lại hệ thống quản trị! Dưới đây là dữ liệu thống kê trực quan và các tác vụ nhanh để bạn bắt đầu quản lý.
           </p>
