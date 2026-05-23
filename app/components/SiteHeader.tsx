@@ -8,6 +8,7 @@ const navItems = [
   { href: "/", label: "Trang chủ" },
   { href: "/tin-tuc", label: "Tin tức" },
   { href: "/goi-du-lich", label: "Gói du lịch" },
+  { href: "/huong-dan-visa", label: "Visa" },
   { href: "/uu-dai", label: "Ưu đãi" },
   { href: "/lien-he", label: "Liên hệ" },
 ];
