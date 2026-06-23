@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  fullName     String   @map("full_name")
+  role         String   @default("editor")
+  status       String   @default("active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admins")
+}
+
+model SiteSetting {
+  settingKey   String   @id @map("setting_key")
+  settingValue String?  @map("setting_value")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+
+model Banner {
+  id         Int      @id @default(autoincrement())
+  title      String?
+  subtitle   String?
+  imageUrl   String   @map("image_url")
+  linkUrl    String?  @map("link_url")
+  bannerType String   @default("homepage") @map("banner_type")
+  status     String   @default("Đang mở")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("banners")
+}
+
+model NavigationMenu {
+  id        Int      @id @default(autoincrement())
+  label     String
+  url       String
+  menuOrder Int      @default(0) @map("menu_order")
+  location  String   @default("header")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("navigation_menus")
+}
+
+model Destination {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  slug      String?   @unique
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  packages  Package[]
+
+  @@map("destinations")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  slug      String?  @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  posts     Post[]
+
+  @@map("categories")
+}
+
+model Author {
+  id        Int      @id @default(autoincrement())
+  name      String
+  avatarUrl String?  @map("avatar_url")
+  role      String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  posts     Post[]
+
+  @@map("authors")
+}
+
+model Package {
+  id            Int                        @id @default(autoincrement())
+  slug          String                     @unique
+  name          String
+  destinationId Int?                       @map("destination_id")
+  destination   Destination?               @relation(fields: [destinationId], references: [id])
+  duration      String?
+  priceText     String?                    @map("price_text")
+  summary       String?
+  imageUrl      String?                    @map("image_url")
+  status        String                     @default("Đang mở")
+  createdAt     DateTime                   @default(now()) @map("created_at")
+  updatedAt     DateTime                   @updatedAt @map("updated_at")
+  collections   PackageCollectionItem[]
+  posts         Post[]
+
+  @@map("packages")
+}
+
+model PackageCollection {
+  id          Int                     @id @default(autoincrement())
+  eyebrow     String?
+  title       String
+  description String?
+  accent      String?
+  createdAt   DateTime                @default(now()) @map("created_at")
+  updatedAt   DateTime                @updatedAt @map("updated_at")
+  items       PackageCollectionItem[]
+
+  @@map("package_collections")
+}
+
+model PackageCollectionItem {
+  collectionId Int               @map("collection_id")
+  packageId    Int               @map("package_id")
+  sortOrder    Int               @default(0) @map("sort_order")
+  collection   PackageCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  package      Package           @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, packageId])
+  @@map("package_collection_items")
+}
+
+model Post {
+  id               Int       @id @default(autoincrement())
+  title            String
+  slug             String?   @unique
+  categoryId       Int?      @map("category_id")
+  authorId         Int?      @map("author_id")
+  relatedPackageId Int?      @map("related_package_id")
+  category         Category? @relation(fields: [categoryId], references: [id])
+  author           Author?   @relation(fields: [authorId], references: [id])
+  relatedPackage   Package?  @relation(fields: [relatedPackageId], references: [id])
+
+  excerpt        String?
+  summary        String?
+  imageUrl       String?   @map("image_url")
+  readTime       String?   @map("read_time")
+  seoDescription String?   @map("seo_description")
+
+  contentBlocks Json? @map("content_blocks")
+
+  status      String    @default("Bản nháp")
+  publishedAt DateTime? @map("published_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("posts")
+}
+
+model Offer {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  tag         String?
+  imageUrl    String?   @map("image_url")
+  validUntil  DateTime? @map("valid_until")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("offers")
+}
+
+model Booking {
+  id                Int      @id @default(autoincrement())
+  customerName      String   @map("customer_name")
+  email             String?
+  phone             String
+  tourName          String?  @map("tour_name")
+  travelDate        String?  @map("travel_date")
+  numberOfTravelers Int      @default(1) @map("number_of_travelers")
+  totalPrice        String?  @map("total_price")
+  notes             String?
+  status            String   @default("Chờ xử lý")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("bookings")
+}

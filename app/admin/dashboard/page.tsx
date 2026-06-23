@@ -23,6 +23,13 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<"posts" | "packages">("posts");
   const [showModal, setShowModal] = useState<null | "post" | "package">(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Settings mock states cho thương hiệu
+  const [siteName, setSiteName] = useState("VietVista - Du lịch Việt Nam");
+  const [contactEmail, setContactEmail] = useState("support@vietvista.vn");
+  const [contactPhone, setContactPhone] = useState("1900 1234");
+  const [address, setAddress] = useState("123 Đường Lê Lợi, Hải Châu, Đà Nẵng");
+  const [successMsg, setSuccessMsg] = useState("");
   
   // Form States
   const [postTitle, setPostTitle] = useState("");
@@ -95,6 +102,12 @@ export default function DashboardPage() {
     setPackageDest("");
     setPackagePrice("");
     setShowModal(null);
+  };
+
+  const handleSaveGeneral = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuccessMsg("Cập nhật thông tin website thành công!");
+    setTimeout(() => setSuccessMsg(""), 3000);
   };
 
   return (
@@ -383,6 +396,74 @@ export default function DashboardPage() {
             </table>
           )}
         </div>
+      </section>
+
+      {/* Thông tin thương hiệu VietVista */}
+      <section className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 space-y-6">
+        <div>
+          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest">Thông tin thương hiệu VietVista</h3>
+          <p className="text-xs text-slate-400 mt-1">Thông tin hiển thị trên header, footer và các trang tin của khách hàng.</p>
+        </div>
+
+        {successMsg && (
+          <div className="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-xl animate-in slide-in-from-top-2 duration-200">
+            <p className="text-sm font-bold text-emerald-800">{successMsg}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSaveGeneral} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500 block">Tên Website (Site Title)</label>
+            <input
+              type="text"
+              required
+              value={siteName}
+              onChange={(e) => setSiteName(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold text-slate-700"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500 block">Hotline liên hệ</label>
+              <input
+                type="text"
+                required
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold text-slate-700"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500 block">Email hỗ trợ</label>
+              <input
+                type="email"
+                required
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold text-slate-700"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500 block">Địa chỉ văn phòng chính</label>
+            <input
+              type="text"
+              required
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold text-slate-700"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md shadow-emerald-600/10 hover:shadow-lg transition-all cursor-pointer"
+          >
+            Lưu cấu hình chung
+          </button>
+        </form>
       </section>
 
       {/* Modern Pop-up Modal dialogs */}

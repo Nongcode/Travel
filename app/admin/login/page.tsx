@@ -16,11 +16,11 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, router]);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
     setLoading(true);
-    
+
     const form = new FormData(e.currentTarget);
     const username = String(form.get("username") ?? "").trim();
     const password = String(form.get("password") ?? "").trim();
@@ -31,28 +31,32 @@ export default function LoginPage() {
       return;
     }
 
-    // Simulate network delay for nice micro-interaction loading state
-    setTimeout(() => {
-      const ok = login(username, password);
+    try {
+      // Gọi hàm login bất đồng bộ và đợi kết quả từ API
+      const ok = await login(username, password);
       setLoading(false);
       if (ok) {
         router.push("/admin/dashboard");
       } else {
         setError("Tên đăng nhập hoặc mật khẩu không chính xác.");
       }
-    }, 800);
+    } catch (err: any) {
+      setLoading(false);
+      // Hiển thị trực tiếp thông báo lỗi cụ thể từ Server trả về
+      setError(err.message || "Đã xảy ra lỗi kết nối đến máy chủ.");
+    }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f7f3ea] via-[#ebdcc5] to-[#dfceb0] p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-5xl bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[600px] border border-white/40 animate-in fade-in zoom-in-95 duration-500">
-        
+
         {/* Left Side: Visual Showcase */}
         <div className="md:col-span-5 relative overflow-hidden bg-emerald-950 flex flex-col justify-between p-8 text-white">
           {/* Background image & gradient overlay */}
           <div className="absolute inset-0 z-0">
-            <img 
-              src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80" 
+            <img
+              src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80"
               alt="Du lịch Việt Nam"
               className="w-full h-full object-cover opacity-50 scale-105 hover:scale-100 transition-all duration-[8000ms] ease-out"
             />
@@ -61,21 +65,18 @@ export default function LoginPage() {
 
           <div className="relative z-10">
             <div className="flex items-center gap-2">
-              <img 
-                src="/vietvista-logo.png" 
-                alt="VietVista" 
-                className="w-24 object-contain brightness-0 invert" 
+              <img
+                src="/vietvista-logo.png"
+                alt="VietVista"
+                className="w-24 object-contain brightness-0 invert"
               />
               <span className="text-[10px] bg-emerald-700/80 text-emerald-100 px-1.5 py-0.5 rounded font-mono font-bold tracking-wider ml-2">PORTAL</span>
             </div>
           </div>
 
           <div className="relative z-10 mt-auto">
-            <span className="text-xs uppercase font-bold tracking-widest text-emerald-400 bg-emerald-900/80 px-2.5 py-1 rounded-full w-fit mb-4 block">
-              Hệ thống quản trị
-            </span>
             <h2 className="text-2xl sm:text-3xl font-black leading-tight text-white mb-3">
-              Quản lý hành trình <br/>trải nghiệm khách hàng
+              Quản lý hành trình <br />trải nghiệm khách hàng
             </h2>
             <p className="text-sm text-emerald-100/70 leading-relaxed font-medium">
               Chào mừng bạn trở lại! Cổng quản trị nội dung bài viết, tin tức du lịch và gói sản phẩm lữ hành của VietVista.
@@ -87,10 +88,10 @@ export default function LoginPage() {
         <div className="md:col-span-7 flex flex-col justify-center p-8 sm:p-12 lg:p-16">
           <div className="max-w-md w-full mx-auto">
             <div className="mb-8 flex justify-center md:justify-start">
-              <img 
-                src="/vietvista-logo.png" 
-                alt="VietVista" 
-                className="w-32 object-contain" 
+              <img
+                src="/vietvista-logo.png"
+                alt="VietVista"
+                className="w-32 object-contain"
               />
             </div>
             <h2 className="text-5xl font-black text-slate-800 tracking-tight" style={{ marginBottom: '1rem' }}>Khu vực quản lý</h2>
@@ -102,7 +103,7 @@ export default function LoginPage() {
                   <div className="flex">
                     <div className="flex-shrink-0">
                       <svg className="h-5 w-5 text-rose-500" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                       </svg>
                     </div>
                     <div className="ml-3">
@@ -153,27 +154,12 @@ export default function LoginPage() {
               >
                 {loading ? (
                   <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                 ) : null}
                 {loading ? "Đang xác thực..." : "Đăng nhập hệ thống"}
               </button>
-
-              {/* Demo Credentials Tip Card */}
-              <div className="bg-[#fcf9f2] rounded-xl border border-dashed border-[#17211d]/10 p-4 mt-6">
-                <div className="flex gap-2.5">
-                  <div className="p-1 bg-emerald-50 text-emerald-700 rounded-lg shrink-0 h-fit">
-                    <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
-                  </div>
-                  <div>
-                    <h5 className="text-xs font-bold text-slate-700 uppercase tracking-wide">Tài khoản thử nghiệm (Demo)</h5>
-                    <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
-                      Sử dụng tên tài khoản <strong className="text-emerald-800 select-all">admin</strong> và mật khẩu <strong className="text-emerald-800 select-all">password</strong> để truy cập bảng điều khiển.
-                    </p>
-                  </div>
-                </div>
-              </div>
             </form>
           </div>
         </div>

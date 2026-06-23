@@ -16,6 +16,16 @@ export default function Home() {
   return (
     <main>
       <section className="hero-section">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="hero-video"
+        >
+          <source src="/Drone_flight_Vietnam_landscapes_202606220932.mp4" type="video/mp4" />
+        </video>
+        <div className="hero-overlay" />
         <SiteHeader variant="hero" />
 
         <div className="hero-content" id="top">
@@ -57,7 +67,7 @@ export default function Home() {
               Thời gian
               <input suppressHydrationWarning name="date" type="month" />
             </label>
-            <button type="submit">Tìm chuyến đi</button>
+            <button suppressHydrationWarning type="submit">Tìm chuyến đi</button>
           </form>
         </div>
       </section>

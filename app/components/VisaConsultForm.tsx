@@ -117,7 +117,7 @@ export function VisaConsultForm() {
           placeholder="Số người đi, lịch sử visa, nghề nghiệp, nơi đang sinh sống..."
         />
       </label>
-      <button type="submit">Gửi yêu cầu tư vấn visa</button>
+      <button suppressHydrationWarning type="submit">Gửi yêu cầu tư vấn visa</button>
       {sent ? (
         <p className="form-status visa-form-status" role="status">
           Đã ghi nhận thông tin. Quản trị viên có thể xem yêu cầu này trong mục Liên hệ & Tư vấn.
