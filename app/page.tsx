@@ -8,11 +8,30 @@ import {
   allPackages,
   destinations,
   packageCollections,
-  posts,
   tripStyles,
 } from "./data/travel";
+import prisma from "@/lib/prisma";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const dbPosts = await prisma.post.findMany({
+    where: { status: "Đã xuất bản" },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+    include: { category: true }
+  });
+
+  const posts = dbPosts.map(p => ({
+    id: p.id,
+    category: p.category?.name || "Chưa phân loại",
+    title: p.title,
+    excerpt: p.excerpt || "",
+    image: p.imageUrl || "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1000&q=80",
+    readTime: p.readTime || "5 phút đọc",
+    date: p.publishedAt ? new Date(p.publishedAt).toLocaleDateString("vi-VN") : new Date(p.createdAt).toLocaleDateString("vi-VN")
+  }));
+
   return (
     <main>
       <section className="hero-section">
@@ -139,7 +158,7 @@ export default function Home() {
         </div>
 
         <div className="post-grid news-grid">
-          {posts.slice(0, 3).map((post) => (
+          {posts.map((post) => (
             <PostCard post={post} key={post.id} />
           ))}
         </div>

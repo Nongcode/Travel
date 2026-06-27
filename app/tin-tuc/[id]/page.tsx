@@ -4,8 +4,11 @@ import { SiteHeader } from "../../components/SiteHeader";
 import { ReadingProgressBar } from "../../components/PostProgress";
 import { PostSidebar } from "../../components/PostSidebar";
 import { PostCard } from "../../components/PostCard";
-import { posts, allPackages } from "../../data/travel";
-import { detailedPosts, ContentBlock } from "../../data/postsContent";
+import { allPackages } from "../../data/travel";
+import { ContentBlock } from "../../data/postsContent";
+import prisma from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 type PostDetailPageProps = {
   params: Promise<{
@@ -14,18 +17,24 @@ type PostDetailPageProps = {
 };
 
 // Generate static params for all posts to build static pages
-export function generateStaticParams() {
-  return Object.keys(detailedPosts).map((id) => ({
-    id: id,
+export async function generateStaticParams() {
+  const dbPosts = await prisma.post.findMany({
+    where: { status: "Đã xuất bản" },
+    select: { id: true },
+  });
+  return dbPosts.map((post) => ({
+    id: String(post.id),
   }));
 }
 
 // Generate dynamic metadata for SEO
 export async function generateMetadata({ params }: PostDetailPageProps) {
   const { id } = await params;
-  const post = detailedPosts[Number(id)];
+  const post = await prisma.post.findUnique({
+    where: { id: Number(id) },
+  });
 
-  if (!post) {
+  if (!post || post.status !== "Đã xuất bản") {
     return {
       title: "Không tìm thấy bài viết | VietVista",
     };
@@ -33,7 +42,7 @@ export async function generateMetadata({ params }: PostDetailPageProps) {
 
   return {
     title: `${post.title} | Cẩm nang VietVista`,
-    description: post.seoDescription || post.summary,
+    description: post.seoDescription || post.summary || undefined,
   };
 }
 
@@ -51,11 +60,37 @@ const slugify = (text: string) => {
 
 export default async function PostDetailPage({ params }: PostDetailPageProps) {
   const { id } = await params;
-  const post = detailedPosts[Number(id)];
+  const dbPost = await prisma.post.findUnique({
+    where: { id: Number(id) },
+    include: {
+      category: true,
+      author: true,
+      relatedPackage: true,
+    },
+  });
 
-  if (!post) {
+  if (!dbPost || dbPost.status !== "Đã xuất bản") {
     notFound();
   }
+
+  const post = {
+    id: dbPost.id,
+    category: dbPost.category?.name || "Chưa phân loại",
+    title: dbPost.title,
+    date: dbPost.publishedAt
+      ? new Date(dbPost.publishedAt).toLocaleDateString("vi-VN")
+      : new Date(dbPost.createdAt).toLocaleDateString("vi-VN"),
+    readTime: dbPost.readTime || "5 phút đọc",
+    author: {
+      name: dbPost.author?.name || "VietVista Editor",
+      avatar: dbPost.author?.avatarUrl || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80",
+      role: dbPost.author?.role || "Travel Writer",
+    },
+    image: dbPost.imageUrl || "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=85",
+    summary: dbPost.summary || "",
+    relatedPackageSlug: dbPost.relatedPackage?.slug || null,
+    blocks: (dbPost.contentBlocks as unknown as ContentBlock[]) || [],
+  };
 
   // Collect heading-2 blocks for the Table of Contents
   const headings = post.blocks
@@ -70,8 +105,28 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
     ? allPackages.find((pkg) => pkg.slug === post.relatedPackageSlug)
     : null;
 
-  // Filter 2 related posts
-  const relatedPosts = posts.filter((p) => p.id !== post.id).slice(0, 2);
+  // Filter 2 related posts from database
+  const dbRelatedPosts = await prisma.post.findMany({
+    where: {
+      status: "Đã xuất bản",
+      id: { not: post.id },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 2,
+    include: { category: true },
+  });
+
+  const relatedPosts = dbRelatedPosts.map((p) => ({
+    id: p.id,
+    category: p.category?.name || "Chưa phân loại",
+    title: p.title,
+    excerpt: p.excerpt || "",
+    image: p.imageUrl || "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1000&q=80",
+    readTime: p.readTime || "5 phút đọc",
+    date: p.publishedAt
+      ? new Date(p.publishedAt).toLocaleDateString("vi-VN")
+      : new Date(p.createdAt).toLocaleDateString("vi-VN"),
+  }));
 
   return (
     <main className="post-detail-page">

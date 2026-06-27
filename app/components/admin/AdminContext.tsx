@@ -9,6 +9,12 @@ export type AdminPost = {
   category: string;
   date: string;
   status: string;
+  imageUrl?: string;
+  contentImageUrl?: string;
+  excerpt?: string;
+  readTime?: string;
+  seoDescription?: string;
+  summary?: string;
 };
 
 export type AdminPackage = {
@@ -185,7 +191,18 @@ type AdminContextValue = {
   mediaFiles: MediaFile[];
   seoConfigs: SeoConfig[];
 
-  addPost: (p: { title: string; category: string; status?: string; date?: string }) => void;
+  addPost: (p: {
+    title: string;
+    category: string;
+    status?: string;
+    date?: string;
+    imageUrl?: string;
+    contentImageUrl?: string;
+    excerpt?: string;
+    readTime?: string;
+    seoDescription?: string;
+    summary?: string;
+  }) => void;
   updatePost: (id: number, updated: Partial<AdminPost>) => void;
   removePost: (id: number) => void;
 
@@ -193,7 +210,8 @@ type AdminContextValue = {
   updatePackage: (id: number, updated: Partial<AdminPackage>) => void;
   removePackage: (id: number) => void;
 
-  addPostCategory: (name: string) => void;
+  addPostCategory: (name: string, slug?: string) => void;
+  updatePostCategory: (id: number, name: string, slug: string) => void;
   removePostCategory: (id: number) => void;
 
   addPackageCategory: (cat: Omit<PackageCategory, "id">) => void;
@@ -523,6 +541,26 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     checkSession();
   }, []);
 
+  // Tải danh sách bài viết từ database khi đã đăng nhập
+  useEffect(() => {
+    async function loadDbPosts() {
+      if (isAuthenticated) {
+        try {
+          const res = await fetch("/api/admin/posts");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && Array.isArray(data.posts)) {
+              setPosts(data.posts);
+            }
+          }
+        } catch (err) {
+          console.error("Lỗi khi tải danh sách bài viết từ database:", err);
+        }
+      }
+    }
+    loadDbPosts();
+  }, [isAuthenticated]);
+
   // Effects to save states to localstorage
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(postStorageKey, JSON.stringify(posts)); }, [posts]);
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(packageStorageKey, JSON.stringify(packages)); }, [packages]);
@@ -542,26 +580,87 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(mediaStorageKey, JSON.stringify(mediaFiles)); }, [mediaFiles]);
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(seoStorageKey, JSON.stringify(seoConfigs)); }, [seoConfigs]);
 
-  // CRUD Implementations
-  function addPost(p: { title: string; category: string; status?: string; date?: string }) {
-    setPosts((current) => [
-      {
-        id: Date.now(),
-        title: p.title,
-        category: p.category,
-        date: p.date ?? new Date().toLocaleDateString("vi-VN"),
-        status: p.status ?? "Bản nháp",
-      },
-      ...current,
-    ]);
+  async function addPost(p: {
+    title: string;
+    category: string;
+    status?: string;
+    date?: string;
+    imageUrl?: string;
+    contentImageUrl?: string;
+    excerpt?: string;
+    readTime?: string;
+    seoDescription?: string;
+    summary?: string;
+  }) {
+    try {
+      const res = await fetch("/api/admin/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(p),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.post) {
+          setPosts((current) => [data.post, ...current]);
+        } else {
+          alert(data.error || "Lỗi khi tạo bài viết.");
+        }
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.error || "Lỗi kết nối máy chủ khi tạo bài viết.");
+      }
+    } catch (err) {
+      console.error("Lỗi khi thêm bài viết:", err);
+      alert("Lỗi hệ thống khi thêm bài viết.");
+    }
   }
 
-  function updatePost(id: number, updated: Partial<AdminPost>) {
-    setPosts((current) => current.map((post) => (post.id === id ? { ...post, ...updated } : post)));
+  async function updatePost(id: number, updated: Partial<AdminPost>) {
+    try {
+      const res = await fetch("/api/admin/posts", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, ...updated }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.post) {
+          setPosts((current) =>
+            current.map((post) => (post.id === id ? { ...post, ...data.post } : post))
+          );
+        } else {
+          alert(data.error || "Lỗi khi cập nhật bài viết.");
+        }
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.error || "Lỗi kết nối máy chủ khi cập nhật bài viết.");
+      }
+    } catch (err) {
+      console.error("Lỗi khi cập nhật bài viết:", err);
+      alert("Lỗi hệ thống khi cập nhật bài viết.");
+    }
   }
 
-  function removePost(id: number) {
-    setPosts((current) => current.filter((p) => p.id !== id));
+  async function removePost(id: number) {
+    try {
+      const res = await fetch(`/api/admin/posts?id=${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setPosts((current) => current.filter((p) => p.id !== id));
+        } else {
+          alert(data.error || "Lỗi khi xóa bài viết.");
+        }
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.error || "Lỗi kết nối máy chủ khi xóa bài viết.");
+      }
+    } catch (err) {
+      console.error("Lỗi khi xóa bài viết:", err);
+      alert("Lỗi hệ thống khi xóa bài viết.");
+    }
   }
 
   function addPackage(p: { name: string; destination: string; duration?: string; price?: string; status?: string }) {
@@ -587,9 +686,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Post Categories CRUD
-  function addPostCategory(name: string) {
-    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-    setPostCategories((current) => [...current, { id: Date.now(), name, slug }]);
+  function addPostCategory(name: string, slug?: string) {
+    const finalSlug = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    setPostCategories((current) => [...current, { id: Date.now(), name, slug: finalSlug }]);
+  }
+
+  function updatePostCategory(id: number, name: string, slug: string) {
+    setPostCategories((current) =>
+      current.map((cat) => (cat.id === id ? { ...cat, name, slug } : cat))
+    );
   }
 
   function removePostCategory(id: number) {
@@ -915,6 +1020,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     removePackage,
 
     addPostCategory,
+    updatePostCategory,
     removePostCategory,
 
     addPackageCategory,

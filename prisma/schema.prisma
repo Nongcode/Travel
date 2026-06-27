@@ -145,6 +145,7 @@ model Post {
   excerpt        String?
   summary        String?
   imageUrl       String?   @map("image_url")
+  contentImageUrl String?   @map("content_image_url")
   readTime       String?   @map("read_time")
   seoDescription String?   @map("seo_description")
 
