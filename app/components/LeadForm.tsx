@@ -51,7 +51,7 @@ export function LeadForm({ destinations }: LeadFormProps) {
           placeholder="Thời gian dự kiến, số người, phong cách mong muốn..."
         />
       </label>
-      <button type="submit">Gửi yêu cầu tư vấn</button>
+      <button suppressHydrationWarning type="submit">Gửi yêu cầu tư vấn</button>
       {sent ? (
         <p className="form-status" role="status">
           Đã ghi nhận thông tin. Đội ngũ tư vấn sẽ liên hệ lại theo kênh bạn đã cung cấp.

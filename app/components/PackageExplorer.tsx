@@ -160,13 +160,14 @@ export function PackageExplorer({ packages, collections, destinations }: Package
               ))}
             </select>
           </label>
-          <button type="button" onClick={resetFilters}>
+          <button suppressHydrationWarning type="button" onClick={resetFilters}>
             Xóa lọc
           </button>
         </form>
 
         <div className="package-tab-list" aria-label="Lọc theo nhóm gói du lịch">
           <button
+            suppressHydrationWarning
             className={activeTab === "all" ? "active" : ""}
             type="button"
             onClick={() => setActiveTab("all")}
@@ -175,6 +176,7 @@ export function PackageExplorer({ packages, collections, destinations }: Package
           </button>
           {collections.map((collection) => (
             <button
+              suppressHydrationWarning
               className={activeTab === collection.accent ? "active" : ""}
               type="button"
               key={collection.accent}
@@ -201,7 +203,7 @@ export function PackageExplorer({ packages, collections, destinations }: Package
         <div className="empty-package-state">
           <h3>Chưa có gói trùng bộ lọc</h3>
           <p>Thử đổi điểm đến, thời lượng hoặc ngân sách để xem thêm gợi ý phù hợp.</p>
-          <button type="button" onClick={resetFilters}>
+          <button suppressHydrationWarning type="button" onClick={resetFilters}>
             Xem lại tất cả gói
           </button>
         </div>

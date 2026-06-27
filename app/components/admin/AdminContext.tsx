@@ -9,6 +9,12 @@ export type AdminPost = {
   category: string;
   date: string;
   status: string;
+  imageUrl?: string;
+  contentImageUrl?: string;
+  excerpt?: string;
+  readTime?: string;
+  seoDescription?: string;
+  summary?: string;
 };
 
 export type AdminPackage = {
@@ -184,16 +190,28 @@ type AdminContextValue = {
   customers: AdminCustomer[];
   mediaFiles: MediaFile[];
   seoConfigs: SeoConfig[];
-  
-  addPost: (p: { title: string; category: string; status?: string; date?: string }) => void;
+
+  addPost: (p: {
+    title: string;
+    category: string;
+    status?: string;
+    date?: string;
+    imageUrl?: string;
+    contentImageUrl?: string;
+    excerpt?: string;
+    readTime?: string;
+    seoDescription?: string;
+    summary?: string;
+  }) => void;
   updatePost: (id: number, updated: Partial<AdminPost>) => void;
   removePost: (id: number) => void;
-  
+
   addPackage: (p: { name: string; destination: string; duration?: string; price?: string; status?: string }) => void;
   updatePackage: (id: number, updated: Partial<AdminPackage>) => void;
   removePackage: (id: number) => void;
 
-  addPostCategory: (name: string) => void;
+  addPostCategory: (name: string, slug?: string) => void;
+  updatePostCategory: (id: number, name: string, slug: string) => void;
   removePostCategory: (id: number) => void;
 
   addPackageCategory: (cat: Omit<PackageCategory, "id">) => void;
@@ -215,7 +233,7 @@ type AdminContextValue = {
   addHeaderMenuItem: (item: Omit<HeaderMenuItem, "id">) => void;
   updateHeaderMenuItem: (id: number, updated: Partial<HeaderMenuItem>) => void;
   removeHeaderMenuItem: (id: number) => void;
-  
+
   updateFooterInfo: (info: Partial<FooterInfo>) => void;
 
   addBooking: (b: Omit<AdminBooking, "id" | "bookingDate" | "status">) => void;
@@ -248,8 +266,9 @@ type AdminContextValue = {
   updateSeoConfig: (id: number, updated: Partial<SeoConfig>) => void;
 
   isAuthenticated: boolean;
-  login: (username: string, password: string) => boolean;
-  logout: () => void;
+  currentAdmin: { id: number; email: string; fullName: string; role: string } | null;
+  login: (username: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
   resetDatabase: () => void;
 };
 
@@ -266,7 +285,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const headerStorageKey = "vietvista-admin-headers";
   const footerStorageKey = "vietvista-admin-footers";
   const authStorageKey = "vietvista-admin-auth";
-  
+
   const bookingStorageKey = "vietvista-admin-bookings";
   const languageStorageKey = "vietvista-admin-languages";
   const translationStorageKey = "vietvista-admin-translations";
@@ -279,7 +298,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   // Initial Seed Data
   const initialPosts: AdminPost[] = seedPosts.map(({ id, title, category, date, status }) => ({ id, title, category, date, status }));
   const initialPackages: AdminPackage[] = seedPackages.map(({ id, name, destination, duration, price, status }) => ({ id, name, destination, duration, price, status }));
-  
+
   const initialPostCategories: PostCategory[] = [
     { id: 1, name: "Vịnh Hạ Long", slug: "vinh-ha-long" },
     { id: 2, name: "Đà Nẵng - Hội An", slug: "da-nang-hoi-an" },
@@ -495,6 +514,52 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (typeof window === "undefined") return false;
     return !!window.localStorage.getItem(authStorageKey);
   });
+  const [currentAdmin, setCurrentAdmin] = useState<{ id: number; email: string; fullName: string; role: string } | null>(null);
+  // Kiểm tra phiên làm việc ngay khi load trang
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const res = await fetch("/api/admin/me");
+        if (res.ok) {
+          const data = await res.json();
+          setIsAuthenticated(data.isAuthenticated);
+          setCurrentAdmin(data.admin);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(authStorageKey, "1");
+          }
+        } else {
+          setIsAuthenticated(false);
+          setCurrentAdmin(null);
+          if (typeof window !== "undefined") {
+            window.localStorage.removeItem(authStorageKey);
+          }
+        }
+      } catch (err) {
+        console.error("Lỗi kiểm tra phiên làm việc:", err);
+      }
+    }
+    checkSession();
+  }, []);
+
+  // Tải danh sách bài viết từ database khi đã đăng nhập
+  useEffect(() => {
+    async function loadDbPosts() {
+      if (isAuthenticated) {
+        try {
+          const res = await fetch("/api/admin/posts");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && Array.isArray(data.posts)) {
+              setPosts(data.posts);
+            }
+          }
+        } catch (err) {
+          console.error("Lỗi khi tải danh sách bài viết từ database:", err);
+        }
+      }
+    }
+    loadDbPosts();
+  }, [isAuthenticated]);
 
   // Effects to save states to localstorage
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(postStorageKey, JSON.stringify(posts)); }, [posts]);
@@ -514,33 +579,88 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(customerStorageKey, JSON.stringify(customers)); }, [customers]);
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(mediaStorageKey, JSON.stringify(mediaFiles)); }, [mediaFiles]);
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(seoStorageKey, JSON.stringify(seoConfigs)); }, [seoConfigs]);
-  
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (isAuthenticated) window.localStorage.setItem(authStorageKey, "1");
-    else window.localStorage.removeItem(authStorageKey);
-  }, [isAuthenticated]);
 
-  // CRUD Implementations
-  function addPost(p: { title: string; category: string; status?: string; date?: string }) {
-    setPosts((current) => [
-      {
-        id: Date.now(),
-        title: p.title,
-        category: p.category,
-        date: p.date ?? new Date().toLocaleDateString("vi-VN"),
-        status: p.status ?? "Bản nháp",
-      },
-      ...current,
-    ]);
+  async function addPost(p: {
+    title: string;
+    category: string;
+    status?: string;
+    date?: string;
+    imageUrl?: string;
+    contentImageUrl?: string;
+    excerpt?: string;
+    readTime?: string;
+    seoDescription?: string;
+    summary?: string;
+  }) {
+    try {
+      const res = await fetch("/api/admin/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(p),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.post) {
+          setPosts((current) => [data.post, ...current]);
+        } else {
+          alert(data.error || "Lỗi khi tạo bài viết.");
+        }
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.error || "Lỗi kết nối máy chủ khi tạo bài viết.");
+      }
+    } catch (err) {
+      console.error("Lỗi khi thêm bài viết:", err);
+      alert("Lỗi hệ thống khi thêm bài viết.");
+    }
   }
 
-  function updatePost(id: number, updated: Partial<AdminPost>) {
-    setPosts((current) => current.map((post) => (post.id === id ? { ...post, ...updated } : post)));
+  async function updatePost(id: number, updated: Partial<AdminPost>) {
+    try {
+      const res = await fetch("/api/admin/posts", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, ...updated }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.post) {
+          setPosts((current) =>
+            current.map((post) => (post.id === id ? { ...post, ...data.post } : post))
+          );
+        } else {
+          alert(data.error || "Lỗi khi cập nhật bài viết.");
+        }
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.error || "Lỗi kết nối máy chủ khi cập nhật bài viết.");
+      }
+    } catch (err) {
+      console.error("Lỗi khi cập nhật bài viết:", err);
+      alert("Lỗi hệ thống khi cập nhật bài viết.");
+    }
   }
 
-  function removePost(id: number) {
-    setPosts((current) => current.filter((p) => p.id !== id));
+  async function removePost(id: number) {
+    try {
+      const res = await fetch(`/api/admin/posts?id=${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setPosts((current) => current.filter((p) => p.id !== id));
+        } else {
+          alert(data.error || "Lỗi khi xóa bài viết.");
+        }
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.error || "Lỗi kết nối máy chủ khi xóa bài viết.");
+      }
+    } catch (err) {
+      console.error("Lỗi khi xóa bài viết:", err);
+      alert("Lỗi hệ thống khi xóa bài viết.");
+    }
   }
 
   function addPackage(p: { name: string; destination: string; duration?: string; price?: string; status?: string }) {
@@ -566,9 +686,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Post Categories CRUD
-  function addPostCategory(name: string) {
-    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-    setPostCategories((current) => [...current, { id: Date.now(), name, slug }]);
+  function addPostCategory(name: string, slug?: string) {
+    const finalSlug = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    setPostCategories((current) => [...current, { id: Date.now(), name, slug: finalSlug }]);
+  }
+
+  function updatePostCategory(id: number, name: string, slug: string) {
+    setPostCategories((current) =>
+      current.map((cat) => (cat.id === id ? { ...cat, name, slug } : cat))
+    );
   }
 
   function removePostCategory(id: number) {
@@ -776,14 +902,53 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     setSeoConfigs((current) => current.map((it) => (it.id === id ? { ...it, ...updated } : it)));
   }
 
-  function login(username: string, password: string) {
-    const ok = username === "admin" && password === "password";
-    if (ok) setIsAuthenticated(true);
-    return ok;
+  async function login(username: string, password: string) {
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.admin) {
+        setIsAuthenticated(true);
+        setCurrentAdmin(data.admin);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(authStorageKey, "1");
+        }
+        return true;
+      } else {
+        // Ném lỗi nhận được từ API để Client bắt được thông báo lỗi cụ thể
+        throw new Error(data.error || "Tên đăng nhập hoặc mật khẩu không hợp lệ.");
+      }
+    } catch (error: any) {
+      setIsAuthenticated(false);
+      setCurrentAdmin(null);
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem(authStorageKey);
+      }
+      throw error;
+    }
   }
 
-  function logout() {
-    setIsAuthenticated(false);
+  async function logout() {
+    try {
+      await fetch("/api/admin/logout", {
+        method: "POST",
+      });
+    } catch (error) {
+      console.error("Lỗi gọi API đăng xuất:", error);
+    } finally {
+      setIsAuthenticated(false);
+      setCurrentAdmin(null);
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem(authStorageKey);
+      }
+    }
   }
 
   function resetDatabase() {
@@ -797,7 +962,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       window.localStorage.removeItem(bannerStorageKey);
       window.localStorage.removeItem(headerStorageKey);
       window.localStorage.removeItem(footerStorageKey);
-      
+
       window.localStorage.removeItem(bookingStorageKey);
       window.localStorage.removeItem(languageStorageKey);
       window.localStorage.removeItem(translationStorageKey);
@@ -816,7 +981,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     setBanners(initialBanners);
     setHeaderMenu(initialHeaderMenu);
     setFooterInfo(initialFooterInfo);
-    
+
     setBookings(initialBookings);
     setLanguages(initialLanguages);
     setTranslations(initialTranslations);
@@ -845,16 +1010,17 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     customers,
     mediaFiles,
     seoConfigs,
-    
+
     addPost,
     updatePost,
     removePost,
-    
+
     addPackage,
     updatePackage,
     removePackage,
 
     addPostCategory,
+    updatePostCategory,
     removePostCategory,
 
     addPackageCategory,
@@ -876,7 +1042,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     addHeaderMenuItem,
     updateHeaderMenuItem,
     removeHeaderMenuItem,
-    
+
     updateFooterInfo,
 
     addBooking,
@@ -909,6 +1075,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     updateSeoConfig,
 
     isAuthenticated,
+    currentAdmin,
     login,
     logout,
     resetDatabase,
