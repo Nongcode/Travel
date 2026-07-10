@@ -10,8 +10,9 @@ type Option = {
 type CustomSelectProps = {
   name: string;
   options: Option[];
-  defaultValue?: string;
+  defaultValue?: string; // Comma separated for initial multi values, or single value
   placeholder?: string;
+  isMulti?: boolean;
 };
 
 export function CustomSelect({
@@ -19,22 +20,38 @@ export function CustomSelect({
   options,
   defaultValue = "",
   placeholder = "Chọn trải nghiệm",
+  isMulti = false,
 }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState(defaultValue);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Find currently selected option
-  const selectedOption = options.find((opt) => opt.value === selectedValue) || {
-    value: "",
-    label: placeholder,
+  
+  // Parse initial selected values
+  const getInitialValues = () => {
+    if (!defaultValue) return [];
+    if (isMulti) {
+      return defaultValue.split(",").map(v => v.trim()).filter(Boolean);
+    }
+    return [defaultValue];
   };
+
+  const [selectedValues, setSelectedValues] = useState<string[]>(getInitialValues);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = () => setIsOpen((prev) => !prev);
 
   const handleSelect = (value: string) => {
-    setSelectedValue(value);
-    setIsOpen(false);
+    if (isMulti) {
+      setSelectedValues((prev) => {
+        if (prev.includes(value)) {
+          return prev.filter((val) => val !== value);
+        } else {
+          return [...prev, value];
+        }
+      });
+      // Do not close dropdown on multi select
+    } else {
+      setSelectedValues([value]);
+      setIsOpen(false);
+    }
   };
 
   // Close dropdown on click outside
@@ -68,10 +85,25 @@ export function CustomSelect({
     };
   }, []);
 
+  // Compute trigger label
+  const getTriggerLabel = () => {
+    if (selectedValues.length === 0) return placeholder;
+    
+    const labels = selectedValues
+      .map((val) => options.find((opt) => opt.value === val)?.label)
+      .filter(Boolean);
+      
+    if (labels.length === 0) return placeholder;
+    return labels.join(", ");
+  };
+
+  const isSelected = (value: string) => selectedValues.includes(value);
+  const hiddenInputValue = selectedValues.join(", ");
+
   return (
     <div className="custom-select-container" ref={containerRef}>
       {/* Hidden input to hold the value for form submission */}
-      <input type="hidden" name={name} value={selectedValue} />
+      <input type="hidden" name={name} value={hiddenInputValue} />
 
       <button
         suppressHydrationWarning
@@ -81,7 +113,7 @@ export function CustomSelect({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
-        <span>{selectedOption.label}</span>
+        <span className="selected-text-label">{getTriggerLabel()}</span>
         <svg
           className="custom-select-chevron"
           width="12"
@@ -106,12 +138,21 @@ export function CustomSelect({
             <li
               key={option.value}
               className={`custom-select-option ${
-                option.value === selectedValue ? "selected" : ""
+                isSelected(option.value) ? "selected" : ""
               }`}
               role="option"
-              aria-selected={option.value === selectedValue}
+              aria-selected={isSelected(option.value)}
               onClick={() => handleSelect(option.value)}
             >
+              {isMulti && (
+                <input
+                  type="checkbox"
+                  className="multi-select-checkbox"
+                  checked={isSelected(option.value)}
+                  readOnly
+                  style={{ marginRight: "10px", cursor: "pointer" }}
+                />
+              )}
               {option.label}
             </li>
           ))}
@@ -120,3 +161,4 @@ export function CustomSelect({
     </div>
   );
 }
+

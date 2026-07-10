@@ -5,6 +5,7 @@ type PackageItem = {
   slug: string;
   name: string;
   destination: string;
+  rawDestination: string;
   duration: string;
   price: string;
   summary: string;
@@ -17,22 +18,22 @@ type DestinationTabsProps = {
   packages: PackageItem[];
 };
 
-function toTabId(destination: string) {
-  return `destination-${destination
+function toTabId(destination: string, index = 0) {
+  const base = destination
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
+    .replace(/[\u0111\u0110]/g, "d")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")}`;
+    .replace(/^-|-$/g, "");
+  return `destination-${base || "item"}-${index}`;
 }
 
 export function DestinationTabs({ destinations, packages }: DestinationTabsProps) {
   const fallbackPackages = packages.slice(0, 3);
   const tabStyles = destinations
-    .map((destination) => {
-      const tabId = toTabId(destination);
+    .map((destination, index) => {
+      const tabId = toTabId(destination, index);
       return `
         .destination-tabs:has(#${tabId}:checked) .destination-tab-label[for="${tabId}"] {
           background: var(--green);
@@ -47,23 +48,23 @@ export function DestinationTabs({ destinations, packages }: DestinationTabsProps
     })
     .join("\n");
 
+  const getTranslatedDestination = (dest: string) => {
+    const matched = packages.find((item) => item.rawDestination === dest);
+    return matched ? matched.destination : dest;
+  };
+
   return (
     <div className="destination-tabs">
       <style>{tabStyles}</style>
-      <div className="destination-tab-list" role="tablist" aria-label="Chọn điểm đến">
+      <div className="destination-tab-list" role="tablist" aria-label="Ch\u1ecdn \u0111i\u1ec3m \u0111\u1ebfn">
         {destinations.map((destination, index) => {
-          const tabId = toTabId(destination);
+          const tabId = toTabId(destination, index);
 
           return (
-            <div className="destination-tab-item" key={destination}>
-              <input suppressHydrationWarning
-                defaultChecked={index === 0}
-                id={tabId}
-                name="destination-tab"
-                type="radio"
-              />
+            <div className="destination-tab-item" key={`${destination}-${index}`}>
+              <input suppressHydrationWarning defaultChecked={index === 0} id={tabId} name="destination-tab" type="radio" />
               <label className="destination-tab-label" htmlFor={tabId}>
-                {destination}
+                {getTranslatedDestination(destination)}
               </label>
             </div>
           );
@@ -71,23 +72,20 @@ export function DestinationTabs({ destinations, packages }: DestinationTabsProps
       </div>
 
       <div className="destination-panels">
-        {destinations.map((destination) => {
-          const tabId = toTabId(destination);
-          const matchedPackages = packages.filter(
-            (item) => item.destination === destination,
-          );
-          const visiblePackages =
-            matchedPackages.length > 0 ? matchedPackages : fallbackPackages;
+        {destinations.map((destination, index) => {
+          const tabId = toTabId(destination, index);
+          const matchedPackages = packages.filter((item) => item.rawDestination === destination);
+          const visiblePackages = matchedPackages.length > 0 ? matchedPackages : fallbackPackages;
 
           return (
-            <section className="destination-panel" data-tab={tabId} key={destination}>
+            <section className="destination-panel" data-tab={tabId} key={`${destination}-${index}`}>
               <div className="destination-result">
                 <div className="destination-result-heading">
-                  <p className="eyebrow">Gợi ý tại {destination}</p>
+                  <p className="eyebrow">{getTranslatedDestination(destination)}</p>
                 </div>
                 <div className="destination-package-grid">
-                  {visiblePackages.slice(0, 3).map((item) => (
-                    <PackageCard item={item} key={item.id} />
+                  {visiblePackages.slice(0, 3).map((item, packageIndex) => (
+                    <PackageCard item={item} key={`${item.id}-${item.slug}-${packageIndex}`} />
                   ))}
                 </div>
               </div>

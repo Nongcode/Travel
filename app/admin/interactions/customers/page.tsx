@@ -88,8 +88,7 @@ export default function CustomersAdminPage() {
     const rows = customers
       .map(
         (c) =>
-          `"${c.id}","${c.name}","${c.email}","${c.phone}","${c.totalBookings}","${c.totalSpent}","${c.dateAdded}","${c.status}","${
-            c.notes || ""
+          `"${c.id}","${c.name}","${c.email}","${c.phone}","${c.totalBookings}","${c.totalSpent}","${c.dateAdded}","${c.status}","${c.notes || ""
           }"`
       )
       .join("\n");
@@ -123,10 +122,10 @@ export default function CustomersAdminPage() {
       <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
-            Quản lý Dữ liệu Khách hàng
+            Quản lý Khách hàng
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Lưu trữ thông tin khách hàng, số lần đặt tour, doanh thu đóng góp và hỗ trợ xuất danh sách phục vụ Email Marketing.
+            Lưu trữ thông tin khách hàng, số lượt đặt tour, doanh thu đóng góp và hỗ trợ xuất danh sách phục vụ Email Marketing.
           </p>
         </div>
         <div className="flex gap-2 self-start sm:self-center">
@@ -162,7 +161,7 @@ export default function CustomersAdminPage() {
           </h3>
           <form onSubmit={handleCreateCustomer} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Họ và tên</label>
+              <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Họ & tên</label>
               <input
                 type="text"
                 required
@@ -198,11 +197,11 @@ export default function CustomersAdminPage() {
               <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Trạng thái tài khoản</label>
               <select
                 value={status}
-                onChange={(e) => setStatus(e.target.value as any)}
+                onChange={(e) => setStatus(e.target.value as "Hoạt động" | "Khóa")}
                 className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold text-slate-700"
               >
-                <option value="Hoạt động">🟢 Hoạt động</option>
-                <option value="Khóa">🔴 Khóa</option>
+                <option value="Hoạt động">Hoạt động</option>
+                <option value="Khóa">Khóa</option>
               </select>
             </div>
             <div className="space-y-1.5 md:col-span-2">
@@ -221,13 +220,13 @@ export default function CustomersAdminPage() {
                 onClick={() => setShowAddForm(false)}
                 className="px-4 py-2.5 bg-slate-100 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-200 transition-colors"
               >
-                Hủy bỏ
+                Hủy tạo khách hàng
               </button>
               <button
                 type="submit"
                 className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-md shadow-emerald-600/10 transition-all"
               >
-                Tạo hồ sơ
+                Thêm khách hàng
               </button>
             </div>
           </form>
@@ -242,11 +241,10 @@ export default function CustomersAdminPage() {
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
-                statusFilter === st
-                  ? "bg-white text-emerald-800 shadow-sm"
-                  : "text-slate-500 hover:text-slate-800"
-              }`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${statusFilter === st
+                ? "bg-white text-emerald-800 shadow-sm"
+                : "text-slate-500 hover:text-slate-800"
+                }`}
             >
               {st}
             </button>
@@ -316,11 +314,10 @@ export default function CustomersAdminPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex px-2 py-0.5 rounded-full text-xs font-bold border ${
-                          c.status === "Hoạt động"
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                            : "bg-rose-50 text-rose-700 border-rose-100"
-                        }`}
+                        className={`inline-flex px-2 py-0.5 rounded-full text-xs font-bold border ${c.status === "Hoạt động"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                          : "bg-rose-50 text-rose-700 border-rose-100"
+                          }`}
                       >
                         {c.status}
                       </span>
@@ -411,11 +408,11 @@ export default function CustomersAdminPage() {
                 <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Trạng thái</label>
                 <select
                   value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value as any)}
+                  onChange={(e) => setEditStatus(e.target.value as "Hoạt động" | "Khóa")}
                   className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 focus:outline-none transition-all font-semibold text-slate-700"
                 >
-                  <option value="Hoạt động">🟢 Hoạt động</option>
-                  <option value="Khóa">🔴 Khóa</option>
+                  <option value="Hoạt động">Hoạt động</option>
+                  <option value="Khóa">Khóa</option>
                 </select>
               </div>
 

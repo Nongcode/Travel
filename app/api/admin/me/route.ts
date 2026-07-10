@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
         if (!decoded) {
             return NextResponse.json(
-                { isAuthenticated: false, error: "Token không hợp lệ hoặc đã hết hạn." },
+                { isAuthenticated: false, error: "Token kh?ng h?p l? ho?c ?? h?t h?n." },
                 { status: 401 }
             );
         }
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     } catch (error) {
         console.error("Lỗi kiểm tra phiên làm việc:", error);
         return NextResponse.json(
-            { isAuthenticated: false, error: "Đã xảy ra lỗi hệ thống khi kiểm tra phiên." },
+            { isAuthenticated: false, error: "?? x?y ra l?i h? th?ng khi ki?m tra phi?n." },
             { status: 500 }
         );
     }

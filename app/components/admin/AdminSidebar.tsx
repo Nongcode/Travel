@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { useAdmin } from "./AdminContext";
 
@@ -54,21 +54,20 @@ const MenuItemGroup = ({
   items,
 }: MenuItemGroupProps) => {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
+  const isPatternActive = pathname.startsWith(activePattern);
+  const [isOpen, setIsOpen] = useState(isPatternActive);
+  const hasActiveChild = items.some((item) => pathname === item.href);
 
-  // Auto-expand if active subpage is active
   useEffect(() => {
-    if (pathname.startsWith(activePattern)) {
+    if (isPatternActive) {
       setIsOpen(true);
     }
-  }, [pathname, activePattern]);
-
-  const hasActiveChild = items.some((item) => pathname === item.href);
+  }, [pathname, isPatternActive]);
 
   return (
     <li className="space-y-1">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen((current) => !current)}
         className={
           "w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-250 group text-left " +
           (hasActiveChild
@@ -176,18 +175,21 @@ export default function AdminSidebar() {
                 label: "Danh sách gói",
                 icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
               },
-              { 
-                href: "/admin/packages/offers", 
-                label: "Gói ưu đãi",
-                icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="16" y1="2" x2="16" y2="4"/><line x1="8" y1="2" x2="8" y2="4"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              },
+
               { 
                 href: "/admin/packages/services", 
-                label: "Gói dịch vụ đi kèm",
+                label: "Chi tiết gói",
                 icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
               },
             ]}
           />
+
+          <MenuItemSingle
+            href="/admin/local-specialties"
+            label="Đặc sản địa phương"
+            icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M11 20H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v7.5" /><path d="M15 22v-4a2 2 0 0 1 2-2h4" /><circle cx="12" cy="12" r="3" /></svg>}
+          />
+
 
           {/* Banner Group */}
           <MenuItemGroup
@@ -262,11 +264,7 @@ export default function AdminSidebar() {
                 label: "Đánh giá & Phản hồi",
                 icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               },
-              { 
-                href: "/admin/interactions/contacts", 
-                label: "Quản lý liên hệ",
-                icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              },
+
               { 
                 href: "/admin/interactions/customers", 
                 label: "Quản lý khách hàng",

@@ -1,45 +1,45 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { stripLocaleFromPath } from "@/lib/i18n/config";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const localized = stripLocaleFromPath(pathname);
+  const effectivePathname = localized.pathname;
 
-  // 1. Lấy token đăng nhập từ cookie của trình duyệt gửi lên
   const token = request.cookies.get("admin_token")?.value;
 
-  // 2. Bảo vệ các trang quản trị bắt đầu bằng /admin
-  if (pathname.startsWith("/admin")) {
-    // Nếu người dùng truy cập trang đăng nhập /admin/login
-    if (pathname === "/admin/login") {
-      // Nếu đã có token đăng nhập -> chuyển hướng thẳng về trang điều khiển (dashboard)
+  if (effectivePathname.startsWith("/admin")) {
+    if (effectivePathname === "/admin/login") {
       if (token) {
         return NextResponse.redirect(new URL("/admin/dashboard", request.url));
       }
       return NextResponse.next();
     }
 
-    // Nếu người dùng truy cập các trang quản trị khác mà chưa có token
     if (!token) {
-      // Chuyển hướng về trang đăng nhập /admin/login
       const loginUrl = new URL("/admin/login", request.url);
       return NextResponse.redirect(loginUrl);
     }
   }
 
-  // 3. Đính kèm x-pathname vào request headers để Server Components nhận diện được đường dẫn hiện tại
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-pathname", pathname);
+  requestHeaders.set("x-pathname", effectivePathname);
+  requestHeaders.set("x-locale", localized.locale);
+
+  if (effectivePathname !== pathname) {
+    const rewriteUrl = request.nextUrl.clone();
+    rewriteUrl.pathname = effectivePathname;
+    return NextResponse.rewrite(rewriteUrl, {
+      request: { headers: requestHeaders },
+    });
+  }
 
   return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
+    request: { headers: requestHeaders },
   });
 }
 
-// Chạy middleware trên tất cả các trang ngoại trừ tài nguyên tĩnh và API
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
 };

@@ -22,7 +22,7 @@ export async function POST() {
     } catch (error) {
         console.error("Lỗi đăng xuất:", error);
         return NextResponse.json(
-            { error: "Đã xảy ra lỗi hệ thống khi xử lý đăng xuất." },
+            { error: "?? x?y ra l?i h? th?ng khi x? l? ??ng xu?t." },
             { status: 500 }
         );
     }

@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     } catch (error: any) {
         console.error("Lỗi đăng nhập admin:", error);
         return NextResponse.json(
-            { error: "Đã xảy ra lỗi hệ thống khi xử lý đăng nhập." },
+            { error: "?? x?y ra l?i h? th?ng khi x? l? ??ng nh?p." },
             { status: 500 }
         );
     }

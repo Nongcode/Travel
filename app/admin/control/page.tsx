@@ -26,14 +26,14 @@ export default function ControlAdminPage() {
     if (confirm("Bạn có chắc chắn muốn khôi phục toàn bộ bài viết và gói du lịch về trạng thái mặc định ban đầu không? Thao tác này không thể hoàn tác!")) {
       resetDatabase();
       setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Thực hiện khôi phục dữ liệu gốc thành công.`]);
-      setSuccessMsg("Đã khôi phục dữ liệu mặc định thành công! Vui lòng tải lại trang hoặc kiểm tra Dashboard.");
+      setSuccessMsg("?? kh?i ph?c d? li?u m?c ??nh th?nh c?ng! Vui l?ng t?i l?i trang ho?c ki?m tra Dashboard.");
       setTimeout(() => setSuccessMsg(""), 4000);
     }
   };
 
   const handleClearCache = () => {
     setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] Xóa bộ nhớ đệm thành công.`]);
-    setSuccessMsg("Đã xóa bộ nhớ đệm thành công!");
+    setSuccessMsg("?? x?a b? nh? ??m th?nh c?ng!");
     setTimeout(() => setSuccessMsg(""), 3000);
   };
 

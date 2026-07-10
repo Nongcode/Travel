@@ -3,10 +3,15 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { packages as seedPackages, posts as seedPosts } from "../../data/travel";
 
+export type ContentTranslationFields = Record<string, string>;
+export type ContentTranslationMap = Record<string, ContentTranslationFields>;
+
 export type AdminPost = {
   id: number;
   title: string;
   category: string;
+  destinationId?: number | null;
+  destination?: string | null;
   date: string;
   status: string;
   imageUrl?: string;
@@ -15,6 +20,7 @@ export type AdminPost = {
   readTime?: string;
   seoDescription?: string;
   summary?: string;
+  translations?: ContentTranslationMap;
 };
 
 export type AdminPackage = {
@@ -96,8 +102,9 @@ export type AdminBooking = {
   travelDate: string;
   numberOfTravelers: number;
   totalPrice: string;
-  status: "Chờ xử lý" | "Đang xử lý" | "Đã xác nhận" | "Đã hủy";
+  status: "Chờ xử lý" | "Đang xử lý" | "Đã xác nhận" | "Đã hủy" | "Hoàn tất";
   notes?: string;
+  adminNotes?: string;
 };
 
 export type LanguageSetting = {
@@ -129,16 +136,6 @@ export type AdminReview = {
   avatar?: string;
 };
 
-export type AdminContact = {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  subject: string;
-  message: string;
-  date: string;
-  status: "Chưa đọc" | "Đã đọc" | "Đã trả lời";
-};
 
 export type AdminCustomer = {
   id: number;
@@ -186,7 +183,7 @@ type AdminContextValue = {
   languages: LanguageSetting[];
   translations: StaticTranslation[];
   reviews: AdminReview[];
-  contacts: AdminContact[];
+
   customers: AdminCustomer[];
   mediaFiles: MediaFile[];
   seoConfigs: SeoConfig[];
@@ -202,6 +199,7 @@ type AdminContextValue = {
     readTime?: string;
     seoDescription?: string;
     summary?: string;
+    translations?: ContentTranslationMap;
   }) => void;
   updatePost: (id: number, updated: Partial<AdminPost>) => void;
   removePost: (id: number) => void;
@@ -236,9 +234,9 @@ type AdminContextValue = {
 
   updateFooterInfo: (info: Partial<FooterInfo>) => void;
 
-  addBooking: (b: Omit<AdminBooking, "id" | "bookingDate" | "status">) => void;
-  updateBooking: (id: number, updated: Partial<AdminBooking>) => void;
-  removeBooking: (id: number) => void;
+  addBooking: (b: Omit<AdminBooking, "id" | "bookingDate" | "status">) => void | Promise<void>;
+  updateBooking: (id: number, updated: Partial<AdminBooking>) => void | Promise<void>;
+  removeBooking: (id: number) => void | Promise<void>;
 
   addLanguage: (lang: Omit<LanguageSetting, "id">) => void;
   updateLanguage: (id: number, updated: Partial<LanguageSetting>) => void;
@@ -252,9 +250,7 @@ type AdminContextValue = {
   updateReview: (id: number, updated: Partial<AdminReview>) => void;
   removeReview: (id: number) => void;
 
-  addContact: (c: Omit<AdminContact, "id" | "date" | "status">) => void;
-  updateContact: (id: number, updated: Partial<AdminContact>) => void;
-  removeContact: (id: number) => void;
+
 
   addCustomer: (c: Omit<AdminCustomer, "id" | "dateAdded" | "totalBookings" | "totalSpent">) => void;
   updateCustomer: (id: number, updated: Partial<AdminCustomer>) => void;
@@ -290,7 +286,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const languageStorageKey = "vietvista-admin-languages";
   const translationStorageKey = "vietvista-admin-translations";
   const reviewStorageKey = "vietvista-admin-reviews";
-  const contactStorageKey = "vietvista-admin-contacts";
+
   const customerStorageKey = "vietvista-admin-customers";
   const mediaStorageKey = "vietvista-admin-media";
   const seoStorageKey = "vietvista-admin-seo";
@@ -301,7 +297,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   const initialPostCategories: PostCategory[] = [
     { id: 1, name: "Vịnh Hạ Long", slug: "vinh-ha-long" },
-    { id: 2, name: "Đà Nẵng - Hội An", slug: "da-nang-hoi-an" },
+    { id: 2, name: "ÄÃ  Náºµng - Há»™i An", slug: "da-nang-hoi-an" },
     { id: 3, name: "Phú Quốc", slug: "phu-quoc" },
     { id: 4, name: "Hà Giang", slug: "ha-giang" },
     { id: 5, name: "Sapa", slug: "sapa" },
@@ -317,20 +313,20 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   ];
 
   const initialPromoPackages: PromoPackage[] = [
-    { id: 1, name: "Early Bird 15%", packageName: "Luxury Phú Quốc Getaway", discountValue: "15%", validUntil: "2026-08-31", status: "Đang mở" },
-    { id: 2, name: "Summer Deal 10%", packageName: "Ninh Bình Weekend Getaway", discountValue: "10%", validUntil: "2026-07-15", status: "Đang mở" },
+    { id: 1, name: "Early Bird 15%", packageName: "Luxury Phú Quốc Getaway", discountValue: "15%", validUntil: "2026-08-31", status: "Äang má»Ÿ" },
+    { id: 2, name: "Summer Deal 10%", packageName: "Ninh BÃ¬nh Weekend Getaway", discountValue: "10%", validUntil: "2026-07-15", status: "Äang má»Ÿ" },
   ];
 
   const initialServicePackages: ServicePackage[] = [
-    { id: 1, name: "Private English-speaking Guide", price: "$50/Day", type: "Hướng dẫn viên", description: "Professional local guide fluent in English with rich knowledge.", status: "Đang mở" },
-    { id: 2, name: "Luxury Airport Pickup (Sedan)", price: "$30/Trip", type: "Vận chuyển", description: "Private luxury airport pickup to hotel in Da Nang or Hanoi.", status: "Đang mở" },
-    { id: 3, name: "Local 4G/5G SIM Card", price: "$10/Unit", type: "Tiện ích", description: "Pre-paid sim card with 4GB high-speed data daily, pre-activated.", status: "Đang mở" },
+    { id: 1, name: "Private English-speaking Guide", price: "$50/Day", type: "Hướng dẫn viên", description: "Professional local guide fluent in English with rich knowledge.", status: "Äang má»Ÿ" },
+    { id: 2, name: "Luxury Airport Pickup (Sedan)", price: "$30/Trip", type: "Vận chuyển", description: "Private luxury airport pickup to hotel in Da Nang or Hanoi.", status: "Äang má»Ÿ" },
+    { id: 3, name: "Local 4G/5G SIM Card", price: "$10/Unit", type: "Tiện ích", description: "Pre-paid sim card with 4GB high-speed data daily, pre-activated.", status: "Äang má»Ÿ" },
   ];
 
   const initialBanners: AdminBanner[] = [
-    { id: 1, type: "homepage", title: "Discover Untouched Vietnam", subtitle: "Handcrafted private itineraries tailored just for you", image: "/hero-bg.jpg", link: "/goi-du-lich", status: "Đang mở" },
-    { id: 2, type: "subpage", title: "Travel Guides & Insider Tips", subtitle: "Get inspiration from our local experts", image: "/news-banner.jpg", link: "/tin-tuc", status: "Đang mở" },
-    { id: 3, type: "detail", title: "Exclusive Offers & Packages", subtitle: "Book early, save more on standard packages", image: "/detail-banner.jpg", link: "/uu-dai", status: "Đang mở" },
+    { id: 1, type: "homepage", title: "Discover Untouched Vietnam", subtitle: "Handcrafted private itineraries tailored just for you", image: "/hero-bg.jpg", link: "/goi-du-lich", status: "Äang má»Ÿ" },
+    { id: 2, type: "subpage", title: "Travel Guides & Insider Tips", subtitle: "Get inspiration from our local experts", image: "/news-banner.jpg", link: "/tin-tuc", status: "Äang má»Ÿ" },
+    { id: 3, type: "detail", title: "Exclusive Offers & Packages", subtitle: "Book early, save more on standard packages", image: "/detail-banner.jpg", link: "/uu-dai", status: "Äang má»Ÿ" },
   ];
 
   const initialHeaderMenu: HeaderMenuItem[] = [
@@ -350,47 +346,43 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     facebook: "https://facebook.com/vietvista",
     instagram: "https://instagram.com/vietvista",
     twitter: "https://twitter.com/vietvista",
-    copyright: "© 2026 VietVista Travel. All Rights Reserved.",
+    copyright: "Â© 2026 VietVista Travel. All Rights Reserved.",
   };
 
   const initialBookings: AdminBooking[] = [
-    { id: 1, customerName: "David Miller", email: "david.miller@example.com", phone: "+1 415 555 2671", tourName: "Hội An đi chậm", bookingDate: "2026-05-20", travelDate: "2026-06-15", numberOfTravelers: 2, totalPrice: "11.800.000đ", status: "Chờ xử lý", notes: "Yêu cầu phòng non-smoking, tầng cao." },
-    { id: 2, customerName: "Sarah Connor", email: "sarah.c@gmail.com", phone: "+61 2 9382 0192", tourName: "Cung đường ảnh Hà Giang", bookingDate: "2026-05-18", travelDate: "2026-07-10", numberOfTravelers: 1, totalPrice: "7.400.000đ", status: "Đang xử lý", notes: "Muốn thuê thêm xe máy tự lái." },
-    { id: 3, customerName: "Nguyen Van A", email: "anguyen@vietnam.com", phone: "0905123456", tourName: "Kỳ nghỉ gia đình Phú Quốc", bookingDate: "2026-05-15", travelDate: "2026-06-05", numberOfTravelers: 4, totalPrice: "24.800.000đ", status: "Đã xác nhận", notes: "Có người già đi cùng, cần xe lăn hỗ trợ tại sân bay." },
-    { id: 4, customerName: "Yuki Tanaka", email: "yuki.tanaka@japan-travel.jp", phone: "+81 90 1234 5678", tourName: "Hội An đi chậm", bookingDate: "2026-05-10", travelDate: "2026-05-25", numberOfTravelers: 2, totalPrice: "11.800.000đ", status: "Đã hủy", notes: "Hủy do thay đổi lịch bay." }
+    { id: 1, customerName: "David Miller", email: "david.miller@example.com", phone: "+1 415 555 2671", tourName: "Hội An đi chậm", bookingDate: "2026-05-20", travelDate: "2026-06-15", numberOfTravelers: 2, totalPrice: "11.800.000đ", status: "Chờ xử lý", notes: "YÃªu cáº§u phÃ²ng non-smoking, táº§ng cao." },
+    { id: 2, customerName: "Sarah Connor", email: "sarah.c@gmail.com", phone: "+61 2 9382 0192", tourName: "Cung đường ảnh Hà Giang", bookingDate: "2026-05-18", travelDate: "2026-07-10", numberOfTravelers: 1, totalPrice: "7.400.000đ", status: "Đang xử lý", notes: "Muá»‘n thuÃª thÃªm xe mÃ¡y tá»± lÃ¡i." },
+    { id: 3, customerName: "Nguyen Van A", email: "anguyen@vietnam.com", phone: "0905123456", tourName: "Kỳ nghỉ gia đình Phú Quốc", bookingDate: "2026-05-15", travelDate: "2026-06-05", numberOfTravelers: 4, totalPrice: "24.800.000đ", status: "Đã xác nhận", notes: "CÃ³ ngÆ°á» i giÃ  Ä‘i cÃ¹ng, cáº§n xe lÄƒn há»— trá»£ táº¡i sÃ¢n bay." },
+    { id: 4, customerName: "Yuki Tanaka", email: "yuki.tanaka@japan-travel.jp", phone: "+81 90 1234 5678", tourName: "Hội An đi chậm", bookingDate: "2026-05-10", travelDate: "2026-05-25", numberOfTravelers: 2, totalPrice: "11.800.000đ", status: "Đã hủy", notes: "Há»§y do thay Ä‘á»•i lá»‹ch bay." }
   ];
 
   const initialLanguages: LanguageSetting[] = [
-    { id: 1, code: "vi", name: "Tiếng Việt", flag: "🇻🇳", isActive: true, isDefault: true },
-    { id: 2, code: "en", name: "English", flag: "🇺🇸", isActive: true, isDefault: false },
-    { id: 3, code: "zh", name: "中文", flag: "🇨🇳", isActive: false, isDefault: false },
-    { id: 4, code: "ja", name: "日本語", flag: "🇯🇵", isActive: false, isDefault: false }
+    { id: 1, code: "vi", name: "Tiếng Việt", flag: "ðŸ‡»ðŸ‡³", isActive: true, isDefault: true },
+    { id: 2, code: "en", name: "English", flag: "ðŸ‡ºðŸ‡¸", isActive: true, isDefault: false },
+    { id: 3, code: "zh", name: "ä¸­æ–‡", flag: "ðŸ‡¨ðŸ‡³", isActive: false, isDefault: false },
+    { id: 4, code: "ja", name: "æ—¥æœ¬èªž", flag: "ðŸ‡¯ðŸ‡µ", isActive: false, isDefault: false }
   ];
 
   const initialTranslations: StaticTranslation[] = [
-    { id: 1, key: "explore_vietnam", description: "Tiêu đề lớn tại trang chủ", translations: { vi: "Khám phá Việt Nam", en: "Explore Vietnam", zh: "探索越南", ja: "ベトナムを探索" } },
-    { id: 2, key: "search_tours", description: "Placeholder cho thanh tìm kiếm tour", translations: { vi: "Tìm tên gói, điểm đến...", en: "Search tours, destinations...", zh: "搜索行程，目的地...", ja: "ツアー、目的地を検索..." } },
-    { id: 3, key: "contact_us", description: "Menu liên hệ", translations: { vi: "Liên hệ", en: "Contact Us", zh: "联系 chúng tôi", ja: "お問い合わせ" } },
-    { id: 4, key: "book_now", description: "Nút đặt tour", translations: { vi: "Đặt tour ngay", en: "Book Now", zh: "立即预订", ja: "今すぐ予約" } }
+    { id: 1, key: "explore_vietnam", description: "TiÃªu Ä‘á» lá»›n táº¡i trang chá»§", translations: { vi: "Khám phá Việt Nam", en: "Explore Vietnam", zh: "æŽ¢ç´¢è¶Šå—", ja: "ãƒ™ãƒˆãƒŠãƒ ã‚’æŽ¢ç´¢" } },
+    { id: 2, key: "search_tours", description: "Placeholder cho thanh tÃ¬m kiáº¿m tour", translations: { vi: "Tìm tên gói, điểm đến...", en: "Search tours, destinations...", zh: "æœç´¢è¡Œç¨‹ï¼Œç›®çš„åœ°...", ja: "ãƒ„ã‚¢ãƒ¼ã€ç›®çš„åœ°ã‚’æ¤œç´¢..." } },
+    { id: 3, key: "contact_us", description: "Menu liÃªn há»‡", translations: { vi: "Liên hệ", en: "Contact Us", zh: "è”ç³» chúng tôi", ja: "ãŠå•ã„åˆã‚ã›" } },
+    { id: 4, key: "book_now", description: "NÃºt Ä‘áº·t tour", translations: { vi: "Äáº·t tour ngay", en: "Book Now", zh: "ç«‹å³é¢„è®¢", ja: "ä»Šã™ãäºˆç´„" } }
   ];
 
   const initialReviews: AdminReview[] = [
     { id: 1, customerName: "Emily Watson", packageName: "Hội An đi chậm", rating: 5, comment: "An absolutely wonderful experience. The cooking class on the river bank was the highlight of our trip!", date: "2026-05-10", status: "Hiển thị", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80" },
-    { id: 2, customerName: "Marcus Aurelius", packageName: "Cung đường ảnh Hà Giang", rating: 5, comment: "Breathtaking landscapes and extremely professional organization. The tour guide was very knowledgeable.", date: "2026-05-08", status: "Hiển thị", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" },
+    { id: 2, customerName: "Marcus Aurelius", packageName: "Cung Ä‘Æ°á»ng áº£nh Hà Giang", rating: 5, comment: "Breathtaking landscapes and extremely professional organization. The tour guide was very knowledgeable.", date: "2026-05-08", status: "Hiển thị", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" },
     { id: 3, customerName: "Jeanne d'Arc", packageName: "Kỳ nghỉ gia đình Phú Quốc", rating: 4, comment: "The resort was top-notch, very child friendly. Transfer service could be slightly faster.", date: "2026-05-05", status: "Hiển thị", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80" }
   ];
 
-  const initialContacts: AdminContact[] = [
-    { id: 1, name: "Robert Downey", email: "robert.d@marvel.com", phone: "+1 212 555 0199", subject: "Customized 10-day tour request", message: "Hi VietVista, I am planning a private trip to Vietnam for 6 people this October. We want to visit Hanoi, Ha Long Bay, Hoi An and Ho Chi Minh City. Can you customize a private itinerary with 5-star hotels?", date: "2026-05-21", status: "Chưa đọc" },
-    { id: 2, name: "Taylor Swift", email: "taylor@swift.music", phone: "+1 615 222 3456", subject: "Partnership Inquiry", message: "Hello, I am interested in booking a private retreat for my crew in Côn Đảo next year. Please send me your luxury portfolio and corporate packages.", date: "2026-05-19", status: "Đã đọc" },
-    { id: 3, name: "John Doe", email: "john.doe@gmail.com", phone: "0900000000", subject: "Lost luggage assistance feedback", message: "Just wanted to say thanks for the quick help when I lost my luggage at Da Nang airport last week. Your guide was amazing!", date: "2026-05-14", status: "Đã trả lời" }
-  ];
+
 
   const initialCustomers: AdminCustomer[] = [
-    { id: 1, name: "David Miller", email: "david.miller@example.com", phone: "+1 415 555 2671", totalBookings: 1, totalSpent: "11.800.000đ", dateAdded: "2026-05-20", status: "Hoạt động" },
-    { id: 2, name: "Sarah Connor", email: "sarah.c@gmail.com", phone: "+61 2 9382 0192", totalBookings: 1, totalSpent: "7.400.000đ", dateAdded: "2026-05-18", status: "Hoạt động" },
-    { id: 3, name: "Nguyen Van A", email: "anguyen@vietnam.com", phone: "0905123456", totalBookings: 1, totalSpent: "24.800.000đ", dateAdded: "2026-05-15", status: "Hoạt động" },
-    { id: 4, name: "Yuki Tanaka", email: "yuki.tanaka@japan-travel.jp", phone: "+81 90 1234 5678", totalBookings: 1, totalSpent: "11.800.000đ", dateAdded: "2026-05-10", status: "Hoạt động" }
+    { id: 1, name: "David Miller", email: "david.miller@example.com", phone: "+1 415 555 2671", totalBookings: 1, totalSpent: "11.800.000Ä‘", dateAdded: "2026-05-20", status: "Hoạt động" },
+    { id: 2, name: "Sarah Connor", email: "sarah.c@gmail.com", phone: "+61 2 9382 0192", totalBookings: 1, totalSpent: "7.400.000Ä‘", dateAdded: "2026-05-18", status: "Hoạt động" },
+    { id: 3, name: "Nguyen Van A", email: "anguyen@vietnam.com", phone: "0905123456", totalBookings: 1, totalSpent: "24.800.000Ä‘", dateAdded: "2026-05-15", status: "Hoạt động" },
+    { id: 4, name: "Yuki Tanaka", email: "yuki.tanaka@japan-travel.jp", phone: "+81 90 1234 5678", totalBookings: 1, totalSpent: "11.800.000Ä‘", dateAdded: "2026-05-10", status: "Hoạt động" }
   ];
 
   const initialMediaFiles: MediaFile[] = [
@@ -401,10 +393,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   ];
 
   const initialSeoConfigs: SeoConfig[] = [
-    { id: 1, page: "Trang chủ", urlPath: "/", metaTitle: "VietVista - Tour du lịch Việt Nam độc bản cho khách nước ngoài", metaDescription: "Thiết kế tour du lịch riêng tư, độc đáo khám phá văn hóa bản địa, ẩm thực và danh lam thắng cảnh Việt Nam với dịch vụ 5 sao.", metaKeywords: "vietnam travel, private tour vietnam, luxury vietnam holiday, customized tour", ogImage: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80" },
-    { id: 2, page: "Danh sách Tour", urlPath: "/goi-du-lich", metaTitle: "Gói Tour Du Lịch Việt Nam Tự Chọn - VietVista Travel", metaDescription: "Danh sách gói tour nghỉ dưỡng biển đảo Phú Quốc, trekking Hà Giang, khám phá văn hóa di sản Hội An. Đặt tour trực tuyến tư vấn miễn phí.", metaKeywords: "tours vietnam, sapa tour, hoi an package, phu quoc vacation", ogImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80" },
-    { id: 3, page: "Bài viết Cẩm nang", urlPath: "/tin-tuc", metaTitle: "Blog Chia Sẻ Cẩm Nang Du Lịch Việt Nam Tự Túc - VietVista", metaDescription: "Lời khuyên, hướng dẫn chi tiết, điểm check-in ẩn và mẹo ăn uống bản địa từ các chuyên gia lữ hành VietVista.", metaKeywords: "vietnam blog, travel guide vietnam, sapa guide, local tips", ogImage: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80" },
-    { id: 4, page: "Liên hệ", urlPath: "/lien-he", metaTitle: "Liên Hệ Thiết Kế Tour Riêng - VietVista Support 24/7", metaDescription: "Liên hệ với đội ngũ VietVista để nhận lịch trình được cá nhân hóa miễn phí trong vòng 24 giờ. Gọi ngay hotline hoặc gửi tin nhắn.", metaKeywords: "contact travel agency, customized tour service, vietnam travel agent", ogImage: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80" }
+    { id: 1, page: "Trang chá»§", urlPath: "/", metaTitle: "VietVista - Tour du lá»‹ch Viá»‡t Nam Ä‘á»™c báº£n cho khÃ¡ch nÆ°á»›c ngoÃ i", metaDescription: "Thiáº¿t káº¿ tour du lá»‹ch riÃªng tÆ°, Ä‘á»™c Ä‘Ã¡o khÃ¡m phÃ¡ vÄƒn hÃ³a báº£n Ä‘á»‹a, áº©m thá»±c vÃ  danh lam tháº¯ng cáº£nh Viá»‡t Nam vá»›i dá»‹ch vá»¥ 5 sao.", metaKeywords: "vietnam travel, private tour vietnam, luxury vietnam holiday, customized tour", ogImage: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80" },
+    { id: 2, page: "Danh sÃ¡ch Tour", urlPath: "/goi-du-lich", metaTitle: "GÃ³i Tour Du Lá»‹ch Viá»‡t Nam Tá»± Chá»n - VietVista Travel", metaDescription: "Danh sÃ¡ch gÃ³i tour nghá»‰ dÆ°á»¡ng biá»ƒn Ä‘áº£o Phú Quốc, trekking Hà Giang, khÃ¡m phÃ¡ vÄƒn hÃ³a di sáº£n Há»™i An. Äáº·t tour trá»±c tuyáº¿n tÆ° váº¥n miá»…n phÃ­.", metaKeywords: "tours vietnam, sapa tour, hoi an package, phu quoc vacation", ogImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80" },
+    { id: 3, page: "BÃ i viáº¿t Cáº©m nang", urlPath: "/tin-tuc", metaTitle: "Blog Chia Sáº» Cáº©m Nang Du Lá»‹ch Viá»‡t Nam Tá»± TÃºc - VietVista", metaDescription: "Lá»i khuyÃªn, hÆ°á»›ng dáº«n chi tiáº¿t, Ä‘iá»ƒm check-in áº©n vÃ  máº¹o Äƒn uá»‘ng báº£n Ä‘á»‹a tá»« cÃ¡c chuyÃªn gia lá»¯ hÃ nh VietVista.", metaKeywords: "vietnam blog, travel guide vietnam, sapa guide, local tips", ogImage: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80" },
+    { id: 4, page: "Liên hệ", urlPath: "/lien-he", metaTitle: "LiÃªn Há»‡ Thiáº¿t Káº¿ Tour RiÃªng - VietVista Support 24/7", metaDescription: "Liên hệ vá»›i Ä‘á»™i ngÅ© VietVista Ä‘á»ƒ nháº­n lá»‹ch trÃ¬nh Ä‘Æ°á»£c cÃ¡ nhÃ¢n hÃ³a miá»…n phÃ­ trong vÃ²ng 24 giá». Gá»i ngay hotline hoáº·c gá»­i tin nháº¯n.", metaKeywords: "contact travel agency, customized tour service, vietnam travel agent", ogImage: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80" }
   ];
 
   // State Definitions with lazy localstorage loading
@@ -480,23 +472,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     return saved ? JSON.parse(saved) : initialTranslations;
   });
 
-  const [reviews, setReviews] = useState<AdminReview[]>(() => {
-    if (typeof window === "undefined") return initialReviews;
-    const saved = window.localStorage.getItem(reviewStorageKey);
-    return saved ? JSON.parse(saved) : initialReviews;
-  });
-
-  const [contacts, setContacts] = useState<AdminContact[]>(() => {
-    if (typeof window === "undefined") return initialContacts;
-    const saved = window.localStorage.getItem(contactStorageKey);
-    return saved ? JSON.parse(saved) : initialContacts;
-  });
-
-  const [customers, setCustomers] = useState<AdminCustomer[]>(() => {
-    if (typeof window === "undefined") return initialCustomers;
-    const saved = window.localStorage.getItem(customerStorageKey);
-    return saved ? JSON.parse(saved) : initialCustomers;
-  });
+  const [reviews, setReviews] = useState<AdminReview[]>([]);
+  const [customers, setCustomers] = useState<AdminCustomer[]>([]);
 
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>(() => {
     if (typeof window === "undefined") return initialMediaFiles;
@@ -515,7 +492,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     return !!window.localStorage.getItem(authStorageKey);
   });
   const [currentAdmin, setCurrentAdmin] = useState<{ id: number; email: string; fullName: string; role: string } | null>(null);
-  // Kiểm tra phiên làm việc ngay khi load trang
+  // Kiá»ƒm tra phiÃªn lÃ m viá»‡c ngay khi load trang
   useEffect(() => {
     async function checkSession() {
       try {
@@ -535,7 +512,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
           }
         }
       } catch (err) {
-        console.error("Lỗi kiểm tra phiên làm việc:", err);
+        console.error("Lá»—i kiá»ƒm tra phiÃªn lÃ m viá»‡c:", err);
       }
     }
     checkSession();
@@ -561,6 +538,82 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     loadDbPosts();
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    async function loadDbPackages() {
+      if (isAuthenticated) {
+        try {
+          const res = await fetch("/api/admin/packages");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && Array.isArray(data.packages)) {
+              setPackages(data.packages);
+            }
+          }
+        } catch (err) {
+          console.error("Lỗi khi tải danh sách gói du lịch từ database:", err);
+        }
+      }
+    }
+    loadDbPackages();
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    async function loadDbBookings() {
+      if (isAuthenticated) {
+        try {
+          const res = await fetch("/api/admin/bookings");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && Array.isArray(data.bookings)) {
+              setBookings(data.bookings);
+            }
+          }
+        } catch (err) {
+          console.error("Lá»—i khi táº£i danh sÃ¡ch bookings tá»« database:", err);
+        }
+      }
+    }
+    loadDbBookings();
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    async function loadDbReviews() {
+      if (isAuthenticated) {
+        try {
+          const res = await fetch("/api/admin/reviews");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && Array.isArray(data.reviews)) {
+              setReviews(data.reviews);
+            }
+          }
+        } catch (err) {
+          console.error("Lá»—i khi táº£i danh sÃ¡ch reviews tá»« database:", err);
+        }
+      }
+    }
+    loadDbReviews();
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    async function loadDbCustomers() {
+      if (isAuthenticated) {
+        try {
+          const res = await fetch("/api/admin/customers");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && Array.isArray(data.customers)) {
+              setCustomers(data.customers);
+            }
+          }
+        } catch (err) {
+          console.error("Lá»—i khi táº£i danh sÃ¡ch khÃ¡ch hÃ ng tá»« database:", err);
+        }
+      }
+    }
+    loadDbCustomers();
+  }, [isAuthenticated]);
+
   // Effects to save states to localstorage
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(postStorageKey, JSON.stringify(posts)); }, [posts]);
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(packageStorageKey, JSON.stringify(packages)); }, [packages]);
@@ -574,9 +627,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(bookingStorageKey, JSON.stringify(bookings)); }, [bookings]);
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(languageStorageKey, JSON.stringify(languages)); }, [languages]);
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(translationStorageKey, JSON.stringify(translations)); }, [translations]);
-  useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(reviewStorageKey, JSON.stringify(reviews)); }, [reviews]);
-  useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(contactStorageKey, JSON.stringify(contacts)); }, [contacts]);
-  useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(customerStorageKey, JSON.stringify(customers)); }, [customers]);
+
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(mediaStorageKey, JSON.stringify(mediaFiles)); }, [mediaFiles]);
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(seoStorageKey, JSON.stringify(seoConfigs)); }, [seoConfigs]);
 
@@ -591,6 +642,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     readTime?: string;
     seoDescription?: string;
     summary?: string;
+    translations?: ContentTranslationMap;
   }) {
     try {
       const res = await fetch("/api/admin/posts", {
@@ -603,15 +655,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         if (data.success && data.post) {
           setPosts((current) => [data.post, ...current]);
         } else {
-          alert(data.error || "Lỗi khi tạo bài viết.");
+          alert(data.error || "Lá»—i khi táº¡o bÃ i viáº¿t.");
         }
       } else {
         const errorData = await res.json().catch(() => ({}));
-        alert(errorData.error || "Lỗi kết nối máy chủ khi tạo bài viết.");
+        alert(errorData.error || "Lá»—i káº¿t ná»‘i mÃ¡y chá»§ khi táº¡o bÃ i viáº¿t.");
       }
     } catch (err) {
-      console.error("Lỗi khi thêm bài viết:", err);
-      alert("Lỗi hệ thống khi thêm bài viết.");
+      console.error("Lá»—i khi thÃªm bÃ i viáº¿t:", err);
+      alert("Lá»—i há»‡ thá»‘ng khi thÃªm bÃ i viáº¿t.");
     }
   }
 
@@ -629,15 +681,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             current.map((post) => (post.id === id ? { ...post, ...data.post } : post))
           );
         } else {
-          alert(data.error || "Lỗi khi cập nhật bài viết.");
+          alert(data.error || "Lá»—i khi cáº­p nháº­t bÃ i viáº¿t.");
         }
       } else {
         const errorData = await res.json().catch(() => ({}));
-        alert(errorData.error || "Lỗi kết nối máy chủ khi cập nhật bài viết.");
+        alert(errorData.error || "Lá»—i káº¿t ná»‘i mÃ¡y chá»§ khi cáº­p nháº­t bÃ i viáº¿t.");
       }
     } catch (err) {
-      console.error("Lỗi khi cập nhật bài viết:", err);
-      alert("Lỗi hệ thống khi cập nhật bài viết.");
+      console.error("Lá»—i khi cáº­p nháº­t bÃ i viáº¿t:", err);
+      alert("Lá»—i há»‡ thá»‘ng khi cáº­p nháº­t bÃ i viáº¿t.");
     }
   }
 
@@ -651,15 +703,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         if (data.success) {
           setPosts((current) => current.filter((p) => p.id !== id));
         } else {
-          alert(data.error || "Lỗi khi xóa bài viết.");
+          alert(data.error || "Lá»—i khi xÃ³a bÃ i viáº¿t.");
         }
       } else {
         const errorData = await res.json().catch(() => ({}));
-        alert(errorData.error || "Lỗi kết nối máy chủ khi xóa bài viết.");
+        alert(errorData.error || "Lá»—i káº¿t ná»‘i mÃ¡y chá»§ khi xÃ³a bÃ i viáº¿t.");
       }
     } catch (err) {
-      console.error("Lỗi khi xóa bài viết:", err);
-      alert("Lỗi hệ thống khi xóa bài viết.");
+      console.error("Lá»—i khi xÃ³a bÃ i viáº¿t:", err);
+      alert("Lá»—i há»‡ thá»‘ng khi xÃ³a bÃ i viáº¿t.");
     }
   }
 
@@ -669,9 +721,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         id: Date.now(),
         name: p.name,
         destination: p.destination,
-        duration: p.duration ?? "3 ngày 2 đêm",
+        duration: p.duration ?? "3 ngÃ y 2 Ä‘Ãªm",
         price: p.price ?? "Liên hệ",
-        status: p.status ?? "Đang mở",
+        status: p.status ?? "Äang má»Ÿ",
       },
       ...current,
     ]);
@@ -772,24 +824,65 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Booking CRUD
-  function addBooking(b: Omit<AdminBooking, "id" | "bookingDate" | "status">) {
-    setBookings((current) => [
-      {
-        id: Date.now(),
-        bookingDate: new Date().toISOString().split("T")[0],
-        status: "Chờ xử lý",
-        ...b,
-      },
-      ...current,
-    ]);
+  async function addBooking(b: Omit<AdminBooking, "id" | "bookingDate" | "status">) {
+    try {
+      const res = await fetch("/api/admin/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(b),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.booking) {
+          setBookings((current) => [data.booking, ...current]);
+        } else {
+          alert(data.error || "Lá»—i khi táº¡o booking.");
+        }
+      }
+    } catch (err) {
+      console.error("Lá»—i khi thÃªm booking:", err);
+      alert("Lá»—i há»‡ thá»‘ng khi thÃªm booking.");
+    }
   }
 
-  function updateBooking(id: number, updated: Partial<AdminBooking>) {
-    setBookings((current) => current.map((it) => (it.id === id ? { ...it, ...updated } : it)));
+  async function updateBooking(id: number, updated: Partial<AdminBooking>) {
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.booking) {
+          setBookings((current) => current.map((it) => (it.id === id ? { ...it, ...data.booking } : it)));
+        } else {
+          alert(data.error || "Lá»—i khi cáº­p nháº­t booking.");
+        }
+      }
+    } catch (err) {
+      console.error("Lá»—i khi cáº­p nháº­t booking:", err);
+      alert("Lá»—i há»‡ thá»‘ng khi cáº­p nháº­t booking.");
+    }
   }
 
-  function removeBooking(id: number) {
-    setBookings((current) => current.filter((it) => it.id !== id));
+  async function removeBooking(id: number) {
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setBookings((current) => current.filter((it) => it.id !== id));
+        } else {
+          alert(data.error || "Lá»—i khi xÃ³a booking.");
+        }
+      }
+    } catch (err) {
+      console.error("Lá»—i khi xÃ³a booking:", err);
+      alert("Lá»—i há»‡ thá»‘ng khi xÃ³a booking.");
+    }
   }
 
   // Language CRUD
@@ -819,66 +912,110 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Review CRUD
-  function addReview(rev: Omit<AdminReview, "id" | "date">) {
-    setReviews((current) => [
-      {
-        id: Date.now(),
-        date: new Date().toISOString().split("T")[0],
-        ...rev,
-      },
-      ...current,
-    ]);
+  async function addReview(rev: Omit<AdminReview, "id" | "date">) {
+    try {
+      const res = await fetch("/api/admin/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(rev),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.review) {
+          setReviews((current) => [data.review, ...current]);
+        }
+      }
+    } catch (err) {
+      console.error("Lá»—i khi thÃªm review:", err);
+    }
   }
 
-  function updateReview(id: number, updated: Partial<AdminReview>) {
-    setReviews((current) => current.map((it) => (it.id === id ? { ...it, ...updated } : it)));
+  async function updateReview(id: number, updated: Partial<AdminReview>) {
+    try {
+      const res = await fetch(`/api/admin/reviews/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.review) {
+          setReviews((current) => current.map((it) => (it.id === id ? { ...it, ...data.review } : it)));
+        }
+      }
+    } catch (err) {
+      console.error("Lá»—i khi cáº­p nháº­t review:", err);
+    }
   }
 
-  function removeReview(id: number) {
-    setReviews((current) => current.filter((it) => it.id !== id));
+  async function removeReview(id: number) {
+    try {
+      const res = await fetch(`/api/admin/reviews/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setReviews((current) => current.filter((it) => it.id !== id));
+        }
+      }
+    } catch (err) {
+      console.error("Lá»—i khi xÃ³a review:", err);
+    }
   }
 
-  // Contact CRUD
-  function addContact(c: Omit<AdminContact, "id" | "date" | "status">) {
-    setContacts((current) => [
-      {
-        id: Date.now(),
-        date: new Date().toISOString().split("T")[0],
-        status: "Chưa đọc",
-        ...c,
-      },
-      ...current,
-    ]);
-  }
-
-  function updateContact(id: number, updated: Partial<AdminContact>) {
-    setContacts((current) => current.map((it) => (it.id === id ? { ...it, ...updated } : it)));
-  }
-
-  function removeContact(id: number) {
-    setContacts((current) => current.filter((it) => it.id !== id));
-  }
 
   // Customer CRUD
-  function addCustomer(c: Omit<AdminCustomer, "id" | "dateAdded" | "totalBookings" | "totalSpent">) {
-    setCustomers((current) => [
-      {
-        id: Date.now(),
-        dateAdded: new Date().toISOString().split("T")[0],
-        totalBookings: 0,
-        totalSpent: "0đ",
-        ...c,
-      },
-      ...current,
-    ]);
+  async function addCustomer(c: Omit<AdminCustomer, "id" | "dateAdded" | "totalBookings" | "totalSpent">) {
+    try {
+      const res = await fetch("/api/admin/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(c),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.customer) {
+          setCustomers((current) => [data.customer, ...current]);
+        }
+      }
+    } catch (err) {
+      console.error("Lá»—i khi thÃªm customer:", err);
+    }
   }
 
-  function updateCustomer(id: number, updated: Partial<AdminCustomer>) {
-    setCustomers((current) => current.map((it) => (it.id === id ? { ...it, ...updated } : it)));
+  async function updateCustomer(id: number, updated: Partial<AdminCustomer>) {
+    try {
+      const res = await fetch(`/api/admin/customers/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.customer) {
+          setCustomers((current) => current.map((it) => (it.id === id ? { ...it, ...data.customer } : it)));
+        }
+      }
+    } catch (err) {
+      console.error("Lá»—i khi cáº­p nháº­t customer:", err);
+    }
   }
 
-  function removeCustomer(id: number) {
-    setCustomers((current) => current.filter((it) => it.id !== id));
+  async function removeCustomer(id: number) {
+    try {
+      const res = await fetch(`/api/admin/customers/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setCustomers((current) => current.filter((it) => it.id !== id));
+        }
+      }
+    } catch (err) {
+      console.error("Lá»—i khi xÃ³a customer:", err);
+    }
   }
 
   // Media CRUD
@@ -922,8 +1059,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         }
         return true;
       } else {
-        // Ném lỗi nhận được từ API để Client bắt được thông báo lỗi cụ thể
-        throw new Error(data.error || "Tên đăng nhập hoặc mật khẩu không hợp lệ.");
+        // NÃ©m lá»—i nháº­n Ä‘Æ°á»£c tá»« API Ä‘á»ƒ Client báº¯t Ä‘Æ°á»£c thÃ´ng bÃ¡o lá»—i cá»¥ thá»ƒ
+        throw new Error(data.error || "TÃªn Ä‘Äƒng nháº­p hoáº·c máº­t kháº©u khÃ´ng há»£p lá»‡.");
       }
     } catch (error: any) {
       setIsAuthenticated(false);
@@ -941,7 +1078,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         method: "POST",
       });
     } catch (error) {
-      console.error("Lỗi gọi API đăng xuất:", error);
+      console.error("Lá»—i gá»i API Ä‘Äƒng xuáº¥t:", error);
     } finally {
       setIsAuthenticated(false);
       setCurrentAdmin(null);
@@ -967,7 +1104,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       window.localStorage.removeItem(languageStorageKey);
       window.localStorage.removeItem(translationStorageKey);
       window.localStorage.removeItem(reviewStorageKey);
-      window.localStorage.removeItem(contactStorageKey);
+
       window.localStorage.removeItem(customerStorageKey);
       window.localStorage.removeItem(mediaStorageKey);
       window.localStorage.removeItem(seoStorageKey);
@@ -986,7 +1123,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     setLanguages(initialLanguages);
     setTranslations(initialTranslations);
     setReviews(initialReviews);
-    setContacts(initialContacts);
+
     setCustomers(initialCustomers);
     setMediaFiles(initialMediaFiles);
     setSeoConfigs(initialSeoConfigs);
@@ -1006,7 +1143,6 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     languages,
     translations,
     reviews,
-    contacts,
     customers,
     mediaFiles,
     seoConfigs,
@@ -1061,9 +1197,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     updateReview,
     removeReview,
 
-    addContact,
-    updateContact,
-    removeContact,
+
 
     addCustomer,
     updateCustomer,
@@ -1089,3 +1223,6 @@ export function useAdmin() {
   if (!ctx) throw new Error("useAdmin must be used inside AdminProvider");
   return ctx;
 }
+
+
+

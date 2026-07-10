@@ -63,7 +63,7 @@ export default function PostCategoriesPage() {
     if (!addName.trim()) return;
 
     if (postCategories.some((c) => c.name.toLowerCase() === addName.trim().toLowerCase())) {
-      alert("Danh mục này đã tồn tại!");
+      alert("Danh m?c n?y ?? t?n t?i!");
       return;
     }
 
@@ -79,7 +79,7 @@ export default function PostCategoriesPage() {
     if (!editName.trim() || editingId === null) return;
 
     if (postCategories.some((c) => c.id !== editingId && c.name.toLowerCase() === editName.trim().toLowerCase())) {
-      alert("Danh mục khác đã sử dụng tên này!");
+      alert("Danh m?c kh?c ?? s? d?ng t?n n?y!");
       return;
     }
 
