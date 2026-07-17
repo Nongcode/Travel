@@ -30,7 +30,7 @@ export function PackageDetailGallery({
   };
 
   return (
-    <div className="detail-gallery-shell" aria-label={`Bo suu tap anh cua ${title}`}>
+    <div className="detail-gallery-shell" aria-label={`Bộ sưu tập ảnh của ${title}`}>
       <div
         className="detail-gallery-main"
         style={{ backgroundImage: `url(${images[activeIndex]})` }}
@@ -45,7 +45,7 @@ export function PackageDetailGallery({
         <button
           type="button"
           className="gallery-nav prev"
-          aria-label="Anh truoc"
+          aria-label="Ảnh trước"
           onClick={showPrevious}
         />
 
@@ -56,11 +56,11 @@ export function PackageDetailGallery({
               key={`${image}-${index}`}
               className={`detail-gallery-thumb${index === activeIndex ? " active" : ""}`}
               style={{ backgroundImage: `url(${image})` }}
-              aria-label={`Chon anh ${index + 1}`}
+              aria-label={`Chọn ảnh ${index + 1}`}
               aria-pressed={index === activeIndex}
               onClick={() => selectImage(index)}
             >
-              <span className="sr-only">Anh {index + 1}</span>
+              <span className="sr-only">Ảnh {index + 1}</span>
             </button>
           ))}
         </div>
@@ -68,7 +68,7 @@ export function PackageDetailGallery({
         <button
           type="button"
           className="gallery-nav next"
-          aria-label="Anh tiep theo"
+          aria-label="Ảnh tiếp theo"
           onClick={showNext}
         />
       </div>

@@ -63,7 +63,7 @@ export default function PostCategoriesPage() {
     if (!addName.trim()) return;
 
     if (postCategories.some((c) => c.name.toLowerCase() === addName.trim().toLowerCase())) {
-      alert("Danh m?c n?y ?? t?n t?i!");
+      alert("Danh mục này đã tồn tại!");
       return;
     }
 
@@ -79,7 +79,7 @@ export default function PostCategoriesPage() {
     if (!editName.trim() || editingId === null) return;
 
     if (postCategories.some((c) => c.id !== editingId && c.name.toLowerCase() === editName.trim().toLowerCase())) {
-      alert("Danh m?c kh?c ?? s? d?ng t?n n?y!");
+      alert("Danh mục khác đã sử dụng tên này!");
       return;
     }
 
@@ -99,7 +99,7 @@ export default function PostCategoriesPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
@@ -231,11 +231,10 @@ export default function PostCategoriesPage() {
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    currentPage === page
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${currentPage === page
                       ? "bg-emerald-600 text-white"
                       : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
+                    }`}
                 >
                   {page}
                 </button>

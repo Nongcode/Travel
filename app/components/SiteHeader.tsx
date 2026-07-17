@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { stripLocaleFromPath, withLocalePrefix } from "@/lib/i18n/config";
 import { useI18n } from "./I18nProvider";
 
@@ -147,7 +148,15 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
   const pathname = usePathname() || "/";
   const strippedPath = stripLocaleFromPath(pathname).pathname;
   const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const isHeroHeader = variant === "hero";
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setIsMounted(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   useEffect(() => {
     if (!isHeroHeader) return;
@@ -168,14 +177,187 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
     };
   }, [isHeroHeader]);
 
-  const headerClassName = ["site-header", variant === "solid" ? "solid-header" : "", isHeroHeader && hasScrolledPastHero ? "scrolled-header" : ""].filter(Boolean).join(" ");
+  // Lock body scroll when a mobile overlay is open
+  useEffect(() => {
+    if (isMobileMenuOpen || isMobileSearchOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen, isMobileSearchOpen]);
+
+  useEffect(() => {
+    if (!isMobileSearchOpen) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMobileSearchOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [isMobileSearchOpen]);
+
+  // Auto-close menu when route changes
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setIsMobileMenuOpen(false);
+      setIsMobileSearchOpen(false);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [pathname]);
+
+  useLayoutEffect(() => {
+    const resetHorizontalScroll = () => {
+      const scrollingElement = document.scrollingElement as HTMLElement | null;
+      const scrollRoots = [scrollingElement, document.documentElement, document.body];
+
+      for (const root of scrollRoots) {
+        if (root && root.scrollLeft !== 0) {
+          root.scrollLeft = 0;
+        }
+      }
+
+      if (window.scrollX !== 0) {
+        window.scrollTo(0, window.scrollY);
+      }
+    };
+
+    resetHorizontalScroll();
+    const firstFrame = window.requestAnimationFrame(resetHorizontalScroll);
+    let secondFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(resetHorizontalScroll);
+    });
+    const stabilizer = window.setInterval(resetHorizontalScroll, 120);
+    const stopStabilizer = window.setTimeout(() => window.clearInterval(stabilizer), 1800);
+
+    window.addEventListener("resize", resetHorizontalScroll);
+    window.addEventListener("orientationchange", resetHorizontalScroll);
+    window.addEventListener("scroll", resetHorizontalScroll, { passive: true });
+    window.visualViewport?.addEventListener("resize", resetHorizontalScroll);
+    window.visualViewport?.addEventListener("scroll", resetHorizontalScroll);
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(secondFrame);
+      window.clearInterval(stabilizer);
+      window.clearTimeout(stopStabilizer);
+      window.removeEventListener("resize", resetHorizontalScroll);
+      window.removeEventListener("orientationchange", resetHorizontalScroll);
+      window.removeEventListener("scroll", resetHorizontalScroll);
+      window.visualViewport?.removeEventListener("resize", resetHorizontalScroll);
+      window.visualViewport?.removeEventListener("scroll", resetHorizontalScroll);
+    };
+  }, [pathname]);
+
+  const headerClassName = [
+    "site-header",
+    variant === "solid" ? "solid-header" : "",
+    isHeroHeader && hasScrolledPastHero ? "scrolled-header" : "",
+    isMobileMenuOpen ? "mobile-menu-active" : ""
+  ].filter(Boolean).join(" ");
+
+  const mobileOverlays = (
+    <>
+      <div 
+        className={`mobile-menu-backdrop ${isMobileMenuOpen ? "open" : ""}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+
+      <div className={`mobile-menu-drawer ${isMobileMenuOpen ? "open" : ""}`}>
+        <div className="drawer-header">
+          <Link className="brand" href={href("/")} onClick={() => setIsMobileMenuOpen(false)}>
+            <Image src="/vietvista-logo.png" alt="VietVista Travel & Discover" width={114} height={75} priority />
+          </Link>
+          <button 
+            className="drawer-close"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-label="Close menu"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="close-svg-icon">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <nav className="mobile-nav">
+          {navItems.map((item) => {
+            const itemHref = href(item.href);
+            const isHome = item.href === "/";
+            const isActive = isHome ? strippedPath === "/" : strippedPath.startsWith(item.href);
+            return (
+              <Link
+                href={itemHref}
+                key={item.href}
+                className={isActive ? "active" : ""}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {t("nav", item.key, item.fallback)}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+
+      <div
+        className={`mobile-search-modal-backdrop ${isMobileSearchOpen ? "open" : ""}`}
+        onClick={() => setIsMobileSearchOpen(false)}
+      />
+      <div className={`mobile-search-modal ${isMobileSearchOpen ? "open" : ""}`} role="dialog" aria-modal="true" aria-label={t("nav", "search_trip", "Tìm chuyến đi")}>
+        <div className="mobile-search-modal-header">
+          <div>
+            <p className="mobile-search-kicker">VietVista</p>
+            <h2>{t("nav", "search_trip", "Tìm chuyến đi")}</h2>
+          </div>
+          <button type="button" className="mobile-search-close" onClick={() => setIsMobileSearchOpen(false)} aria-label="Close search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <form className="mobile-search-form" action={href("/goi-du-lich")}>
+          <label>
+            <span>{t("home", "search_destination", "Điểm đến")}</span>
+            <input name="destination" placeholder={t("home", "search_destination_placeholder", "Bạn muốn đi đâu?")} />
+          </label>
+
+          <label>
+            <span>{t("home", "search_style", "Phong cách")}</span>
+            <select name="style" defaultValue="">
+              <option value="">{t("home", "search_style_placeholder", "Chọn trải nghiệm")}</option>
+              <option value="family">{t("home", "style_family", "Gia đình")}</option>
+              <option value="friends">{t("home", "style_friends", "Nhóm bạn")}</option>
+              <option value="resort">{t("home", "style_resort", "Nghỉ dưỡng")}</option>
+              <option value="photo">{t("home", "style_photo", "Chụp ảnh")}</option>
+            </select>
+          </label>
+
+          <label>
+            <span>{t("home", "search_time", "Thời gian")}</span>
+            <input name="date" type="month" />
+          </label>
+
+          <button type="submit">{t("home", "search_submit", "Tìm chuyến đi")}</button>
+        </form>
+      </div>
+    </>
+  );
 
   return (
+    <>
     <header className={headerClassName}>
       <Link className="brand" href={href("/")} aria-label={t("nav", "home", "Trang chủ")}>
         <Image src="/vietvista-logo.png" alt="VietVista Travel & Discover" width={152} height={100} priority />
       </Link>
-      <nav aria-label="Điều hướng chính">
+      
+      {/* Desktop Navigation */}
+      <nav className="desktop-nav" aria-label="Điều hướng chính">
         {navItems.map((item) => {
           const itemHref = href(item.href);
           const isHome = item.href === "/";
@@ -195,6 +377,38 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
         </Link>
         <LanguageSwitcher />
       </nav>
+
+      <div className="mobile-header-actions" aria-label="Thao tác nhanh">
+        <button
+          type="button"
+          className="mobile-header-search"
+          aria-label={t("nav", "search_trip", "Tìm chuyến đi")}
+          onClick={() => {
+            setIsMobileMenuOpen(false);
+            setIsMobileSearchOpen(true);
+          }}
+        >
+          <span className="search-icon" aria-hidden="true" />
+        </button>
+
+        <div className="mobile-header-language">
+          <LanguageSwitcher />
+        </div>
+
+        <button 
+          className={`mobile-menu-toggle ${isMobileMenuOpen ? "open" : ""}`}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle menu"
+          aria-expanded={isMobileMenuOpen}
+        >
+          <span className="hamburger-line line-1" />
+          <span className="hamburger-line line-2" />
+          <span className="hamburger-line line-3" />
+        </button>
+      </div>
+
     </header>
+    {isMounted ? createPortal(mobileOverlays, document.body) : null}
+    </>
   );
 }
