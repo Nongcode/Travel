@@ -99,7 +99,7 @@ export default function PostCategoriesPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
@@ -231,11 +231,10 @@ export default function PostCategoriesPage() {
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    currentPage === page
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${currentPage === page
                       ? "bg-emerald-600 text-white"
                       : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
+                    }`}
                 >
                   {page}
                 </button>

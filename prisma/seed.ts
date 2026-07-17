@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { destinations, posts, offers, packages, packageCollections } from "../app/data/travel";
@@ -69,14 +69,29 @@ async function main() {
 
   // 4. Seed Package Collections
   for (const collection of packageCollections) {
-    const createdCollection = await prisma.packageCollection.create({
-      data: {
-        eyebrow: collection.eyebrow,
-        title: collection.title,
-        description: collection.description,
-        accent: collection.accent,
-      },
+    const existingCollection = await prisma.packageCollection.findFirst({
+      where: { accent: collection.accent },
+      orderBy: { id: "asc" },
     });
+
+    const createdCollection = existingCollection
+      ? await prisma.packageCollection.update({
+          where: { id: existingCollection.id },
+          data: {
+            eyebrow: collection.eyebrow,
+            title: collection.title,
+            description: collection.description,
+            accent: collection.accent,
+          },
+        })
+      : await prisma.packageCollection.create({
+          data: {
+            eyebrow: collection.eyebrow,
+            title: collection.title,
+            description: collection.description,
+            accent: collection.accent,
+          },
+        });
 
     // Link items
     for (let i = 0; i < collection.items.length; i++) {
@@ -85,8 +100,15 @@ async function main() {
         where: { slug: item.slug },
       });
       if (pkg) {
-        await prisma.packageCollectionItem.create({
-          data: {
+        await prisma.packageCollectionItem.upsert({
+          where: {
+            collectionId_packageId: {
+              collectionId: createdCollection.id,
+              packageId: pkg.id,
+            },
+          },
+          update: { sortOrder: i },
+          create: {
             collectionId: createdCollection.id,
             packageId: pkg.id,
             sortOrder: i,
@@ -170,7 +192,7 @@ async function main() {
         relatedPackageId: relatedPackageId,
         summary: detailed?.summary,
         seoDescription: detailed?.seoDescription,
-        contentBlocks: detailed ? (detailed.blocks as any) : undefined,
+        contentBlocks: detailed ? (detailed.blocks as Prisma.InputJsonValue) : undefined,
         publishedAt: publishDate,
       },
     });

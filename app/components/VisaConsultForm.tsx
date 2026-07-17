@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useI18n } from "./I18nProvider";
 
 type StoredContact = {
   id: number;
@@ -15,7 +16,57 @@ type StoredContact = {
 
 const contactStorageKey = "vietvista-admin-contacts";
 
+const visaFormCopy = {
+  vi: {
+    email: "Email",
+    phone: "Số điện thoại",
+    country: "Quốc gia cần xin visa",
+    chooseCountry: "Chọn quốc gia",
+    visaType: "Loại visa",
+    chooseNeed: "Chọn nhu cầu",
+    travelDate: "Thời gian dự kiến khởi hành",
+    fileNote: "Ghi chú hồ sơ",
+    filePlaceholder: "Số người đi, lịch sử visa, nghề nghiệp, nơi đang sinh sống...",
+    submit: "Gửi yêu cầu tư vấn visa",
+    success: "Đã ghi nhận thông tin. Quản trị viên có thể xem yêu cầu này trong mục Liên hệ & Tư vấn.",
+    countries: ["Hàn Quốc", "Nhật Bản", "Trung Quốc", "Đài Loan", "Châu Âu - Schengen", "Úc", "Canada", "Mỹ", "Quốc gia khác"],
+    types: ["Du lịch tự túc", "Du lịch theo tour", "Thăm thân kết hợp du lịch", "Công tác ngắn ngày"],
+  },
+  en: {
+    email: "Email",
+    phone: "Phone number",
+    country: "Visa destination country",
+    chooseCountry: "Choose a country",
+    visaType: "Visa type",
+    chooseNeed: "Choose a need",
+    travelDate: "Expected departure time",
+    fileNote: "File notes",
+    filePlaceholder: "Number of travelers, visa history, occupation, current residence...",
+    submit: "Send visa consultation request",
+    success: "Your information has been received. Admins can view this request in Contact & Consultation.",
+    countries: ["South Korea", "Japan", "China", "Taiwan", "Europe - Schengen", "Australia", "Canada", "United States", "Other country"],
+    types: ["Independent travel", "Tour travel", "Family visit with travel", "Short business trip"],
+  },
+  "zh-CN": {
+    email: "邮箱",
+    phone: "电话号码",
+    country: "签证目的地国家",
+    chooseCountry: "选择国家",
+    visaType: "签证类型",
+    chooseNeed: "选择需求",
+    travelDate: "预计出发时间",
+    fileNote: "材料备注",
+    filePlaceholder: "出行人数、签证记录、职业、现居地...",
+    submit: "发送签证咨询请求",
+    success: "已收到你的信息。管理员可在联系与咨询模块查看此请求。",
+    countries: ["韩国", "日本", "中国", "台湾", "欧洲 - 申根", "澳大利亚", "加拿大", "美国", "其他国家"],
+    types: ["自由行", "跟团游", "探亲结合旅游", "短期商务"],
+  },
+};
+
 export function VisaConsultForm() {
+  const { locale, t } = useI18n();
+  const copy = visaFormCopy[locale as keyof typeof visaFormCopy] || visaFormCopy.vi;
   const [sent, setSent] = useState(false);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -60,67 +111,55 @@ export function VisaConsultForm() {
   return (
     <form className="lead-form visa-consult-form" onSubmit={handleSubmit}>
       <label>
-        Họ và tên
+        {t("form", "name", "Họ và tên")}
         <input suppressHydrationWarning name="name" type="text" placeholder="Nguyễn Minh Anh" required />
       </label>
       <div className="visa-form-grid">
         <label>
-          Email
+          {copy.email}
           <input suppressHydrationWarning name="email" type="email" placeholder="email@example.com" required />
         </label>
         <label>
-          Số điện thoại
+          {copy.phone}
           <input suppressHydrationWarning name="phone" type="tel" placeholder="09xx xxx xxx" required />
         </label>
       </div>
       <div className="visa-form-grid">
         <label>
-          Quốc gia cần xin visa
+          {copy.country}
           <select suppressHydrationWarning name="destination" defaultValue="" required>
             <option value="" disabled>
-              Chọn quốc gia
+              {copy.chooseCountry}
             </option>
-            <option>Hàn Quốc</option>
-            <option>Nhật Bản</option>
-            <option>Trung Quốc</option>
-            <option>Đài Loan</option>
-            <option>Châu Âu - Schengen</option>
-            <option>Úc</option>
-            <option>Canada</option>
-            <option>Mỹ</option>
-            <option>Quốc gia khác</option>
+            {copy.countries.map((country) => (
+              <option key={country}>{country}</option>
+            ))}
           </select>
         </label>
         <label>
-          Loại visa
+          {copy.visaType}
           <select suppressHydrationWarning name="visaType" defaultValue="" required>
             <option value="" disabled>
-              Chọn nhu cầu
+              {copy.chooseNeed}
             </option>
-            <option>Du lịch tự túc</option>
-            <option>Du lịch theo tour</option>
-            <option>Thăm thân kết hợp du lịch</option>
-            <option>Công tác ngắn ngày</option>
+            {copy.types.map((type) => (
+              <option key={type}>{type}</option>
+            ))}
           </select>
         </label>
       </div>
       <label>
-        Thời gian dự kiến khởi hành
+        {copy.travelDate}
         <input suppressHydrationWarning name="travelDate" type="month" />
       </label>
       <label>
-        Ghi chú hồ sơ
-        <textarea
-          suppressHydrationWarning
-          name="message"
-          rows={4}
-          placeholder="Số người đi, lịch sử visa, nghề nghiệp, nơi đang sinh sống..."
-        />
+        {copy.fileNote}
+        <textarea suppressHydrationWarning name="message" rows={4} placeholder={copy.filePlaceholder} />
       </label>
-      <button suppressHydrationWarning type="submit">Gửi yêu cầu tư vấn visa</button>
+      <button suppressHydrationWarning type="submit">{copy.submit}</button>
       {sent ? (
         <p className="form-status visa-form-status" role="status">
-          Đã ghi nhận thông tin. Quản trị viên có thể xem yêu cầu này trong mục Liên hệ & Tư vấn.
+          {copy.success}
         </p>
       ) : null}
     </form>

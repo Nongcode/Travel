@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useI18n } from "./I18nProvider";
 import { PackageCard } from "./PackageCard";
 
 type TravelPackage = {
@@ -20,6 +21,7 @@ type PackageCollection = {
   title: string;
   description: string;
   accent: string;
+  key?: string;
   items: TravelPackage[];
 };
 
@@ -29,26 +31,14 @@ type PackageExplorerProps = {
   destinations: string[];
 };
 
-const durationOptions = [
-  { value: "", label: "Mọi thời lượng" },
-  { value: "short", label: "1 - 2 ngày" },
-  { value: "medium", label: "3 - 4 ngày" },
-  { value: "long", label: "5 ngày trở lên" },
-];
-
-const budgetOptions = [
-  { value: "", label: "Mọi ngân sách" },
-  { value: "under5", label: "Dưới 5 triệu" },
-  { value: "5to7", label: "5 - 7 triệu" },
-  { value: "over7", label: "Trên 7 triệu" },
-];
-
 function normalizeText(value: string) {
   return value
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d");
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "d")
+    .replace(/Ã„â€˜/g, "d");
 }
 
 function getDurationDays(duration: string) {
@@ -66,13 +56,28 @@ function getPriceInMillions(price: string) {
 }
 
 export function PackageExplorer({ packages, collections, destinations }: PackageExplorerProps) {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState("all");
   const [query, setQuery] = useState("");
   const [destination, setDestination] = useState("");
   const [duration, setDuration] = useState("");
   const [budget, setBudget] = useState("");
 
-  const activeCollection = collections.find((collection) => collection.accent === activeTab);
+  const durationOptions = [
+    { value: "", label: t("packages", "duration_all", "Mọi thời lượng") },
+    { value: "short", label: t("packages", "duration_short", "1 - 2 ngày") },
+    { value: "medium", label: t("packages", "duration_medium", "3 - 4 ngày") },
+    { value: "long", label: t("packages", "duration_long", "5 ngày trở lên") },
+  ];
+
+  const budgetOptions = [
+    { value: "", label: t("packages", "budget_all", "Mọi ngân sách") },
+    { value: "under5", label: t("packages", "budget_under5", "Dưới 5 triệu") },
+    { value: "5to7", label: t("packages", "budget_5to7", "5 - 7 triệu") },
+    { value: "over7", label: t("packages", "budget_over7", "Trên 7 triệu") },
+  ];
+
+  const activeCollection = collections.find((collection) => (collection.key || collection.accent) === activeTab);
   const basePackages = activeCollection ? activeCollection.items : packages;
   const normalizedQuery = normalizeText(query.trim());
 
@@ -110,29 +115,28 @@ export function PackageExplorer({ packages, collections, destinations }: Package
     <section className="package-finder" id="package-finder">
       <div className="package-finder-heading">
         <div>
-          <p className="eyebrow">Tìm gói phù hợp</p>
-          <h2>Lọc nhanh hành trình theo nhu cầu của bạn</h2>
+          <p className="eyebrow">{t("packages", "finder_eyebrow", "Tìm gói phù hợp")}</p>
+          <h2>{t("packages", "finder_title", "Lọc nhanh hành trình theo nhu cầu của bạn")}</h2>
         </div>
-        <p>
-          Chọn nhóm du lịch, điểm đến, thời lượng hoặc ngân sách để xem các gói đang phù hợp nhất.
-        </p>
+        <p>{t("packages", "finder_copy", "Chọn nhóm du lịch, điểm đến, thời lượng hoặc ngân sách để xem các gói đang phù hợp nhất.")}</p>
       </div>
 
       <div className="package-filter-panel">
         <form className="package-search-form" onSubmit={(event) => event.preventDefault()}>
           <label className="search-field wide-field">
-            Từ khóa
-            <input suppressHydrationWarning
+            {t("packages", "keyword", "Từ khóa")}
+            <input
+              suppressHydrationWarning
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Ví dụ: Phú Quốc, gia đình, roadtrip..."
+              placeholder={t("packages", "keyword_placeholder", "Ví dụ: Phú Quốc, gia đình, roadtrip...")}
               type="search"
             />
           </label>
           <label className="search-field">
-            Điểm đến
+            {t("packages", "destination", "Điểm đến")}
             <select suppressHydrationWarning value={destination} onChange={(event) => setDestination(event.target.value)}>
-              <option value="">Tất cả điểm đến</option>
+              <option value="">{t("packages", "all_destinations", "Tất cả điểm đến")}</option>
               {destinations.map((item) => (
                 <option value={item} key={item}>
                   {item}
@@ -141,7 +145,7 @@ export function PackageExplorer({ packages, collections, destinations }: Package
             </select>
           </label>
           <label className="search-field">
-            Thời lượng
+            {t("packages", "duration", "Thời lượng")}
             <select suppressHydrationWarning value={duration} onChange={(event) => setDuration(event.target.value)}>
               {durationOptions.map((item) => (
                 <option value={item.value} key={item.value}>
@@ -151,7 +155,7 @@ export function PackageExplorer({ packages, collections, destinations }: Package
             </select>
           </label>
           <label className="search-field">
-            Ngân sách
+            {t("packages", "budget", "Ngân sách")}
             <select suppressHydrationWarning value={budget} onChange={(event) => setBudget(event.target.value)}>
               {budgetOptions.map((item) => (
                 <option value={item.value} key={item.value}>
@@ -161,26 +165,26 @@ export function PackageExplorer({ packages, collections, destinations }: Package
             </select>
           </label>
           <button suppressHydrationWarning type="button" onClick={resetFilters}>
-            Xóa lọc
+            {t("packages", "reset_filters", "Xóa lọc")}
           </button>
         </form>
 
-        <div className="package-tab-list" aria-label="Lọc theo nhóm gói du lịch">
+        <div className="package-tab-list" aria-label={t("packages", "filter_by_group", "Lọc theo nhóm gói du lịch")}>
           <button
             suppressHydrationWarning
             className={activeTab === "all" ? "active" : ""}
             type="button"
             onClick={() => setActiveTab("all")}
           >
-            Tất cả gói
+            {t("packages", "all_packages", "Tất cả gói")}
           </button>
-          {collections.map((collection) => (
+          {collections.map((collection, index) => (
             <button
               suppressHydrationWarning
-              className={activeTab === collection.accent ? "active" : ""}
+              className={activeTab === (collection.key || collection.accent) ? "active" : ""}
               type="button"
-              key={collection.accent}
-              onClick={() => setActiveTab(collection.accent)}
+              key={collection.key || `${collection.accent}-${index}`}
+              onClick={() => setActiveTab(collection.key || collection.accent)}
             >
               {collection.eyebrow}
             </button>
@@ -189,22 +193,22 @@ export function PackageExplorer({ packages, collections, destinations }: Package
       </div>
 
       <div className="package-result-bar">
-        <span>{filteredPackages.length} gói phù hợp</span>
-        <strong>{activeCollection ? activeCollection.title : "Tất cả hành trình đang có"}</strong>
+        <span>{filteredPackages.length} {t("packages", "matching_suffix", "gói phù hợp")}</span>
+        <strong>{activeCollection ? activeCollection.title : t("packages", "all_journeys", "Tất cả hành trình đang có")}</strong>
       </div>
 
       {filteredPackages.length > 0 ? (
         <div className="package-grid wide">
-          {filteredPackages.map((item) => (
-            <PackageCard item={item} key={item.slug} />
+          {filteredPackages.map((item, index) => (
+            <PackageCard item={item} key={`${item.slug}-${item.id}-${index}`} />
           ))}
         </div>
       ) : (
         <div className="empty-package-state">
-          <h3>Chưa có gói trùng bộ lọc</h3>
-          <p>Thử đổi điểm đến, thời lượng hoặc ngân sách để xem thêm gợi ý phù hợp.</p>
+          <h3>{t("packages", "empty_title", "Chưa có gói trùng bộ lọc")}</h3>
+          <p>{t("packages", "empty_copy", "Thử đổi điểm đến, thời lượng hoặc ngân sách để xem thêm gợi ý phù hợp.")}</p>
           <button suppressHydrationWarning type="button" onClick={resetFilters}>
-            Xem lại tất cả gói
+            {t("packages", "empty_button", "Xem lại tất cả gói")}
           </button>
         </div>
       )}

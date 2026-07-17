@@ -35,7 +35,8 @@ model Banner {
   imageUrl   String   @map("image_url")
   linkUrl    String?  @map("link_url")
   bannerType String   @default("homepage") @map("banner_type")
-  status     String   @default("Đang mở")
+  mediaType  String   @default("image") @map("media_type")
+  status     String   @default("Äang má»Ÿ")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
@@ -55,12 +56,14 @@ model NavigationMenu {
 }
 
 model Destination {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
-  slug      String?   @unique
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  packages  Package[]
+  id               Int              @id @default(autoincrement())
+  name             String           @unique
+  slug             String?          @unique
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  packages         Package[]
+  localSpecialties LocalSpecialty[]
+  posts            Post[]
 
   @@map("destinations")
 }
@@ -76,6 +79,18 @@ model Category {
   @@map("categories")
 }
 
+model PackageCategory {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  packages    Package[]
+
+  @@map("package_categories")
+}
+
 model Author {
   id        Int      @id @default(autoincrement())
   name      String
@@ -89,22 +104,55 @@ model Author {
 }
 
 model Package {
-  id            Int                        @id @default(autoincrement())
-  slug          String                     @unique
+  id            Int                     @id @default(autoincrement())
+  slug          String                  @unique
   name          String
-  destinationId Int?                       @map("destination_id")
-  destination   Destination?               @relation(fields: [destinationId], references: [id])
+  categoryId    Int?                    @map("category_id")
+  category      PackageCategory?        @relation(fields: [categoryId], references: [id])
+  destinationId Int?                    @map("destination_id")
+  destination   Destination?            @relation(fields: [destinationId], references: [id])
+  offerId       Int?                    @map("offer_id")
+  offer         Offer?                  @relation(fields: [offerId], references: [id])
   duration      String?
-  priceText     String?                    @map("price_text")
+  priceText     String?                 @map("price_text")
   summary       String?
-  imageUrl      String?                    @map("image_url")
-  status        String                     @default("Đang mở")
-  createdAt     DateTime                   @default(now()) @map("created_at")
-  updatedAt     DateTime                   @updatedAt @map("updated_at")
+  description   String?
+  minPeople     Int?                    @map("min_people")
+  maxPeople     Int?                    @map("max_people")
+  peopleNote    String?                 @map("people_note")
+  imageUrl      String?                 @map("image_url")
+  detailContent Json?                   @map("detail_content")
+  status        String                  @default("Đang mở")
+  createdAt     DateTime                @default(now()) @map("created_at")
+  updatedAt     DateTime                @updatedAt @map("updated_at")
   collections   PackageCollectionItem[]
   posts         Post[]
+  detail        PackageDetail?
 
   @@map("packages")
+}
+
+model PackageDetail {
+  id             Int      @id @default(autoincrement())
+  packageId      Int      @unique @map("package_id")
+  bannerImageUrl String?  @map("banner_image_url")
+  gallery        Json?
+  overview       String?
+  highlights     Json?
+  offers         Json?
+  included       Json?
+  itinerary      Json?
+  benefits       Json?
+  consultTitle   String?  @map("consult_title")
+  consultCopy    String?  @map("consult_copy")
+  consultPoints  Json?    @map("consult_points")
+  seoTitle       String?  @map("seo_title")
+  seoDescription String?  @map("seo_description")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  package        Package  @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@map("package_details")
 }
 
 model PackageCollection {
@@ -137,21 +185,23 @@ model Post {
   slug             String?   @unique
   categoryId       Int?      @map("category_id")
   authorId         Int?      @map("author_id")
+  destinationId    Int?      @map("destination_id")
   relatedPackageId Int?      @map("related_package_id")
   category         Category? @relation(fields: [categoryId], references: [id])
   author           Author?   @relation(fields: [authorId], references: [id])
+  destination      Destination? @relation(fields: [destinationId], references: [id])
   relatedPackage   Package?  @relation(fields: [relatedPackageId], references: [id])
 
-  excerpt        String?
-  summary        String?
-  imageUrl       String?   @map("image_url")
-  contentImageUrl String?   @map("content_image_url")
-  readTime       String?   @map("read_time")
-  seoDescription String?   @map("seo_description")
+  excerpt         String?
+  summary         String?
+  imageUrl        String? @map("image_url")
+  contentImageUrl String? @map("content_image_url")
+  readTime        String? @map("read_time")
+  seoDescription  String? @map("seo_description")
 
   contentBlocks Json? @map("content_blocks")
 
-  status      String    @default("Bản nháp")
+  status      String    @default("Báº£n nhÃ¡p")
   publishedAt DateTime? @map("published_at")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
@@ -168,6 +218,7 @@ model Offer {
   validUntil  DateTime? @map("valid_until")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
+  packages   Package[]
 
   @@map("offers")
 }
@@ -182,9 +233,163 @@ model Booking {
   numberOfTravelers Int      @default(1) @map("number_of_travelers")
   totalPrice        String?  @map("total_price")
   notes             String?
+  adminNotes        String?  @map("admin_notes")
   status            String   @default("Chờ xử lý")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
   @@map("bookings")
 }
+
+model Language {
+  id         Int      @id @default(autoincrement())
+  code       String   @unique
+  name       String
+  nativeName String   @map("native_name")
+  flag       String?
+  isActive   Boolean  @default(true) @map("is_active")
+  isDefault  Boolean  @default(false) @map("is_default")
+  sortOrder  Int      @default(0) @map("sort_order")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  staticValues StaticTranslationValue[]
+
+  @@map("languages")
+}
+
+model StaticTranslationKey {
+  id          Int      @id @default(autoincrement())
+  namespace   String
+  key         String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  values StaticTranslationValue[]
+
+  @@unique([namespace, key])
+  @@map("static_translation_keys")
+}
+
+model StaticTranslationValue {
+  id        Int      @id @default(autoincrement())
+  keyId     Int      @map("key_id")
+  locale    String
+  value     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  key      StaticTranslationKey @relation(fields: [keyId], references: [id], onDelete: Cascade)
+  language Language?            @relation(fields: [locale], references: [code], onDelete: Cascade)
+
+  @@unique([keyId, locale])
+  @@map("static_translation_values")
+}
+
+model ContentTranslation {
+  id         Int      @id @default(autoincrement())
+  entityType String   @map("entity_type")
+  entityId   Int      @map("entity_id")
+  locale     String
+  fields     Json
+  sourceHash String   @map("source_hash")
+  status     String   @default("machine")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([entityType, entityId, locale])
+  @@index([entityType, entityId])
+  @@map("content_translations")
+}
+
+model Review {
+  id            Int      @id @default(autoincrement())
+  customerName  String   @map("customer_name")
+  packageName   String   @map("package_name")
+  rating        Int      @default(5)
+  comment       String
+  status        String   @default("Hiển thị")
+  avatar        String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("reviews")
+}
+
+model Customer {
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String   @unique
+  phone         String
+  totalBookings Int      @default(0) @map("total_bookings")
+  totalSpent    String   @default("0") @map("total_spent")
+  notes         String?
+  status        String   @default("Hoạt động")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("customers")
+}
+
+model LocalSpecialtyCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  type        String   
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  specialties LocalSpecialty[]
+
+  @@map("local_specialty_categories")
+}
+
+model LocalSpecialty {
+  id             Int                     @id @default(autoincrement())
+  slug           String                  @unique
+  name           String
+  type           String                  
+  
+  categoryId     Int?                    @map("category_id")
+  category       LocalSpecialtyCategory? @relation(fields: [categoryId], references: [id])
+  
+  destinationId  Int?                    @map("destination_id")
+  destination    Destination?            @relation(fields: [destinationId], references: [id])
+  
+  description    String?                 @db.Text
+  imageUrl       String?                 @map("image_url")
+  priceText      String?                 @map("price_text") 
+  whereToBuy     String?                 @map("where_to_buy") 
+  gallery        Json?                   
+  
+  status         String                  @default("Hiển thị") 
+  
+  createdAt      DateTime                @default(now()) @map("created_at")
+  updatedAt      DateTime                @updatedAt @map("updated_at")
+
+  detail         LocalSpecialtyDetail?
+
+  @@map("local_specialties")
+}
+
+model LocalSpecialtyDetail {
+  id             Int      @id @default(autoincrement())
+  specialtyId    Int      @unique @map("specialty_id")
+  bannerImageUrl String?  @map("banner_image_url")
+  overview       String?  @db.Text
+  history        String?  @db.Text
+  ingredients    String?  @db.Text
+  howToUse       String?  @db.Text
+  preservation   String?  @db.Text
+  highlights     Json?
+  seoTitle       String?  @map("seo_title")
+  seoDescription String?  @map("seo_description")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  specialty      LocalSpecialty @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
+
+  @@map("local_specialty_details")
+}
+

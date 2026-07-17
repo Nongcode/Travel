@@ -5,11 +5,22 @@ import { useAdmin } from "../../components/admin/AdminContext";
 import { useRouter } from "next/navigation";
 
 export default function BookingsAdminPage() {
-  const { bookings, isAuthenticated, addBooking, updateBooking, removeBooking } = useAdmin();
+  const { bookings, isAuthenticated, addBooking, updateBooking } = useAdmin();
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
   const [statusFilter, setStatusFilter] = useState("Tất cả");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get("status");
+      if (status) {
+        setStatusFilter(status);
+      }
+    }
+  }, []);
 
   // Form States
   const [customerName, setCustomerName] = useState("");
@@ -20,11 +31,11 @@ export default function BookingsAdminPage() {
   const [numberOfTravelers, setNumberOfTravelers] = useState(2);
   const [totalPrice, setTotalPrice] = useState("");
   const [notes, setNotes] = useState("");
-  const [showAddForm, setShowAddForm] = useState(false);
 
   // Notes Modal State
-  const [editingNotesId, setEditingNotesId] = useState<number | null>(null);
-  const [editingNotesValue, setEditingNotesValue] = useState("");
+  const [viewingRequestId, setViewingRequestId] = useState<number | null>(null);
+  const [editingAdminNotesId, setEditingAdminNotesId] = useState<number | null>(null);
+  const [editingAdminNotesValue, setEditingAdminNotesValue] = useState("");
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -70,10 +81,10 @@ export default function BookingsAdminPage() {
     updateBooking(id, { status: nextStatus });
   };
 
-  const handleSaveNotes = () => {
-    if (editingNotesId !== null) {
-      updateBooking(editingNotesId, { notes: editingNotesValue });
-      setEditingNotesId(null);
+  const handleSaveAdminNotes = () => {
+    if (editingAdminNotesId !== null) {
+      updateBooking(editingAdminNotesId, { adminNotes: editingAdminNotesValue });
+      setEditingAdminNotesId(null);
     }
   };
 
@@ -224,27 +235,9 @@ export default function BookingsAdminPage() {
         </div>
       )}
 
-      {/* Controls: Search and Filters */}
+      {/* Controls: Search */}
       <section className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-        {/* Status filters */}
-        <div className="flex gap-1.5 overflow-x-auto w-full sm:w-auto p-1 bg-slate-50 rounded-xl">
-          {["Tất cả", "Chờ xử lý", "Đang xử lý", "Đã xác nhận", "Đã hủy"].map((status) => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
-                statusFilter === status
-                  ? "bg-white text-emerald-800 shadow-sm"
-                  : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
-
-        {/* Search */}
-        <div className="relative w-full sm:max-w-xs">
+        <div className="relative w-full sm:max-w-xs flex-1">
           <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
             <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" />
@@ -258,6 +251,22 @@ export default function BookingsAdminPage() {
             className="w-full pl-9 pr-4 rounded-xl border border-slate-200 bg-slate-50/50 py-2 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-medium text-slate-700"
           />
         </div>
+        
+        <select
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            router.push(`/admin/bookings?status=${encodeURIComponent(e.target.value)}`);
+          }}
+          className="w-full sm:w-auto px-4 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-medium text-slate-700"
+        >
+          <option value="Tất cả">Tất cả trạng thái</option>
+          <option value="Chờ xử lý">Chờ xử lý</option>
+          <option value="Đang xử lý">Đang xử lý</option>
+          <option value="Đã xác nhận">Đã xác nhận</option>
+          <option value="Hoàn tất">Hoàn tất</option>
+          <option value="Đã hủy">Đã hủy</option>
+        </select>
       </section>
 
       {/* List Table Card */}
@@ -295,8 +304,7 @@ export default function BookingsAdminPage() {
                       {b.notes && (
                         <button
                           onClick={() => {
-                            setEditingNotesId(b.id);
-                            setEditingNotesValue(b.notes || "");
+                            setViewingRequestId(b.id);
                           }}
                           className="mt-1 flex items-center gap-1 text-[11px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-100 px-2 py-0.5 rounded-full transition-colors w-fit border border-amber-100"
                         >
@@ -316,14 +324,14 @@ export default function BookingsAdminPage() {
                     <td className="px-6 py-4">
                       <button
                         onClick={() => handleStatusChange(b.id, b.status)}
-                        className={`inline-flex px-2.5 py-1 rounded-full text-xs font-bold border transition-colors cursor-pointer ${
+                        className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider ${
                           b.status === "Chờ xử lý"
-                            ? "bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100"
+                            ? "bg-amber-100 text-amber-700"
                             : b.status === "Đang xử lý"
-                            ? "bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100"
+                            ? "bg-blue-100 text-blue-700"
                             : b.status === "Đã xác nhận"
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100"
-                            : "bg-rose-50 text-rose-700 border-rose-100 hover:bg-rose-100"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-rose-100 text-rose-700"
                         }`}
                       >
                         {b.status}
@@ -333,26 +341,12 @@ export default function BookingsAdminPage() {
                       <div className="flex justify-end items-center gap-2">
                         <button
                           onClick={() => {
-                            setEditingNotesId(b.id);
-                            setEditingNotesValue(b.notes || "");
+                            setEditingAdminNotesId(b.id);
+                            setEditingAdminNotesValue(b.adminNotes || "");
                           }}
                           className="px-2 py-1.5 bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 rounded-lg text-xs font-bold border border-slate-100"
                         >
                           Ghi chú
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (confirm("Xóa yêu cầu đặt tour này?")) {
-                              removeBooking(b.id);
-                            }
-                          }}
-                          className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors"
-                          aria-label="Xóa"
-                        >
-                          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                          </svg>
                         </button>
                       </div>
                     </td>
@@ -364,14 +358,47 @@ export default function BookingsAdminPage() {
         </div>
       </section>
 
-      {/* Editing Notes Dialog Modal */}
-      {editingNotesId !== null && (
+      {/* Viewing Customer Request Modal */}
+      {viewingRequestId !== null && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
             <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-              <h3 className="font-bold text-slate-800 text-base">Cập nhật yêu cầu cụ thể</h3>
+              <h3 className="font-bold text-slate-800 text-base">Yêu cầu từ khách hàng</h3>
               <button
-                onClick={() => setEditingNotesId(null)}
+                onClick={() => setViewingRequestId(null)}
+                className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-500 transition-colors"
+              >
+                <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="p-4 bg-amber-50/50 rounded-xl border border-amber-100/50 text-sm font-medium text-slate-700 whitespace-pre-wrap">
+                {bookings.find(b => b.id === viewingRequestId)?.notes || "Không có yêu cầu đặc biệt."}
+              </div>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setViewingRequestId(null)}
+                  className="px-5 py-2.5 bg-slate-100 text-slate-700 rounded-xl text-sm font-bold hover:bg-slate-200 transition-colors"
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Editing Admin Notes Dialog Modal */}
+      {editingAdminNotesId !== null && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+              <h3 className="font-bold text-slate-800 text-base">Ghi chú nội bộ (Admin)</h3>
+              <button
+                onClick={() => setEditingAdminNotesId(null)}
                 className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-500 transition-colors"
               >
                 <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
@@ -382,24 +409,24 @@ export default function BookingsAdminPage() {
             </div>
             <div className="p-6 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Ghi chú chi tiết</label>
+                <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Ghi chú nội bộ</label>
                 <textarea
                   rows={4}
-                  value={editingNotesValue}
-                  onChange={(e) => setEditingNotesValue(e.target.value)}
-                  placeholder="Nhập ghi chú hoặc yêu cầu đặc biệt của khách hàng tại đây..."
+                  value={editingAdminNotesValue}
+                  onChange={(e) => setEditingAdminNotesValue(e.target.value)}
+                  placeholder="Ghi chú các thông tin cần thiết để trao đổi giữa các admin..."
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 focus:outline-none transition-all font-medium text-slate-700"
                 />
               </div>
               <div className="flex justify-end gap-2">
                 <button
-                  onClick={() => setEditingNotesId(null)}
+                  onClick={() => setEditingAdminNotesId(null)}
                   className="px-4 py-2.5 bg-slate-100 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-200 transition-colors"
                 >
                   Hủy
                 </button>
                 <button
-                  onClick={handleSaveNotes}
+                  onClick={handleSaveAdminNotes}
                   className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-md shadow-emerald-600/10 transition-all"
                 >
                   Lưu thay đổi

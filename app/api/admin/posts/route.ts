@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 import { slugify } from "@/lib/slug";
+import { getContentTranslations, saveContentTranslations, validateRequiredTranslations } from "@/lib/translation/adminContent";
 
-// Hàm kiểm tra và xác thực phiên đăng nhập của Admin hoặc Editor
+const DRAFT_STATUS = "Bản nháp";
+const PUBLISHED_STATUS = "Đã xuất bản";
+const UNCATEGORIZED = "Chưa phân loại";
+
 function verifyAdminSession(request: NextRequest) {
   const tokenCookie = request.cookies.get("admin_token");
   if (!tokenCookie) return null;
@@ -14,7 +19,6 @@ function verifyAdminSession(request: NextRequest) {
   return decoded;
 }
 
-// Định dạng ngày thành DD/MM/YYYY thủ công để luôn đồng bộ
 function formatDate(date: Date): string {
   const d = new Date(date);
   const day = String(d.getDate()).padStart(2, "0");
@@ -23,29 +27,26 @@ function formatDate(date: Date): string {
   return `${day}/${month}/${year}`;
 }
 
-// Tự động phân tích summary thành các content blocks (đoạn văn & ảnh đan xen)
-function generateContentBlocks(summaryText: string, contentImageUrl?: string, title?: string): any[] {
+function generateContentBlocks(summaryText: string, contentImageUrl?: string, title?: string): Prisma.InputJsonArray {
   const paragraphs = summaryText
-    ? summaryText.split(/\r?\n/).map(p => p.trim()).filter(Boolean)
+    ? summaryText.split(/\r?\n/).map((paragraph) => paragraph.trim()).filter(Boolean)
     : [];
-  
-  const blocks: any[] = paragraphs.map(text => ({
+
+  const blocks: Prisma.InputJsonObject[] = paragraphs.map((text) => ({
     type: "paragraph",
-    text
+    text,
   }));
 
   if (contentImageUrl && contentImageUrl.trim()) {
-    const imgBlock = {
+    const imgBlock: Prisma.InputJsonObject = {
       type: "image",
       url: contentImageUrl.trim(),
-      caption: title || "Hình ảnh mô tả nội dung bài viết"
+      caption: title || "Hình ảnh mô tả nội dung bài viết",
     };
-    
+
     if (blocks.length > 1) {
-      // Chèn ảnh vào giữa (ví dụ sau đoạn văn đầu tiên)
       blocks.splice(1, 0, imgBlock);
     } else {
-      // Nếu ít đoạn văn quá thì đẩy xuống cuối
       blocks.push(imgBlock);
     }
   }
@@ -53,7 +54,6 @@ function generateContentBlocks(summaryText: string, contentImageUrl?: string, ti
   return blocks;
 }
 
-// GET: Lấy tất cả bài viết kèm tên chuyên mục (Category Name)
 export async function GET(request: NextRequest) {
   try {
     const session = verifyAdminSession(request);
@@ -65,13 +65,16 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
       include: {
         category: true,
+        destination: true,
       },
     });
 
-    const formattedPosts = posts.map((post) => ({
+    const formattedPosts = await Promise.all(posts.map(async (post) => ({
       id: post.id,
       title: post.title,
-      category: post.category?.name || "Chưa phân loại",
+      category: post.category?.name || UNCATEGORIZED,
+      destinationId: post.destinationId,
+      destination: post.destination?.name || null,
       date: formatDate(post.createdAt),
       status: post.status,
       imageUrl: post.imageUrl || "",
@@ -80,7 +83,8 @@ export async function GET(request: NextRequest) {
       readTime: post.readTime || "",
       seoDescription: post.seoDescription || "",
       summary: post.summary || "",
-    }));
+      translations: await getContentTranslations("post", post.id),
+    })));
 
     return NextResponse.json({ success: true, posts: formattedPosts });
   } catch (error) {
@@ -89,7 +93,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Tạo bài viết mới dưới dạng bản nháp
 export async function POST(request: NextRequest) {
   try {
     const session = verifyAdminSession(request);
@@ -98,16 +101,20 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, category, status, imageUrl, contentImageUrl, excerpt, readTime, seoDescription, summary } = body;
+    const { title, category, destinationId, status, imageUrl, contentImageUrl, excerpt, readTime, seoDescription, summary } = body;
 
     if (!title || !title.trim()) {
       return NextResponse.json({ error: "Tiêu đề bài viết không được trống." }, { status: 400 });
     }
 
-    const categoryName = category ? category.trim() : "Chưa phân loại";
-    const postStatus = status || "Bản nháp";
+    const missingTranslations = validateRequiredTranslations("post", body.translations || {});
+    if (missingTranslations.length > 0) {
+      return NextResponse.json({ error: "Vui lòng nhập đủ bản dịch tiếng Anh và tiếng Trung cho bài viết.", missingTranslations }, { status: 400 });
+    }
 
-    // 1. Tạo slug độc nhất (unique slug)
+    const categoryName = category ? category.trim() : UNCATEGORIZED;
+    const postStatus = status || DRAFT_STATUS;
+
     const baseSlug = slugify(title);
     let finalSlug = baseSlug || "bai-viet";
     let counter = 1;
@@ -122,7 +129,6 @@ export async function POST(request: NextRequest) {
       counter++;
     }
 
-    // 2. Tìm hoặc tạo mới chuyên mục
     let dbCategory = await prisma.category.findUnique({
       where: { name: categoryName },
     });
@@ -136,15 +142,14 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Sinh content blocks
     const contentBlocks = generateContentBlocks(summary, contentImageUrl, title);
 
-    // 3. Tạo bài viết
     const newPost = await prisma.post.create({
       data: {
         title: title.trim(),
         slug: finalSlug,
         categoryId: dbCategory.id,
+        destinationId: destinationId ? Number(destinationId) : null,
         status: postStatus,
         imageUrl: imageUrl ? imageUrl.trim() : null,
         contentImageUrl: contentImageUrl ? contentImageUrl.trim() : null,
@@ -152,9 +157,18 @@ export async function POST(request: NextRequest) {
         readTime: readTime ? readTime.trim() : null,
         seoDescription: seoDescription ? seoDescription.trim() : null,
         summary: summary ? summary.trim() : null,
-        contentBlocks: contentBlocks,
-        publishedAt: postStatus === "Đã xuất bản" ? new Date() : null,
+        contentBlocks,
+        publishedAt: postStatus === PUBLISHED_STATUS ? new Date() : null,
       },
+    });
+
+    await saveContentTranslations("post", newPost.id, body.translations || {}, {
+      title: newPost.title,
+      excerpt: newPost.excerpt,
+      summary: newPost.summary,
+      seoDescription: newPost.seoDescription,
+      readTime: newPost.readTime,
+      contentBlocks: newPost.contentBlocks,
     });
 
     return NextResponse.json({
@@ -163,6 +177,7 @@ export async function POST(request: NextRequest) {
         id: newPost.id,
         title: newPost.title,
         category: dbCategory.name,
+        destinationId: newPost.destinationId,
         date: formatDate(newPost.createdAt),
         status: newPost.status,
         imageUrl: newPost.imageUrl || "",
@@ -171,6 +186,7 @@ export async function POST(request: NextRequest) {
         readTime: newPost.readTime || "",
         seoDescription: newPost.seoDescription || "",
         summary: newPost.summary || "",
+        translations: await getContentTranslations("post", newPost.id),
       },
     });
   } catch (error) {
@@ -179,7 +195,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT: Cập nhật thông tin bài viết (Tiêu đề, Chuyên mục, Trạng thái)
 export async function PUT(request: NextRequest) {
   try {
     const session = verifyAdminSession(request);
@@ -188,7 +203,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, title, category, status, imageUrl, contentImageUrl, excerpt, readTime, seoDescription, summary } = body;
+    const { id, title, category, destinationId, status, imageUrl, contentImageUrl, excerpt, readTime, seoDescription, summary } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Thiếu ID bài viết cần chỉnh sửa." }, { status: 400 });
@@ -196,7 +211,6 @@ export async function PUT(request: NextRequest) {
 
     const postId = Number(id);
 
-    // Kiểm tra bài viết tồn tại
     const existingPost = await prisma.post.findUnique({
       where: { id: postId },
     });
@@ -205,14 +219,19 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Bài viết không tồn tại trên hệ thống." }, { status: 404 });
     }
 
-    const updateData: any = {};
+    if (body.translations !== undefined) {
+      const missingTranslations = validateRequiredTranslations("post", body.translations || {});
+      if (missingTranslations.length > 0) {
+        return NextResponse.json({ error: "Vui lòng nhập đủ bản dịch tiếng Anh và tiếng Trung cho bài viết.", missingTranslations }, { status: 400 });
+      }
+    }
 
-    // Cập nhật tiêu đề & slug
+    const updateData: Record<string, unknown> = {};
+
     if (title && title.trim()) {
       const trimmedTitle = title.trim();
       updateData.title = trimmedTitle;
 
-      // Sinh slug mới nếu tiêu đề thay đổi
       if (trimmedTitle !== existingPost.title) {
         const baseSlug = slugify(trimmedTitle);
         let finalSlug = baseSlug || "bai-viet";
@@ -222,7 +241,7 @@ export async function PUT(request: NextRequest) {
           const existingSlug = await prisma.post.findFirst({
             where: {
               slug: finalSlug,
-              id: { not: postId }, // Tránh kiểm tra chính bài viết đang cập nhật
+              id: { not: postId },
             },
           });
           if (!existingSlug) break;
@@ -234,7 +253,6 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    // Cập nhật chuyên mục
     if (category && category.trim()) {
       const categoryName = category.trim();
       let dbCategory = await prisma.category.findUnique({
@@ -252,17 +270,19 @@ export async function PUT(request: NextRequest) {
       updateData.categoryId = dbCategory.id;
     }
 
-    // Cập nhật trạng thái
+    if (destinationId !== undefined) {
+      updateData.destinationId = destinationId ? Number(destinationId) : null;
+    }
+
     if (status) {
       updateData.status = status;
-      if (status === "Đã xuất bản" && existingPost.status !== "Đã xuất bản") {
+      if (status === PUBLISHED_STATUS && existingPost.status !== PUBLISHED_STATUS) {
         updateData.publishedAt = new Date();
-      } else if (status === "Bản nháp" && existingPost.status === "Đã xuất bản") {
+      } else if (status === DRAFT_STATUS && existingPost.status === PUBLISHED_STATUS) {
         updateData.publishedAt = null;
       }
     }
 
-    // Cập nhật các trường mở rộng
     if (imageUrl !== undefined) {
       updateData.imageUrl = imageUrl ? imageUrl.trim() : null;
     }
@@ -282,27 +302,39 @@ export async function PUT(request: NextRequest) {
       updateData.summary = summary ? summary.trim() : null;
     }
 
-    // Tái tạo contentBlocks
     const finalSummary = summary !== undefined ? summary : existingPost.summary;
     const finalContentImageUrl = contentImageUrl !== undefined ? contentImageUrl : existingPost.contentImageUrl;
     const finalTitle = title !== undefined ? title : existingPost.title;
     updateData.contentBlocks = generateContentBlocks(finalSummary || "", finalContentImageUrl || "", finalTitle || "");
 
-    // Tiến hành cập nhật
     const updatedPost = await prisma.post.update({
       where: { id: postId },
       data: updateData,
       include: {
         category: true,
+        destination: true,
       },
     });
+
+    if (body.translations !== undefined) {
+      await saveContentTranslations("post", updatedPost.id, body.translations || {}, {
+        title: updatedPost.title,
+        excerpt: updatedPost.excerpt,
+        summary: updatedPost.summary,
+        seoDescription: updatedPost.seoDescription,
+        readTime: updatedPost.readTime,
+        contentBlocks: updatedPost.contentBlocks,
+      });
+    }
 
     return NextResponse.json({
       success: true,
       post: {
         id: updatedPost.id,
         title: updatedPost.title,
-        category: updatedPost.category?.name || "Chưa phân loại",
+        category: updatedPost.category?.name || UNCATEGORIZED,
+        destinationId: updatedPost.destinationId,
+        destination: updatedPost.destination?.name || null,
         date: formatDate(updatedPost.createdAt),
         status: updatedPost.status,
         imageUrl: updatedPost.imageUrl || "",
@@ -311,6 +343,7 @@ export async function PUT(request: NextRequest) {
         readTime: updatedPost.readTime || "",
         seoDescription: updatedPost.seoDescription || "",
         summary: updatedPost.summary || "",
+        translations: await getContentTranslations("post", updatedPost.id),
       },
     });
   } catch (error) {
@@ -319,7 +352,6 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE: Xóa bài viết khỏi cơ sở dữ liệu
 export async function DELETE(request: NextRequest) {
   try {
     const session = verifyAdminSession(request);
@@ -341,7 +373,6 @@ export async function DELETE(request: NextRequest) {
 
     const postId = Number(id);
 
-    // Kiểm tra tồn tại
     const existingPost = await prisma.post.findUnique({
       where: { id: postId },
     });
@@ -350,6 +381,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Bài viết không tồn tại trên hệ thống." }, { status: 404 });
     }
 
+    await prisma.contentTranslation.deleteMany({ where: { entityType: "post", entityId: postId } });
     await prisma.post.delete({
       where: { id: postId },
     });

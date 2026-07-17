@@ -49,7 +49,7 @@ export default function ReviewsAdminPage() {
     setShowAddForm(false);
   };
 
-  const handleToggleStatus = (id: number, currentStatus: "Hiển thị" | "Ẩn") => {
+  const handleToggleStatus = (id: number, currentStatus: string) => {
     const nextStatus = currentStatus === "Hiển thị" ? "Ẩn" : "Hiển thị";
     updateReview(id, { status: nextStatus });
   };
@@ -76,7 +76,7 @@ export default function ReviewsAdminPage() {
             Quản lý Đánh giá & Phản hồi
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Duyệt và điều hành ý kiến phản hồi (Social Proof) từ khách du lịch nước ngoài hiển thị trên website.
+            Duyệt và điều chỉnh đánh giá (Social Proof) từ khách hàng quốc tế trước khi hiển thị trên website.
           </p>
         </div>
         <button
@@ -95,7 +95,7 @@ export default function ReviewsAdminPage() {
       {showAddForm && (
         <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm animate-in slide-in-from-top-4 duration-200">
           <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">
-            Thêm Phản Hồi Mới
+            Thêm Phản hồi Mới
           </h3>
           <form onSubmit={handleCreateReview} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1.5">
@@ -182,11 +182,10 @@ export default function ReviewsAdminPage() {
             <button
               key={stars}
               onClick={() => setRatingFilter(stars)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
-                ratingFilter === stars
-                  ? "bg-white text-emerald-800 shadow-sm"
-                  : "text-slate-500 hover:text-slate-800"
-              }`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${ratingFilter === stars
+                ? "bg-white text-emerald-800 shadow-sm"
+                : "text-slate-500 hover:text-slate-800"
+                }`}
             >
               {stars === "Tất cả" ? "Tất cả" : `${stars} ★`}
             </button>
@@ -220,9 +219,8 @@ export default function ReviewsAdminPage() {
           filteredReviews.map((r) => (
             <div
               key={r.id}
-              className={`bg-white rounded-2xl border p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between ${
-                r.status === "Ẩn" ? "border-slate-200 bg-slate-50/50 opacity-75" : "border-slate-100"
-              }`}
+              className={`bg-white rounded-2xl border p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between ${r.status === "Ẩn" ? "border-slate-200 bg-slate-50/50 opacity-75" : "border-slate-100"
+                }`}
             >
               <div className="space-y-3">
                 {/* Review Header (Customer & Rating) */}
@@ -240,7 +238,7 @@ export default function ReviewsAdminPage() {
                   </div>
 
                   <span className="inline-flex items-center gap-0.5 text-xs text-amber-500 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100/50">
-                    {r.rating} ★
+                    {r.rating} ⭐
                   </span>
                 </div>
 
@@ -251,18 +249,17 @@ export default function ReviewsAdminPage() {
 
                 {/* Comment */}
                 <p className="text-slate-600 text-xs leading-relaxed italic">
-                  "{r.comment}"
+                  &quot;{r.comment}&quot;
                 </p>
               </div>
 
               {/* Action Buttons */}
               <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
                 <span
-                  className={`text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-md ${
-                    r.status === "Hiển thị"
-                      ? "text-emerald-700 bg-emerald-50"
-                      : "text-slate-500 bg-slate-100"
-                  }`}
+                  className={`text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-md ${r.status === "Hiển thị"
+                    ? "text-emerald-700 bg-emerald-50"
+                    : "text-slate-500 bg-slate-100"
+                    }`}
                 >
                   Trạng thái: {r.status}
                 </span>
@@ -270,11 +267,10 @@ export default function ReviewsAdminPage() {
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => handleToggleStatus(r.id, r.status)}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-colors cursor-pointer ${
-                      r.status === "Hiển thị"
-                        ? "bg-slate-50 text-slate-600 hover:bg-slate-100 border-slate-200/50"
-                        : "bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600"
-                    }`}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-colors cursor-pointer ${r.status === "Hiển thị"
+                      ? "bg-slate-50 text-slate-600 hover:bg-slate-100 border-slate-200/50"
+                      : "bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600"
+                      }`}
                   >
                     {r.status === "Hiển thị" ? "Ẩn" : "Phê duyệt"}
                   </button>

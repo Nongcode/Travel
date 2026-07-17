@@ -99,7 +99,7 @@ export default function HeaderFooterNavigationPage() {
       twitter,
       copyright,
     });
-    setFooterMessage("Đã cập nhật thông tin footer thành công!");
+    setFooterMessage("Cập nhật thông tin footer thành công!");
     setTimeout(() => setFooterMessage(""), 3000);
   };
 
@@ -333,7 +333,7 @@ export default function HeaderFooterNavigationPage() {
           <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-6">
             Thông tin thương hiệu & Liên hệ ở Footer
           </h3>
-          
+
           {footerMessage && (
             <div className="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl text-sm font-bold animate-in fade-in duration-200">
               {footerMessage}

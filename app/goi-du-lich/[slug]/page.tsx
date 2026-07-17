@@ -1,116 +1,95 @@
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { LeadForm } from "../../components/LeadForm";
 import { PackageDetailGallery } from "../../components/PackageDetailGallery";
 import { SiteHeader } from "../../components/SiteHeader";
-import {
-  allPackages,
-  destinations,
-  packageDetailExtras,
-  packageDetailMediaBySlug,
-} from "../../data/travel";
+import { destinations, packageDetailExtras, packageDetailMediaBySlug } from "../../data/travel";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { getStaticTranslationMap, translateFromMap } from "@/lib/i18n/server";
+import { normalizePackageDetailContent } from "@/lib/packageDetailContent";
+import { getPublicPackageBySlug, getPublicPackages } from "@/lib/packages";
 
 type PackageDetailPageProps = {
-  params: Promise<{
-    slug: string;
-  }>;
+  params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return allPackages.map((item) => ({
-    slug: item.slug,
-  }));
+import { getStatusStyleAndLabel } from "@/lib/status";
+
+export async function generateStaticParams() {
+  const packages = await getPublicPackages("vi");
+  return packages.map((item) => ({ slug: item.slug }));
 }
 
 export async function generateMetadata({ params }: PackageDetailPageProps) {
   const { slug } = await params;
-  const item = allPackages.find((packageItem) => packageItem.slug === slug);
+  const item = await getPublicPackageBySlug(slug, "vi");
 
   if (!item) {
-    return {
-      title: "Khong tim thay goi du lich | VietVista",
-    };
+    return { title: "Không tìm thấy gói du lịch | VietVista" };
   }
 
   return {
-    title: `${item.name} | VietVista`,
-    description: item.summary,
+    title: item.name + " | VietVista",
+    description: item.description || item.summary,
   };
 }
 
-export default async function PackageDetailPage({
-  params,
-}: PackageDetailPageProps) {
+export default async function PackageDetailPage({ params }: PackageDetailPageProps) {
   const { slug } = await params;
-  const item = allPackages.find((packageItem) => packageItem.slug === slug);
+  const locale = normalizeLocale((await headers()).get("x-locale"));
+  const translations = await getStaticTranslationMap(locale).catch(() => ({}));
+  const t = (namespace: string, key: string, fallback: string) => translateFromMap(translations, namespace, key, fallback);
+  const local = (values: Record<string, string>) => values[locale] || values.vi;
+  const item = await getPublicPackageBySlug(slug, locale);
 
-  if (!item) {
-    notFound();
-  }
+  if (!item) notFound();
+
+  const packages = await getPublicPackages(locale);
+  const packageNames = packages.map((p) => p.name);
 
   const media = packageDetailMediaBySlug[item.slug];
-  const gallery =
-    media?.gallery?.length
-      ? media.gallery
-      : [item.image, ...packageDetailExtras.gallery].slice(0, 5);
+  const detailContent = normalizePackageDetailContent(item.detailContent);
+  const detailGallery = detailContent.gallery.length ? detailContent.gallery : [];
+  const gallery = detailGallery.length ? detailGallery : media?.gallery?.length ? media.gallery : [item.image, ...packageDetailExtras.gallery].slice(0, 5);
+  const flexibleConsulting = t("packageDetail", "flexible", "Tư vấn linh hoạt");
+  const { statusClass, statusLabel } = getStatusStyleAndLabel(item.status, locale, t);
+  const peopleRange = item.peopleNote || (item.minPeople && item.maxPeople ? `${item.minPeople} - ${item.maxPeople} khách` : item.minPeople ? `Từ ${item.minPeople} khách` : "");
   const quickFacts = [
-    { icon: "calendar", label: "Thoi luong", value: item.duration },
-    { icon: "pin", label: "Diem den", value: item.destination },
-    { icon: "spark", label: "Hinh thuc", value: "Tu van linh hoat" },
-    { icon: "wallet", label: "Ngan sach", value: item.price },
+    { icon: "calendar", label: t("packageDetail", "duration", "Thời lượng"), value: item.duration },
+    { icon: "pin", label: t("packageDetail", "destination", "Điểm đến"), value: item.destination },
+    ...(peopleRange ? [{ icon: "spark", label: t("packageDetail", "people", "Số người phù hợp"), value: peopleRange }] : []),
+    { icon: "spark", label: t("packageDetail", "type", "Hình thức"), value: flexibleConsulting },
+    { icon: "wallet", label: t("packageDetail", "budget", "Ngân sách"), value: item.price },
   ];
-  const experienceMoments = [
-    {
-      title: "Không gian lưu trú lý tưởng",
-      description:
-        "Ưu tiên nơi có vị trí thuận tiện, dễ nghỉ ngơi và phù hợp với nhịp chuyển động.",
-      image: gallery[1] ?? gallery[0],
-    },
-    {
-      title: "Điểm dừng nổi bật",
-      description:
-        "Gợi ý các khung cảnh đáng trải nghiệm và lịch tham quan không bị đơn điệu.",
-      image: gallery[2] ?? gallery[0],
-    },
-    {
-      title: "Khoảnh khắc đáng nhớ",
-      description:
-        "Bổ sung góc chụp đẹp, trải nghiệm địa phương và thời gian tự do hợp lý.",
-      image: gallery[3] ?? gallery[0],
-    },
-  ];
+  const experienceMoments = detailContent.moments.map((moment, index) => ({
+    ...moment,
+    image: gallery[index + 1] ?? gallery[0],
+  }));
 
   return (
     <main>
       <SiteHeader variant="hero" />
 
-      <section
-        className="page-hero detail-hero"
-        style={{
-          backgroundImage: `linear-gradient(90deg, rgba(10, 20, 17, 0.78), rgba(10, 20, 17, 0.26)), url(${media?.banner ?? gallery[0]})`
-        }}
-      >
-        <p className="eyebrow">Điểm đến đặc trưng</p>
+      <section className="page-hero detail-hero" style={{ backgroundImage: "linear-gradient(90deg, rgba(10, 20, 17, 0.78), rgba(10, 20, 17, 0.26)), url(" + (detailContent.bannerImageUrl || media?.banner || gallery[0]) + ")" }}>
+        <p className="eyebrow">{t("packageDetail", "hero_eyebrow", "Điểm đến đặc trưng")}</p>
         <h1>{item.destination}</h1>
-        <p>Khung cảnh, ánh sáng và những điểm dừng chân phù hợp nhất với tinh thần của hành trình này.</p>
+        <p>{t("packageDetail", "hero_copy", "Khung cảnh, ánh sáng và những điểm dừng chân phù hợp nhất với tinh thần của hành trình này.")}</p>
       </section>
 
       <section className="package-detail-hero">
         <div className="detail-hero-copy">
-          <p className="eyebrow">Chi tiết hành trình</p>
-          <h1>{item.name}</h1>
-          <p>{item.summary}</p>
+          <p className="eyebrow">{t("packageDetail", "detail_eyebrow", "Chi tiết hành trình")}</p>
+          <h2>{item.name}</h2>
+          <p>{item.description || item.summary}</p>
           <div className="detail-hero-actions">
-            <a href="#detail-consult">Nhận tư vấn ngay</a>
+            <a href="#detail-consult">{t("packageDetail", "consult_now", "Nhận tư vấn ngay")}</a>
             <span>{item.price}</span>
           </div>
 
           <div className="detail-quick-facts">
             {quickFacts.map((fact) => (
-              <article className="detail-fact-card" key={fact.label}>
-                <span
-                  className={`detail-fact-icon ${fact.icon}`}
-                  aria-hidden="true"
-                />
+              <article className="detail-fact-card" key={`${fact.icon}-${fact.label}`}>
+                <span className={"detail-fact-icon " + fact.icon} aria-hidden="true" />
                 <div>
                   <strong>{fact.value}</strong>
                   <small>{fact.label}</small>
@@ -125,49 +104,32 @@ export default async function PackageDetailPage({
 
       <section className="package-detail-shell">
         <aside className="detail-summary-card">
-          <span>{item.status}</span>
+          <span className={statusClass}>{statusLabel}</span>
           <h2>{item.price}</h2>
           <dl>
-            <div>
-              <dt>Điểm đến</dt>
-              <dd>{item.destination}</dd>
-            </div>
-            <div>
-              <dt>Thời gian</dt>
-              <dd>{item.duration}</dd>
-            </div>
-            <div>
-              <dt>Hình thức</dt>
-              <dd>Tư vấn theo yêu cầu</dd>
-            </div>
+            <div><dt>{t("packageDetail", "destination", "Điểm đến")}</dt><dd>{item.destination}</dd></div>
+            <div><dt>{t("packageDetail", "duration", "Thời gian")}</dt><dd>{item.duration}</dd></div>
+            {peopleRange && <div><dt>{t("packageDetail", "people", "Số người phù hợp")}</dt><dd>{peopleRange}</dd></div>}
+            <div><dt>{t("packageDetail", "type", "Hình thức")}</dt><dd>{flexibleConsulting}</dd></div>
           </dl>
-          <a href="#detail-consult">Gửi yêu cầu tư vấn</a>
+          <a href="#detail-consult">{local({ vi: "Gửi yêu cầu tư vấn", en: "Send consultation request", "zh-CN": "发送咨询请求" })}</a>
         </aside>
 
         <div className="detail-content">
           <section>
-            <p className="eyebrow">Tổng quan</p>
-            <h2>Gói này phù hợp với ?</h2>
-            <p>
-              {item.summary} Lịch trình có thể điều chỉnh theo số lượng khách,
-              thời gian rảnh, phong cách nghỉ dưỡng và ngân sách mong muốn.
-            </p>
+            <p className="eyebrow">{local({ vi: "Tổng quan", en: "Overview", "zh-CN": "概览" })}</p>
+            <h2>{local({ vi: "Gói này phù hợp với ai?", en: "Who is this package for?", "zh-CN": "这个套餐适合谁？" })}</h2>
+            <p>{item.description || item.summary} {detailContent.overviewSuffix}</p>
           </section>
 
           <section>
-            <p className="eyebrow">Trải nghiệm nổi bật</p>
-            <h2>Nội dung nên có trong hành trình</h2>
+            <p className="eyebrow">{local({ vi: "Trải nghiệm nổi bật", en: "Highlights", "zh-CN": "亮点体验" })}</p>
+            <h2>{local({ vi: "Nội dung nên có trong hành trình", en: "Recommended elements for the journey", "zh-CN": "行程中的推荐内容" })}</h2>
             <div className="detail-experience-grid">
-              {experienceMoments.map((moment) => (
-                <article className="detail-experience-card" key={moment.title}>
-                  <div
-                    className="detail-experience-image"
-                    style={{ backgroundImage: `url(${moment.image})` }}
-                  />
-                  <div className="detail-experience-copy">
-                    <h3>{moment.title}</h3>
-                    <p>{moment.description}</p>
-                  </div>
+              {experienceMoments.map((moment, index) => (
+                <article className="detail-experience-card" key={`${moment.title}-${index}`}>
+                  <div className="detail-experience-image" style={{ backgroundImage: "url(" + moment.image + ")" }} />
+                  <div className="detail-experience-copy"><h3>{moment.title}</h3><p>{moment.description}</p></div>
                 </article>
               ))}
             </div>
@@ -175,64 +137,34 @@ export default async function PackageDetailPage({
 
           <section className="detail-grid-section">
             <div>
-              <p className="eyebrow">Ưu đãi</p>
-              <h2>Điểm cộng khi đặt chỗ sớm</h2>
+              <p className="eyebrow">{local({ vi: "Ưu đãi", en: "Offers", "zh-CN": "优惠" })}</p>
+              <h2>{local({ vi: "Điểm cộng khi đặt chỗ sớm", en: "Perks for early planning", "zh-CN": "提前规划的好处" })}</h2>
               <ul className="detail-icon-list offers-list">
-                {packageDetailExtras.offers.map((offer, index) => (
-                  <li key={offer}>
-                    <span
-                      className={`detail-list-icon offer-icon-${index + 1}`}
-                      aria-hidden="true"
-                    />
-                    <p>{offer}</p>
-                  </li>
-                ))}
+                {detailContent.offers.map((offer, index) => <li key={`${offer}-${index}`}><span className={"detail-list-icon offer-icon-" + (index + 1)} aria-hidden="true" /><p>{offer}</p></li>)}
               </ul>
             </div>
-
             <div>
-              <p className="eyebrow">Tiện ích</p>
-              <h2>Bao gồm trong gói tư vấn</h2>
+              <p className="eyebrow">{local({ vi: "Tiện ích", en: "Included", "zh-CN": "包含" })}</p>
+              <h2>{local({ vi: "Bao gồm trong gói tư vấn", en: "Included in the consultation", "zh-CN": "咨询服务包含" })}</h2>
               <ul className="detail-icon-list included-list">
-                {packageDetailExtras.included.map((included, index) => (
-                  <li key={included}>
-                    <span
-                      className={`detail-list-icon included-icon-${(index % 3) + 1}`}
-                      aria-hidden="true"
-                    />
-                    <p>{included}</p>
-                  </li>
-                ))}
+                {detailContent.included.map((included, index) => <li key={`${included}-${index}`}><span className={"detail-list-icon included-icon-" + ((index % 3) + 1)} aria-hidden="true" /><p>{included}</p></li>)}
               </ul>
             </div>
           </section>
 
           <section>
-            <p className="eyebrow">Lịch trình mẫu</p>
-            <h2>Khung hành trình tham khảo</h2>
+            <p className="eyebrow">{local({ vi: "Lịch trình mẫu", en: "Sample itinerary", "zh-CN": "参考行程" })}</p>
+            <h2>{local({ vi: "Khung hành trình tham khảo", en: "Suggested itinerary frame", "zh-CN": "建议行程框架" })}</h2>
             <div className="itinerary-list">
-              {packageDetailExtras.itinerary.map((step, index) => (
-                <article key={step}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <p>{step}</p>
-                </article>
-              ))}
+              {detailContent.itinerary.map((step, index) => <article key={`${step}-${index}`}><span>{String(index + 1).padStart(2, "0")}</span><p>{step}</p></article>)}
             </div>
           </section>
 
           <section>
-            <p className="eyebrow">Lý do nên chọn</p>
-            <h2>Những hỗ trợ trước chuyến đi</h2>
+            <p className="eyebrow">{local({ vi: "Lý do nên chọn", en: "Why choose this", "zh-CN": "选择理由" })}</p>
+            <h2>{local({ vi: "Những hỗ trợ trước chuyến đi", en: "Support before the journey", "zh-CN": "出行前支持" })}</h2>
             <div className="benefit-grid">
-              {packageDetailExtras.benefits.map((benefit, index) => (
-                <article key={benefit}>
-                  <span
-                    className={`benefit-icon benefit-icon-${index + 1}`}
-                    aria-hidden="true"
-                  />
-                  <p>{benefit}</p>
-                </article>
-              ))}
+              {detailContent.benefits.map((benefit, index) => <article key={`${benefit}-${index}`}><span className={"benefit-icon benefit-icon-" + (index + 1)} aria-hidden="true" /><p>{benefit}</p></article>)}
             </div>
           </section>
         </div>
@@ -240,19 +172,14 @@ export default async function PackageDetailPage({
 
       <section className="detail-consult-band" id="detail-consult">
         <div className="detail-consult-copy">
-          <p className="eyebrow">Liên hệ tư vấn</p>
-          <h2>Giữ lại gói này và nhận tư vấn phù hợp với nhu cầu thực tế.</h2>
-          <p>
-            Chỉ cần để lại email hoặc số điện thoại. VietVista sẽ liên hệ để
-            định chỉnh lịch trình, gợi ý ngân sách và chọn điểm lưu trú phù hợp.
-          </p>
+          <p className="eyebrow">{local({ vi: "Liên hệ tư vấn", en: "Consultation contact", "zh-CN": "咨询联系" })}</p>
+          <h2>{detailContent.consultTitle}</h2>
+          <p>{detailContent.consultCopy}</p>
           <div className="detail-consult-points">
-            <span>Không cần thanh toán ngay</span>
-            <span>Điều chỉnh theo gia đình hoặc nhóm bạn</span>
-            <span>Gửi lại tư vấn trong 24 giờ</span>
+            {detailContent.consultPoints.map((point, index) => <span key={`${point}-${index}`}>{point}</span>)}
           </div>
         </div>
-        <LeadForm destinations={destinations} />
+        <LeadForm packages={packageNames} defaultPackage={item.name} />
       </section>
     </main>
   );

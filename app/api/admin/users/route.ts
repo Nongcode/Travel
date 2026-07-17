@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const isAuthorized = checkSuperAdmin(request);
     if (!isAuthorized) {
       return NextResponse.json(
-        { error: "Quyền truy cập bị từ chối. Chỉ tài khoản admin tối cao mới được phép truy cập." },
+        { error: "Quy?n truy c?p b? t? ch?i. Ch? t?i kho?n admin t?i cao m?i ???c ph?p truy c?p." },
         { status: 403 }
       );
     }
@@ -49,7 +49,7 @@ export async function PUT(request: NextRequest) {
     const isAuthorized = checkSuperAdmin(request);
     if (!isAuthorized) {
       return NextResponse.json(
-        { error: "Quyền truy cập bị từ chối. Chỉ tài khoản admin tối cao mới được phép thực hiện." },
+        { error: "Quy?n truy c?p b? t? ch?i. Ch? t?i kho?n admin t?i cao m?i ???c ph?p th?c hi?n." },
         { status: 403 }
       );
     }
@@ -126,7 +126,7 @@ export async function DELETE(request: NextRequest) {
     const isAuthorized = checkSuperAdmin(request);
     if (!isAuthorized) {
       return NextResponse.json(
-        { error: "Quyền truy cập bị từ chối. Chỉ tài khoản admin tối cao mới được phép thực hiện." },
+        { error: "Quy?n truy c?p b? t? ch?i. Ch? t?i kho?n admin t?i cao m?i ???c ph?p th?c hi?n." },
         { status: 403 }
       );
     }
@@ -156,7 +156,7 @@ export async function DELETE(request: NextRequest) {
     // 2. Ngăn chặn tự xóa tài khoản gốc "admin"
     if (targetAdmin.email === "admin") {
       return NextResponse.json(
-        { error: "Không được phép xóa tài khoản quản trị tối cao của hệ thống." },
+        { error: "Không ???c ph?p x?a t?i kho?n qu?n tr? t?i cao c?a h? th?ng." },
         { status: 400 }
       );
     }

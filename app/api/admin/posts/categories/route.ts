@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json({ error: "Tên chuyên mục hoặc đường dẫn tĩnh (slug) đã tồn tại." }, { status: 400 });
+      return NextResponse.json({ error: "T?n chuy?n m?c ho?c ???ng d?n t?nh (slug) ?? t?n t?i." }, { status: 400 });
     }
 
     const newCategory = await prisma.category.create({
@@ -168,7 +168,7 @@ export async function PUT(request: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json({ error: "Tên chuyên mục hoặc đường dẫn tĩnh (slug) đã tồn tại." }, { status: 400 });
+      return NextResponse.json({ error: "T?n chuy?n m?c ho?c ???ng d?n t?nh (slug) ?? t?n t?i." }, { status: 400 });
     }
 
     const updated = await prisma.category.update({

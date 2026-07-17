@@ -30,7 +30,7 @@ export default function SettingsAdminPage() {
   const [pageVisaStatus, setPageVisaStatus] = useState("active");
   const [pageNewsStatus, setPageNewsStatus] = useState("active");
   const [pageContactStatus, setPageContactStatus] = useState("active");
-  const [pageOffersStatus, setPageOffersStatus] = useState("active");
+  const [pageLocalSpecialtiesStatus, setPageLocalSpecialtiesStatus] = useState("active");
   const [loadingSettings, setLoadingSettings] = useState(false);
   const [settingsError, setSettingsError] = useState("");
   const [settingsSuccess, setSettingsSuccess] = useState("");
@@ -87,7 +87,7 @@ export default function SettingsAdminPage() {
         setPageVisaStatus(s.page_visa_status || "active");
         setPageNewsStatus(s.page_news_status || "active");
         setPageContactStatus(s.page_contact_status || "active");
-        setPageOffersStatus(s.page_offers_status || "active");
+        setPageLocalSpecialtiesStatus(s.page_local_specialties_status || "active");
       } else {
         setSettingsError(data.error || "Không thể tải cấu hình website.");
       }
@@ -117,7 +117,7 @@ export default function SettingsAdminPage() {
             page_visa_status: pageVisaStatus,
             page_news_status: pageNewsStatus,
             page_contact_status: pageContactStatus,
-            page_offers_status: pageOffersStatus,
+            page_local_specialties_status: pageLocalSpecialtiesStatus,
           },
         }),
       });
@@ -270,7 +270,7 @@ export default function SettingsAdminPage() {
   // Xóa tài khoản admin
   const handleDeleteAdmin = async (id: number, email: string) => {
     if (email === "admin") {
-      alert("Không được phép xóa tài khoản quản trị tối cao gốc.");
+      alert("Không ???c ph?p x?a t?i kho?n qu?n tr? t?i cao g?c.");
       return;
     }
 
@@ -420,7 +420,7 @@ export default function SettingsAdminPage() {
                         onClick={() => handleDeleteAdmin(user.id, user.email)}
                         disabled={user.email === "admin"}
                         className={`p-1.5 rounded-lg transition-colors cursor-pointer inline-flex items-center ${user.email === "admin" ? 'text-slate-200 cursor-not-allowed' : 'hover:bg-rose-50 text-rose-400 hover:text-rose-600'}`}
-                        title={user.email === "admin" ? "Không được phép xóa Super Admin" : "Xóa tài khoản"}
+                        title={user.email === "admin" ? "Không ???c ph?p x?a Super Admin" : "Xóa tài khoản"}
                       >
                         <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
                       </button>
@@ -594,15 +594,15 @@ export default function SettingsAdminPage() {
                 </select>
               </div>
 
-              {/* Ưu đãi */}
+              {/* Đặc sản địa phương */}
               <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/20 hover:bg-slate-50/40 transition-colors flex flex-col justify-between gap-3">
                 <div className="space-y-0.5">
-                  <span className="text-xs font-bold text-slate-700 block">Ưu đãi (Offers)</span>
-                  <span className="text-[10px] text-slate-400 block font-medium">Đường dẫn: /uu-dai</span>
+                  <span className="text-xs font-bold text-slate-700 block">Đặc sản địa phương (Local Specialties)</span>
+                  <span className="text-[10px] text-slate-400 block font-medium">Đường dẫn: /dac-san</span>
                 </div>
                 <select
-                  value={pageOffersStatus}
-                  onChange={(e) => setPageOffersStatus(e.target.value)}
+                  value={pageLocalSpecialtiesStatus}
+                  onChange={(e) => setPageLocalSpecialtiesStatus(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-bold bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer"
                 >
                   <option value="active">🟢 Đang hiển thị (Active)</option>

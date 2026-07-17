@@ -1,43 +1,48 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "../../components/SiteHeader";
 import { ReadingProgressBar } from "../../components/PostProgress";
 import { PostSidebar } from "../../components/PostSidebar";
 import { PostCard } from "../../components/PostCard";
-import { allPackages } from "../../data/travel";
 import { ContentBlock } from "../../data/postsContent";
 import prisma from "@/lib/prisma";
+import { normalizeLocale, withLocalePrefix } from "@/lib/i18n/config";
+import { getStaticTranslationMap, localizeContent, translateFromMap } from "@/lib/i18n/server";
+import { getPublicPackageBySlug } from "@/lib/packages";
 
 export const dynamic = "force-dynamic";
 
 type PostDetailPageProps = {
-  params: Promise<{
-    id: string;
-  }>;
+  params: Promise<{ id: string }>;
 };
 
-// Generate static params for all posts to build static pages
-export async function generateStaticParams() {
-  const dbPosts = await prisma.post.findMany({
-    where: { status: "Đã xuất bản" },
-    select: { id: true },
-  });
-  return dbPosts.map((post) => ({
-    id: String(post.id),
-  }));
+const legacyDecoder = new TextDecoder("windows-1252");
+const toLegacyMojibake = (value: string) => legacyDecoder.decode(Buffer.from(value, "utf8"));
+const toDoubleLegacyMojibake = (value: string) => toLegacyMojibake(toLegacyMojibake(value));
+const PUBLISHED_STATUS = "Đã xuất bản";
+const PUBLISHED_STATUSES = [PUBLISHED_STATUS, toLegacyMojibake(PUBLISHED_STATUS), toDoubleLegacyMojibake(PUBLISHED_STATUS)];
+
+function getDateLocale(locale: string) {
+  if (locale === "en") return "en-US";
+  if (locale === "zh-CN") return "zh-CN";
+  return "vi-VN";
 }
 
-// Generate dynamic metadata for SEO
+export async function generateStaticParams() {
+  const dbPosts = await prisma.post.findMany({
+    where: { status: { in: PUBLISHED_STATUSES } },
+    select: { id: true },
+  });
+  return dbPosts.map((post) => ({ id: String(post.id) }));
+}
+
 export async function generateMetadata({ params }: PostDetailPageProps) {
   const { id } = await params;
-  const post = await prisma.post.findUnique({
-    where: { id: Number(id) },
-  });
+  const post = await prisma.post.findUnique({ where: { id: Number(id) } });
 
-  if (!post || post.status !== "Đã xuất bản") {
-    return {
-      title: "Không tìm thấy bài viết | VietVista",
-    };
+  if (!post || !PUBLISHED_STATUSES.includes(post.status)) {
+    return { title: "Không tìm thấy bài viết | VietVista" };
   }
 
   return {
@@ -46,12 +51,11 @@ export async function generateMetadata({ params }: PostDetailPageProps) {
   };
 }
 
-// Helper to convert Vietnamese heading text to a clean URL slug/anchor ID
 const slugify = (text: string) => {
   return text
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Remove accents
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[đĐ]/g, "d")
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
@@ -60,6 +64,11 @@ const slugify = (text: string) => {
 
 export default async function PostDetailPage({ params }: PostDetailPageProps) {
   const { id } = await params;
+  const locale = normalizeLocale((await headers()).get("x-locale"));
+  const translations = await getStaticTranslationMap(locale).catch(() => ({}));
+  const t = (namespace: string, key: string, fallback: string) => translateFromMap(translations, namespace, key, fallback);
+  const dateLocale = getDateLocale(locale);
+
   const dbPost = await prisma.post.findUnique({
     where: { id: Number(id) },
     include: {
@@ -69,46 +78,39 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
     },
   });
 
-  if (!dbPost || dbPost.status !== "Đã xuất bản") {
+  if (!dbPost || !PUBLISHED_STATUSES.includes(dbPost.status)) {
     notFound();
   }
 
+  const localizedDbPost = await localizeContent("post", dbPost, locale);
   const post = {
-    id: dbPost.id,
-    category: dbPost.category?.name || "Chưa phân loại",
-    title: dbPost.title,
-    date: dbPost.publishedAt
-      ? new Date(dbPost.publishedAt).toLocaleDateString("vi-VN")
-      : new Date(dbPost.createdAt).toLocaleDateString("vi-VN"),
-    readTime: dbPost.readTime || "5 phút đọc",
+    id: localizedDbPost.id,
+    category: localizedDbPost.category?.name || t("news", "fallback_category", "Cẩm nang"),
+    title: localizedDbPost.title,
+    date: localizedDbPost.publishedAt
+      ? new Date(localizedDbPost.publishedAt).toLocaleDateString(dateLocale)
+      : new Date(localizedDbPost.createdAt).toLocaleDateString(dateLocale),
+    readTime: localizedDbPost.readTime || t("news", "read_time_default", "5 phút đọc"),
     author: {
-      name: dbPost.author?.name || "VietVista Editor",
-      avatar: dbPost.author?.avatarUrl || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80",
-      role: dbPost.author?.role || "Travel Writer",
+      name: localizedDbPost.author?.name || "VietVista Editor",
+      avatar: localizedDbPost.author?.avatarUrl || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80",
+      role: localizedDbPost.author?.role || "Travel Writer",
     },
-    image: dbPost.imageUrl || "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=85",
-    summary: dbPost.summary || "",
-    relatedPackageSlug: dbPost.relatedPackage?.slug || null,
-    blocks: (dbPost.contentBlocks as unknown as ContentBlock[]) || [],
+    image: localizedDbPost.imageUrl || "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=85",
+    summary: localizedDbPost.summary || "",
+    relatedPackageSlug: localizedDbPost.relatedPackage?.slug || null,
+    blocks: (localizedDbPost.contentBlocks as unknown as ContentBlock[]) || [],
   };
 
-  // Collect heading-2 blocks for the Table of Contents
   const headings = post.blocks
-    .filter((b): b is Extract<ContentBlock, { type: "heading-2" }> => b.type === "heading-2")
-    .map((b) => ({
-      id: slugify(b.text),
-      text: b.text,
-    }));
+    .filter((block): block is Extract<ContentBlock, { type: "heading-2" }> => block.type === "heading-2")
+    .map((block) => ({ id: slugify(block.text), text: block.text }));
 
-  // Find the related package details if configured
-  const relatedPackage = post.relatedPackageSlug
-    ? allPackages.find((pkg) => pkg.slug === post.relatedPackageSlug)
-    : null;
+  const relatedPackage = post.relatedPackageSlug ? await getPublicPackageBySlug(post.relatedPackageSlug, locale) : null;
 
-  // Filter 2 related posts from database
   const dbRelatedPosts = await prisma.post.findMany({
     where: {
-      status: "Đã xuất bản",
+      status: { in: PUBLISHED_STATUSES },
       id: { not: post.id },
     },
     orderBy: { createdAt: "desc" },
@@ -116,26 +118,24 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
     include: { category: true },
   });
 
-  const relatedPosts = dbRelatedPosts.map((p) => ({
-    id: p.id,
-    category: p.category?.name || "Chưa phân loại",
-    title: p.title,
-    excerpt: p.excerpt || "",
-    image: p.imageUrl || "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1000&q=80",
-    readTime: p.readTime || "5 phút đọc",
-    date: p.publishedAt
-      ? new Date(p.publishedAt).toLocaleDateString("vi-VN")
-      : new Date(p.createdAt).toLocaleDateString("vi-VN"),
+  const localizedRelatedPosts = await Promise.all(dbRelatedPosts.map((item) => localizeContent("post", item, locale)));
+  const relatedPosts = localizedRelatedPosts.map((relatedPost) => ({
+    id: relatedPost.id,
+    category: relatedPost.category?.name || t("news", "fallback_category", "Cẩm nang"),
+    title: relatedPost.title,
+    excerpt: relatedPost.excerpt || "",
+    image: relatedPost.imageUrl || "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1000&q=80",
+    readTime: relatedPost.readTime || t("news", "read_time_default", "5 phút đọc"),
+    date: relatedPost.publishedAt
+      ? new Date(relatedPost.publishedAt).toLocaleDateString(dateLocale)
+      : new Date(relatedPost.createdAt).toLocaleDateString(dateLocale),
   }));
 
   return (
     <main className="post-detail-page">
-      {/* Scroll Progress Bar */}
       <ReadingProgressBar />
-      
       <SiteHeader variant="hero" />
 
-      {/* Hero Section */}
       <section
         className="page-hero post-hero"
         style={{
@@ -144,43 +144,35 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
       >
         <div className="post-hero-content">
           <nav className="breadcrumbs" aria-label="Breadcrumb">
-            <Link href="/">Trang chủ</Link>
+            <Link href={withLocalePrefix("/", locale)}>{t("postDetail", "home", "Trang chủ")}</Link>
             <span className="separator">/</span>
-            <Link href="/tin-tuc">Tin tức</Link>
+            <Link href={withLocalePrefix("/tin-tuc", locale)}>{t("postDetail", "news", "Tin tức")}</Link>
             <span className="separator">/</span>
             <span className="current">{post.category}</span>
           </nav>
-          
+
           <p className="eyebrow">{post.category}</p>
           <h1>{post.title}</h1>
-          
+
           <div className="post-author-meta">
-            <img
-              src={post.author.avatar}
-              alt={post.author.name}
-              className="author-avatar"
-            />
+            <img src={post.author.avatar} alt={post.author.name} className="author-avatar" />
             <div className="author-info">
               <strong>{post.author.name}</strong>
               <span>{post.author.role}</span>
             </div>
             <div className="meta-divider" />
             <div className="post-time-meta">
-              <span>📅 {post.date}</span>
-              <span>⏱️ {post.readTime}</span>
+              <span>{post.date}</span>
+              <span>{post.readTime}</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Main Layout: Sidebar + Article */}
       <section className="post-detail-shell">
         <div className="post-detail-layout">
-          
-          {/* Sticky Sidebar with TOC and Share panel */}
           <PostSidebar headings={headings} title={post.title} />
 
-          {/* Article content */}
           <article className="article-body">
             <p className="article-lead-summary">{post.summary}</p>
 
@@ -199,8 +191,8 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                 case "blockquote":
                   return (
                     <blockquote key={index}>
-                      <p>“{block.text}”</p>
-                      {block.author && <cite>— {block.author}</cite>}
+                      <p>{block.text}</p>
+                      {block.author && <cite>{block.author}</cite>}
                     </blockquote>
                   );
                 case "image":
@@ -213,15 +205,15 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                 case "tip-box":
                   return (
                     <div key={index} className="article-tip-box">
-                      <h4>💡 {block.title}</h4>
+                      <h4>{block.title}</h4>
                       <p>{block.text}</p>
                     </div>
                   );
                 case "list":
                   return (
                     <ul key={index} className="article-list">
-                      {block.items.map((item, idx) => (
-                        <li key={idx}>{item}</li>
+                      {block.items.map((item, itemIndex) => (
+                        <li key={`${item}-${itemIndex}`}>{item}</li>
                       ))}
                     </ul>
                   );
@@ -230,27 +222,23 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
               }
             })}
 
-            {/* In-article Package Recommendation CTA */}
             {relatedPackage && (
               <div className="article-cta-package">
-                <div
-                  className="cta-package-image"
-                  style={{ backgroundImage: `url(${relatedPackage.image})` }}
-                />
+                <div className="cta-package-image" style={{ backgroundImage: `url(${relatedPackage.image})` }} />
                 <div className="cta-package-content">
-                  <span className="cta-badge">Gợi ý hành trình</span>
-                  <h3>Hành trình VietVista: {relatedPackage.name}</h3>
+                  <span className="cta-badge">{t("postDetail", "package_badge", "Gợi ý hành trình")}</span>
+                  <h3>{t("postDetail", "package_title_prefix", "Hành trình VietVista")}: {relatedPackage.name}</h3>
                   <p>{relatedPackage.summary}</p>
                   <div className="cta-package-details">
-                    <span>⏳ {relatedPackage.duration}</span>
-                    <span>💰 {relatedPackage.price}</span>
+                    <span>{relatedPackage.duration}</span>
+                    <span>{relatedPackage.price}</span>
                   </div>
                   <div className="cta-package-actions">
-                    <Link href={`/goi-du-lich/${relatedPackage.slug}`} className="cta-primary">
-                      Xem chi tiết lịch trình
+                    <Link href={withLocalePrefix("/goi-du-lich/" + relatedPackage.slug, locale)} className="cta-primary">
+                      {t("postDetail", "view_package", "Xem chi tiết lịch trình")}
                     </Link>
-                    <Link href="/lien-he" className="cta-secondary">
-                      Nhận tư vấn nhóm
+                    <Link href={withLocalePrefix("/lien-he", locale)} className="cta-secondary">
+                      {t("postDetail", "consult_group", "Nhận tư vấn nhóm")}
                     </Link>
                   </div>
                 </div>
@@ -260,17 +248,16 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
         </div>
       </section>
 
-      {/* Related Posts Section */}
       <section className="related-posts-section">
         <div className="section-container">
           <div className="section-heading compact">
-            <p className="eyebrow">Đọc tiếp cẩm nang</p>
-            <h2>Bài viết liên quan bạn có thể thích</h2>
+            <p className="eyebrow">{t("postDetail", "related_eyebrow", "Đọc tiếp cẩm nang")}</p>
+            <h2>{t("postDetail", "related_title", "Bài viết liên quan bạn có thể thích")}</h2>
           </div>
-          
+
           <div className="post-grid">
-            {relatedPosts.map((rPost) => (
-              <PostCard post={rPost} key={rPost.id} />
+            {relatedPosts.map((relatedPost) => (
+              <PostCard post={relatedPost} key={relatedPost.id} />
             ))}
           </div>
         </div>
@@ -278,3 +265,4 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
     </main>
   );
 }
+
