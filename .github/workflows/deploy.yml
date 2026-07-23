@@ -10,6 +10,7 @@ jobs:
 
     steps:
       - name: Triển khai dự án tự động
+        shell: cmd
         run: |
           d:
           cd D:\Travel
