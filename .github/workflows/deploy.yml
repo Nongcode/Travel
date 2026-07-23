@@ -9,17 +9,11 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Kéo mã nguồn mới nhất
+      - name: Triển khai dự án tự động
         run: |
           d:
           cd D:\Travel
           git pull origin master
-
-      - name: Cài đặt thư viện mới (nếu có)
-        run: npm install
-
-      - name: Đóng gói dự án Next.js
-        run: npm run build
-
-      - name: Khởi động lại ứng dụng qua PM2
-        run: pm2 restart travel || pm2 start ecosystem.config.js
+          npm install
+          npm run build
+          pm2 restart travel || pm2 start ecosystem.config.js
