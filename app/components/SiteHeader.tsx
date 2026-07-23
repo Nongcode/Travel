@@ -8,15 +8,6 @@ import { createPortal } from "react-dom";
 import { stripLocaleFromPath, withLocalePrefix } from "@/lib/i18n/config";
 import { useI18n } from "./I18nProvider";
 
-const navItems = [
-  { href: "/", key: "home", fallback: "Trang ch\u1ee7", settingKey: "page_home_status" },
-  { href: "/tin-tuc", key: "news", fallback: "Tin t\u1ee9c", settingKey: "page_news_status" },
-  { href: "/goi-du-lich", key: "packages", fallback: "G\u00f3i du l\u1ecbch", settingKey: "page_tours_status" },
-  { href: "/huong-dan-visa", key: "visa", fallback: "Visa", settingKey: "page_visa_status" },
-  { href: "/dac-san", key: "local_specialty", fallback: "Đặc sản", settingKey: "page_local_specialties_status" },
-  { href: "/lien-he", key: "contact", fallback: "Li\u00ean h\u1ec7", settingKey: "page_contact_status" },
-];
-
 type SiteHeaderProps = {
   variant?: "hero" | "solid";
 };
@@ -144,7 +135,7 @@ function LanguageSwitcher() {
 }
 
 export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
-  const { t, href, hiddenPageKeys } = useI18n();
+  const { locale, t, href, hiddenPageKeys, siteChrome } = useI18n();
   const pathname = usePathname() || "/";
   const strippedPath = stripLocaleFromPath(pathname).pathname;
   const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
@@ -152,7 +143,7 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const isHeroHeader = variant === "hero";
-  const visibleNavItems = navItems.filter((item) => !item.settingKey || !hiddenPageKeys.includes(item.settingKey));
+  const visibleNavItems = siteChrome.header.menu.filter((item) => !item.settingKey || !hiddenPageKeys.includes(item.settingKey));
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => setIsMounted(true));
@@ -272,7 +263,7 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
       <div className={`mobile-menu-drawer ${isMobileMenuOpen ? "open" : ""}`}>
         <div className="drawer-header">
           <Link className="brand" href={href("/")} onClick={() => setIsMobileMenuOpen(false)}>
-            <Image src="/vietvista-logo.png" alt="VietVista Travel & Discover" width={114} height={75} priority />
+            <Image src={siteChrome.header.logoUrl} alt={siteChrome.header.logoAlt} width={114} height={75} priority />
           </Link>
           <button 
             className="drawer-close"
@@ -287,17 +278,17 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
         </div>
         <nav className="mobile-nav">
           {visibleNavItems.map((item) => {
-            const itemHref = href(item.href);
-            const isHome = item.href === "/";
-            const isActive = isHome ? strippedPath === "/" : strippedPath.startsWith(item.href);
+            const itemHref = item.url.startsWith("/") ? href(item.url) : item.url;
+            const isHome = item.url === "/";
+            const isActive = isHome ? strippedPath === "/" : item.url.startsWith("/") && strippedPath.startsWith(item.url);
             return (
               <Link
                 href={itemHref}
-                key={item.href}
+                key={item.id}
                 className={isActive ? "active" : ""}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                {t("nav", item.key, item.fallback)}
+                {item.translationKey && locale !== "vi" ? t("nav", item.translationKey, item.label) : item.label}
               </Link>
             );
           })}
@@ -354,22 +345,22 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
     <>
     <header className={headerClassName}>
       <Link className="brand" href={href("/")} aria-label={t("nav", "home", "Trang chủ")}>
-        <Image src="/vietvista-logo.png" alt="VietVista Travel & Discover" width={152} height={100} priority />
+        <Image src={siteChrome.header.logoUrl} alt={siteChrome.header.logoAlt} width={152} height={100} priority />
       </Link>
       
       {/* Desktop Navigation */}
       <nav className="desktop-nav" aria-label="Điều hướng chính">
         {visibleNavItems.map((item) => {
-          const itemHref = href(item.href);
-          const isHome = item.href === "/";
-          const isActive = isHome ? strippedPath === "/" : strippedPath.startsWith(item.href);
+          const itemHref = item.url.startsWith("/") ? href(item.url) : item.url;
+          const isHome = item.url === "/";
+          const isActive = isHome ? strippedPath === "/" : item.url.startsWith("/") && strippedPath.startsWith(item.url);
           return (
             <Link
               href={itemHref}
-              key={item.href}
+              key={item.id}
               className={isActive ? "active" : ""}
             >
-              {t("nav", item.key, item.fallback)}
+              {item.translationKey && locale !== "vi" ? t("nav", item.translationKey, item.label) : item.label}
             </Link>
           );
         })}

@@ -5,49 +5,50 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useI18n } from "./I18nProvider";
-
-const footerLinks = [
-  { href: "/", key: "home", fallback: "Trang ch?", settingKey: "page_home_status" },
-  { href: "/tin-tuc", key: "news", fallback: "Tin t?c", settingKey: "page_news_status" },
-  { href: "/goi-du-lich", key: "packages", fallback: "G?i du l?ch", settingKey: "page_tours_status" },
-  { href: "/huong-dan-visa", key: "visa", fallback: "Visa", settingKey: "page_visa_status" },
-  { href: "/uu-dai", key: "offers", fallback: "?u ??i" },
-  { href: "/lien-he", key: "contact", fallback: "Li?n h?", settingKey: "page_contact_status" },
-  { href: "/admin", key: "admin", fallback: "Admin" },
-];
+import { DEFAULT_SITE_CHROME_CONFIG } from "@/lib/siteChromeShared";
 
 export function SiteFooter() {
   const pathname = usePathname();
-  const { t, href, hiddenPageKeys } = useI18n();
+  const { locale, t, href, hiddenPageKeys, siteChrome } = useI18n();
 
   if (pathname?.startsWith("/admin")) return null;
 
-  const visibleFooterLinks = footerLinks.filter((item) => !item.settingKey || !hiddenPageKeys.includes(item.settingKey));
+  const visibleFooterLinks = siteChrome.footer.menu.filter((item) => !item.settingKey || !hiddenPageKeys.includes(item.settingKey));
+  const footerDescription = siteChrome.footer.description === DEFAULT_SITE_CHROME_CONFIG.footer.description
+    ? t("footer", "description", DEFAULT_SITE_CHROME_CONFIG.footer.description)
+    : siteChrome.footer.description;
+  const footerCopyright = siteChrome.footer.copyright === DEFAULT_SITE_CHROME_CONFIG.footer.copyright
+    ? t("footer", "rights", DEFAULT_SITE_CHROME_CONFIG.footer.copyright)
+    : siteChrome.footer.copyright;
 
   return (
     <footer className="site-footer">
       <div className="footer-main">
         <div>
-          <Link className="footer-brand" href={href("/")} aria-label={t("nav", "home", "Trang ch?")}>
-            <Image src="/vietvista-logo.png" alt="VietVista Travel & Discover" width={180} height={118} />
+          <Link className="footer-brand" href={href("/")} aria-label={siteChrome.header.companyName}>
+            <Image src={siteChrome.header.logoUrl} alt={siteChrome.header.logoAlt} width={180} height={118} />
           </Link>
-          <p>{t("footer", "description", "Blog du l?ch v? k?nh t? v?n h?nh tr?nh Vi?t Nam. Website ch? thu th?p th?ng tin li?n h?, kh?ng x? l? thanh to?n tr?c tuy?n.")}</p>
+          <p>{footerDescription}</p>
         </div>
         <nav aria-label="Footer navigation">
           {visibleFooterLinks.map((item) => (
-            <Link href={href(item.href)} key={item.href}>
-              {t("nav", item.key, item.fallback)}
+            <Link href={item.url.startsWith("/") ? href(item.url) : item.url} key={item.id}>
+              {item.translationKey && locale !== "vi" ? t("nav", item.translationKey, item.label) : item.label}
             </Link>
           ))}
         </nav>
         <div className="footer-contact">
-          <span>{t("footer", "consult", "Li?n h? t? v?n")}</span>
-          <a href="mailto:hello@vietvista.vn">hello@vietvista.vn</a>
-          <a href="tel:+84901234567">090 123 4567</a>
+          <span>{t("footer", "consult", "Liên hệ tư vấn")}</span>
+          {siteChrome.footer.address && <span>{siteChrome.footer.address}</span>}
+          {siteChrome.footer.email && <a href={`mailto:${siteChrome.footer.email}`}>{siteChrome.footer.email}</a>}
+          {siteChrome.footer.phone && <a href={`tel:${siteChrome.footer.phone.replace(/[^+\d]/g, "")}`}>{siteChrome.footer.phone}</a>}
+          {siteChrome.footer.facebook && <a href={siteChrome.footer.facebook} target="_blank" rel="noreferrer">Facebook</a>}
+          {siteChrome.footer.instagram && <a href={siteChrome.footer.instagram} target="_blank" rel="noreferrer">Instagram</a>}
+          {siteChrome.footer.twitter && <a href={siteChrome.footer.twitter} target="_blank" rel="noreferrer">Twitter / X</a>}
         </div>
       </div>
       <div className="footer-bottom">
-        <span>{t("footer", "rights", "? 2026 VietVista. All rights reserved.")}</span>
+        <span>{footerCopyright}</span>
         <span>Travel blog & curated journeys</span>
       </div>
     </footer>

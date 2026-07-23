@@ -2,6 +2,7 @@
 
 import { createContext, useContext, ReactNode } from "react";
 import { withLocalePrefix } from "@/lib/i18n/config";
+import { DEFAULT_SITE_CHROME_CONFIG, type SiteChromeConfig } from "@/lib/siteChromeShared";
 
 export type ClientTranslationMap = Record<string, string>;
 
@@ -19,6 +20,7 @@ type I18nContextValue = {
   translations: ClientTranslationMap;
   languages: ClientLanguageOption[];
   hiddenPageKeys: string[];
+  siteChrome: SiteChromeConfig;
   t: (namespace: string, key: string, fallback: string) => string;
   href: (href: string) => string;
 };
@@ -28,16 +30,18 @@ const I18nContext = createContext<I18nContextValue>({
   translations: {},
   languages: [],
   hiddenPageKeys: [],
+  siteChrome: DEFAULT_SITE_CHROME_CONFIG,
   t: (_namespace, _key, fallback) => fallback,
   href: (href) => href,
 });
 
-export function I18nProvider({ locale, translations, languages, hiddenPageKeys, children }: { locale: string; translations: ClientTranslationMap; languages: ClientLanguageOption[]; hiddenPageKeys: string[]; children: ReactNode }) {
+export function I18nProvider({ locale, translations, languages, hiddenPageKeys, siteChrome, children }: { locale: string; translations: ClientTranslationMap; languages: ClientLanguageOption[]; hiddenPageKeys: string[]; siteChrome: SiteChromeConfig; children: ReactNode }) {
   const value: I18nContextValue = {
     locale,
     translations,
     languages,
     hiddenPageKeys,
+    siteChrome,
     t(namespace, key, fallback) {
       return translations[namespace + "." + key] || fallback;
     },

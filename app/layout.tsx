@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
+import { getSiteChromeConfig } from "@/lib/siteChrome";
+import { DEFAULT_SITE_CHROME_CONFIG } from "@/lib/siteChromeShared";
 import { normalizeLocale, withLocalePrefix } from "@/lib/i18n/config";
 import { getActiveLanguages, getStaticTranslationMap } from "@/lib/i18n/server";
 import type { LanguageOption, TranslationMap } from "@/lib/i18n/server";
@@ -89,6 +91,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   let staticTranslations: TranslationMap = {};
   let activeLanguages: LanguageOption[] = [];
   let hiddenPageKeys: string[] = [];
+  let siteChrome = DEFAULT_SITE_CHROME_CONFIG;
 
   if (!isAdminOrApi) {
     try {
@@ -131,6 +134,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     }
 
     try {
+      siteChrome = await getSiteChromeConfig();
+    } catch (err) {
+      console.error("Failed to load Header/Footer configuration:", err);
+    }
+
+    try {
       staticTranslations = await getStaticTranslationMap(locale);
       activeLanguages = await getActiveLanguages();
     } catch (err) {
@@ -156,7 +165,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang={locale} suppressHydrationWarning className={roboto.variable + " h-full antialiased"}>
       <body className="min-h-full flex flex-col">
-        <I18nProvider locale={locale} translations={staticTranslations} languages={activeLanguages} hiddenPageKeys={hiddenPageKeys}>
+        <I18nProvider locale={locale} translations={staticTranslations} languages={activeLanguages} hiddenPageKeys={hiddenPageKeys} siteChrome={siteChrome}>
           {children}
           <SiteFooter />
         </I18nProvider>

@@ -16,5 +16,6 @@ jobs:
           cd D:\Travel
           git pull --ff-only origin master || exit /b 1
           npm ci || exit /b 1
+          npm run db:deploy || exit /b 1
           npm run build || exit /b 1
           pm2 restart travel || pm2 start ecosystem.config.js
