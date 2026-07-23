@@ -37,6 +37,7 @@ export const defaultStaticTranslations: DefaultStaticTranslation[] = [
   { namespace: "home", key: "package_heading", description: "Homepage package heading", values: { vi: "Ch\u1ecdn h\u00e0nh tr\u00ecnh theo ng\u01b0\u1eddi \u0111i c\u00f9ng b\u1ea1n", en: "Choose a journey by who you travel with", "zh-CN": "\u6309\u540c\u884c\u4eba\u9009\u62e9\u884c\u7a0b" } },
   { namespace: "home", key: "package_all", description: "Homepage all packages link", values: { vi: "Xem t\u1ea5t c\u1ea3 g\u00f3i du l\u1ecbch", en: "View all travel packages", "zh-CN": "\u67e5\u770b\u5168\u90e8\u65c5\u6e38\u5957\u9910" } },
   { namespace: "home", key: "package_consult", description: "Homepage package consult link", values: { vi: "Nh\u1eadn t\u01b0 v\u1ea5n nh\u00f3m g\u00f3i n\u00e0y", en: "Get advice for this group", "zh-CN": "\u83b7\u53d6\u8fd9\u7c7b\u884c\u7a0b\u5efa\u8bae" } },
+  { namespace: "home", key: "package_view_current", description: "Homepage package group view link", values: { vi: "Xem g\u00f3i n\u00e0y", en: "View this group", "zh-CN": "\u67e5\u770b\u8fd9\u7c7b\u5957\u9910" } },
   { namespace: "home", key: "feature_title", description: "Homepage destination feature title", values: { vi: "Ch\u1ecdn \u0111i\u1ec3m \u0111\u1ebfn theo c\u1ea3m x\u00fac,", en: "Choose destinations by feeling,", "zh-CN": "\u6309\u5fc3\u60c5\u9009\u62e9\u76ee\u7684\u5730\uff0c" } },
   { namespace: "home", key: "feature_title_span", description: "Homepage destination feature span", values: { vi: "kh\u00f4ng ch\u1ec9 theo \u0111\u1ecba danh.", en: "not just by place names.", "zh-CN": "\u800c\u4e0d\u53ea\u662f\u6309\u5730\u540d\u3002" } },
   { namespace: "home", key: "feature_copy", description: "Homepage destination feature copy", values: { vi: "Vì đó là kỉ niệm mà bạn sẽ đem theo mãi bên mình.", en: "Because these are memories you will carry with you.", "zh-CN": "因为这些是你一直带在心里的回忆。" } },
@@ -146,5 +147,4 @@ export const defaultStaticTranslations: DefaultStaticTranslation[] = [
   { namespace: "footer", key: "consult", description: "Footer consult label", values: { vi: "Li\u00ean h\u1ec7 t\u01b0 v\u1ea5n", en: "Consultation contact", "zh-CN": "\u54a8\u8be2\u8054\u7cfb" } },
   { namespace: "footer", key: "rights", description: "Footer rights", values: { vi: "\u00a9 2026 VietVista. All rights reserved.", en: "\u00a9 2026 VietVista. All rights reserved.", "zh-CN": "\u00a9 2026 VietVista. \u4fdd\u7559\u6240\u6709\u6743\u5229\u3002" } },
 ];
-
 

@@ -1,7 +1,8 @@
 ﻿"use client";
 
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { PackageCard } from "./PackageCard";
+import { ScrollProgressIndicator, useHorizontalScrollProgress } from "./ScrollProgressIndicator";
 
 type PackageItem = {
   id: number;
@@ -45,7 +46,7 @@ function buildDisplayItems(items: PackageItem[], fallbackItems: PackageItem[] = 
 }
 
 export function PackageCarousel({ items, fallbackItems = [], minItems = 5 }: PackageCarouselProps) {
-  const carouselRef = useRef<HTMLDivElement>(null);
+  const { viewportRef: carouselRef, hasOverflow, progress } = useHorizontalScrollProgress<HTMLDivElement>();
   const displayItems = useMemo(() => buildDisplayItems(items, fallbackItems, minItems), [fallbackItems, items, minItems]);
   const loopItems = useMemo(() => [...displayItems, ...displayItems], [displayItems]);
 
@@ -82,6 +83,13 @@ export function PackageCarousel({ items, fallbackItems = [], minItems = 5 }: Pac
         </div>
       </div>
 
+      {hasOverflow ? (
+        <ScrollProgressIndicator
+          className="package-scroll-indicator"
+          label="Package carousel position"
+          progress={progress}
+        />
+      ) : null}
       <button className="package-carousel-nav next" type="button" aria-label="Xem g\u00f3i ti\u1ebfp theo" onClick={() => scrollByCard("next")}>
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M9 18l6-6-6-6" />
