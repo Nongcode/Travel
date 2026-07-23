@@ -1,11 +1,19 @@
 import { headers } from "next/headers";
+import { PageDisabled } from "../components/PageDisabled";
 import { SiteHeader } from "../components/SiteHeader";
 import { LocalSpecialtyExplorer } from "../components/LocalSpecialtyExplorer";
 import prisma from "@/lib/prisma";
+import { isSitePageInactive } from "@/lib/siteSettings";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { getStaticTranslationMap, translateFromMap, localizeContent } from "@/lib/i18n/server";
 
+export const dynamic = "force-dynamic";
+
 export default async function LocalSpecialtiesPage() {
+  if (await isSitePageInactive("page_local_specialties_status")) {
+    return <PageDisabled pageName="Đặc sản địa phương" />;
+  }
+
   const locale = normalizeLocale((await headers()).get("x-locale"));
   const translations = await getStaticTranslationMap(locale).catch(() => ({}));
   const t = (namespace: string, key: string, fallback: string) => translateFromMap(translations, namespace, key, fallback);

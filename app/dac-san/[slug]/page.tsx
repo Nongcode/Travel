@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { PageDisabled } from "../../components/PageDisabled";
 import { notFound } from "next/navigation";
 import { JsonLd } from "../../components/JsonLd";
 import { LeadForm } from "../../components/LeadForm";
@@ -7,6 +8,7 @@ import { SiteHeader } from "../../components/SiteHeader";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { getStaticTranslationMap, translateFromMap, localizeContent } from "@/lib/i18n/server";
 import prisma from "@/lib/prisma";
+import { isSitePageInactive } from "@/lib/siteSettings";
 
 type SpecialtyDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -49,7 +51,13 @@ export async function generateMetadata({ params }: SpecialtyDetailPageProps) {
   };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function SpecialtyDetailPage({ params }: SpecialtyDetailPageProps) {
+  if (await isSitePageInactive("page_local_specialties_status")) {
+    return <PageDisabled pageName="Đặc sản địa phương" />;
+  }
+
   const { slug } = await params;
   const locale = normalizeLocale((await headers()).get("x-locale"));
   const translations = await getStaticTranslationMap(locale).catch(() => ({}));

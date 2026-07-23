@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { isSitePageInactive } from "@/lib/siteSettings";
+import { PageDisabled } from "../components/PageDisabled";
 import { headers } from "next/headers";
 import { SiteHeader } from "../components/SiteHeader";
 import { VisaConsultForm } from "../components/VisaConsultForm";
@@ -119,7 +121,13 @@ const pageCopy = {
   },
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function VisaGuidePage() {
+  if (await isSitePageInactive("page_visa_status")) {
+    return <PageDisabled pageName="Hướng dẫn Visa" />;
+  }
+
   const locale = normalizeLocale((await headers()).get("x-locale"));
   const translations = await getStaticTranslationMap(locale).catch(() => ({}));
   const t = (namespace: string, key: string, fallback: string) => translateFromMap(translations, namespace, key, fallback);

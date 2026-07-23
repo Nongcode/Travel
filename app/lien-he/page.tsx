@@ -8,8 +8,15 @@ import { normalizeLocale } from "@/lib/i18n/config";
 import { getStaticTranslationMap, translateFromMap } from "@/lib/i18n/server";
 import { getPublicPackages } from "@/lib/packages";
 import prisma from "@/lib/prisma";
+import { isSitePageInactive } from "@/lib/siteSettings";
+import { PageDisabled } from "../components/PageDisabled";
+
+export const dynamic = "force-dynamic";
 
 export default async function ContactPage() {
+  if (await isSitePageInactive("page_contact_status")) {
+    return <PageDisabled pageName="Liên hệ" />;
+  }
   const locale = normalizeLocale((await headers()).get("x-locale"));
   const translations = await getStaticTranslationMap(locale).catch(() => ({}));
   const t = (namespace: string, key: string, fallback: string) => translateFromMap(translations, namespace, key, fallback);

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageDisabled } from "./components/PageDisabled";
 import Link from "next/link";
 import { JsonLd } from "./components/JsonLd";
 import { DestinationTabs } from "./components/DestinationTabs";
@@ -8,6 +9,7 @@ import { CustomSelect } from "./components/CustomSelect";
 import { SiteHeader } from "./components/SiteHeader";
 import { destinations, tripStyles } from "./data/travel";
 import prisma from "@/lib/prisma";
+import { isSitePageInactive } from "@/lib/siteSettings";
 import { withLocalePrefix } from "@/lib/i18n/config";
 import { getRequestLocale, getStaticTranslationMap, localizeContent, translateFromMap } from "@/lib/i18n/server";
 import { getPublicPackageCollections, getPublicPackages } from "@/lib/packages";
@@ -34,6 +36,10 @@ const PUBLISHED_STATUSES = [PUBLISHED_STATUS, toLegacyMojibake(PUBLISHED_STATUS)
 const OPEN_STATUSES = [OPEN_STATUS, toLegacyMojibake(OPEN_STATUS), toDoubleLegacyMojibake(OPEN_STATUS)];
 
 export default async function Home() {
+  if (await isSitePageInactive("page_home_status")) {
+    return <PageDisabled pageName="Trang chủ" />;
+  }
+
   const locale = await getRequestLocale();
   const translations = await getStaticTranslationMap(locale).catch(() => ({}));
   const t = (namespace: string, key: string, fallback: string) => translateFromMap(translations, namespace, key, fallback);

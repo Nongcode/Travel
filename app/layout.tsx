@@ -75,6 +75,8 @@ function DisabledScreen({ locale, title, message, actionLabel }: { locale: strin
   );
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "";
@@ -86,6 +88,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   let disabledPageName = "";
   let staticTranslations: TranslationMap = {};
   let activeLanguages: LanguageOption[] = [];
+  let hiddenPageKeys: string[] = [];
 
   if (!isAdminOrApi) {
     try {
@@ -94,6 +97,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         acc[curr.settingKey] = curr.settingValue;
         return acc;
       }, {});
+      hiddenPageKeys = Object.entries(settingsMap)
+        .filter(([key, value]) => key.startsWith("page_") && value === "inactive")
+        .map(([key]) => key);
 
       if (settingsMap.site_status === "suspended") {
         isSuspended = true;
@@ -150,7 +156,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang={locale} suppressHydrationWarning className={roboto.variable + " h-full antialiased"}>
       <body className="min-h-full flex flex-col">
-        <I18nProvider locale={locale} translations={staticTranslations} languages={activeLanguages}>
+        <I18nProvider locale={locale} translations={staticTranslations} languages={activeLanguages} hiddenPageKeys={hiddenPageKeys}>
           {children}
           <SiteFooter />
         </I18nProvider>

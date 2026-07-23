@@ -1,4 +1,6 @@
 import { headers } from "next/headers";
+import { isSitePageInactive } from "@/lib/siteSettings";
+import { PageDisabled } from "../../components/PageDisabled";
 import { notFound } from "next/navigation";
 import { JsonLd } from "../../components/JsonLd";
 import { LeadForm } from "../../components/LeadForm";
@@ -53,7 +55,13 @@ export async function generateMetadata({ params }: PackageDetailPageProps) {
   };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function PackageDetailPage({ params }: PackageDetailPageProps) {
+  if (await isSitePageInactive("page_tours_status")) {
+    return <PageDisabled pageName="Gói du lịch" />;
+  }
+
   const { slug } = await params;
   const locale = normalizeLocale((await headers()).get("x-locale"));
   const translations = await getStaticTranslationMap(locale).catch(() => ({}));

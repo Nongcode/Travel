@@ -9,12 +9,12 @@ import { stripLocaleFromPath, withLocalePrefix } from "@/lib/i18n/config";
 import { useI18n } from "./I18nProvider";
 
 const navItems = [
-  { href: "/", key: "home", fallback: "Trang ch\u1ee7" },
-  { href: "/tin-tuc", key: "news", fallback: "Tin t\u1ee9c" },
-  { href: "/goi-du-lich", key: "packages", fallback: "G\u00f3i du l\u1ecbch" },
-  { href: "/huong-dan-visa", key: "visa", fallback: "Visa" },
-  { href: "/dac-san", key: "local_specialty", fallback: "Đặc sản" },
-  { href: "/lien-he", key: "contact", fallback: "Li\u00ean h\u1ec7" },
+  { href: "/", key: "home", fallback: "Trang ch\u1ee7", settingKey: "page_home_status" },
+  { href: "/tin-tuc", key: "news", fallback: "Tin t\u1ee9c", settingKey: "page_news_status" },
+  { href: "/goi-du-lich", key: "packages", fallback: "G\u00f3i du l\u1ecbch", settingKey: "page_tours_status" },
+  { href: "/huong-dan-visa", key: "visa", fallback: "Visa", settingKey: "page_visa_status" },
+  { href: "/dac-san", key: "local_specialty", fallback: "Đặc sản", settingKey: "page_local_specialties_status" },
+  { href: "/lien-he", key: "contact", fallback: "Li\u00ean h\u1ec7", settingKey: "page_contact_status" },
 ];
 
 type SiteHeaderProps = {
@@ -144,7 +144,7 @@ function LanguageSwitcher() {
 }
 
 export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
-  const { t, href } = useI18n();
+  const { t, href, hiddenPageKeys } = useI18n();
   const pathname = usePathname() || "/";
   const strippedPath = stripLocaleFromPath(pathname).pathname;
   const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
@@ -152,6 +152,7 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const isHeroHeader = variant === "hero";
+  const visibleNavItems = navItems.filter((item) => !item.settingKey || !hiddenPageKeys.includes(item.settingKey));
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => setIsMounted(true));
@@ -285,7 +286,7 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
           </button>
         </div>
         <nav className="mobile-nav">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const itemHref = href(item.href);
             const isHome = item.href === "/";
             const isActive = isHome ? strippedPath === "/" : strippedPath.startsWith(item.href);
@@ -358,7 +359,7 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
       
       {/* Desktop Navigation */}
       <nav className="desktop-nav" aria-label="Điều hướng chính">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const itemHref = href(item.href);
           const isHome = item.href === "/";
           const isActive = isHome ? strippedPath === "/" : strippedPath.startsWith(item.href);

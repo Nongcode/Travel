@@ -34,6 +34,8 @@ export default function SettingsAdminPage() {
   const [loadingSettings, setLoadingSettings] = useState(false);
   const [settingsError, setSettingsError] = useState("");
   const [settingsSuccess, setSettingsSuccess] = useState("");
+  const [savedSettings, setSavedSettings] = useState<Record<string, string>>({});
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   // Modal: Thêm tài khoản mới
   const [showAddModal, setShowAddModal] = useState(false);
@@ -76,18 +78,30 @@ export default function SettingsAdminPage() {
   // Tải cấu hình website từ API
   const fetchSettings = async () => {
     setLoadingSettings(true);
+    setSettingsLoaded(false);
     try {
       const res = await fetch("/api/admin/settings");
       const data = await res.json();
       if (res.ok && data.success) {
         const s = data.settings || {};
-        setSiteStatus(s.site_status || "active");
-        setPageHomeStatus(s.page_home_status || "active");
-        setPageToursStatus(s.page_tours_status || "active");
-        setPageVisaStatus(s.page_visa_status || "active");
-        setPageNewsStatus(s.page_news_status || "active");
-        setPageContactStatus(s.page_contact_status || "active");
-        setPageLocalSpecialtiesStatus(s.page_local_specialties_status || "active");
+        const loadedSettings: Record<string, string> = {
+          site_status: s.site_status || "active",
+          page_home_status: s.page_home_status || "active",
+          page_tours_status: s.page_tours_status || "active",
+          page_visa_status: s.page_visa_status || "active",
+          page_news_status: s.page_news_status || "active",
+          page_contact_status: s.page_contact_status || "active",
+          page_local_specialties_status: s.page_local_specialties_status || "active",
+        };
+        setSiteStatus(loadedSettings.site_status);
+        setPageHomeStatus(loadedSettings.page_home_status);
+        setPageToursStatus(loadedSettings.page_tours_status);
+        setPageVisaStatus(loadedSettings.page_visa_status);
+        setPageNewsStatus(loadedSettings.page_news_status);
+        setPageContactStatus(loadedSettings.page_contact_status);
+        setPageLocalSpecialtiesStatus(loadedSettings.page_local_specialties_status);
+        setSavedSettings(loadedSettings);
+        setSettingsLoaded(true);
       } else {
         setSettingsError(data.error || "Không thể tải cấu hình website.");
       }
@@ -105,20 +119,37 @@ export default function SettingsAdminPage() {
     setSettingsSuccess("");
     setLoadingSettings(true);
 
+    if (!settingsLoaded) {
+      setSettingsError("Chưa tải xong cấu hình hiện tại, vui lòng thử lại.");
+      setLoadingSettings(false);
+      return;
+    }
+
+    const currentSettings: Record<string, string> = {
+      site_status: siteStatus,
+      page_home_status: pageHomeStatus,
+      page_tours_status: pageToursStatus,
+      page_visa_status: pageVisaStatus,
+      page_news_status: pageNewsStatus,
+      page_contact_status: pageContactStatus,
+      page_local_specialties_status: pageLocalSpecialtiesStatus,
+    };
+    const changedSettings = Object.fromEntries(
+      Object.entries(currentSettings).filter(([key, value]) => savedSettings[key] !== value),
+    );
+
+    if (Object.keys(changedSettings).length === 0) {
+      setSettingsSuccess("Cấu hình không có thay đổi.");
+      setLoadingSettings(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          settings: {
-            site_status: siteStatus,
-            page_home_status: pageHomeStatus,
-            page_tours_status: pageToursStatus,
-            page_visa_status: pageVisaStatus,
-            page_news_status: pageNewsStatus,
-            page_contact_status: pageContactStatus,
-            page_local_specialties_status: pageLocalSpecialtiesStatus,
-          },
+          settings: changedSettings,
         }),
       });
 
@@ -126,6 +157,7 @@ export default function SettingsAdminPage() {
       setLoadingSettings(false);
 
       if (res.ok && data.success) {
+        setSavedSettings(currentSettings);
         setSettingsSuccess("Cập nhật cấu hình website thành công!");
         setTimeout(() => setSettingsSuccess(""), 3000);
       } else {
@@ -145,8 +177,12 @@ export default function SettingsAdminPage() {
     
     // Nếu là super admin, tải danh sách tài khoản & cấu hình
     if (currentAdmin?.email === "admin") {
-      fetchAdmins();
-      fetchSettings();
+      const loadTimer = window.setTimeout(() => {
+        void fetchAdmins();
+        void fetchSettings();
+      }, 0);
+
+      return () => window.clearTimeout(loadTimer);
     }
   }, [isAuthenticated, currentAdmin, router]);
 

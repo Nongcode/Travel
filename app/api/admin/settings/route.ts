@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     const settings = await prisma.siteSetting.findMany();
     
     // Chuyển mảng [{ settingKey, settingValue }] thành dạng key-value object { [key]: value }
-    const settingsMap = settings.reduce((acc: any, curr) => {
+    const settingsMap = settings.reduce<Record<string, string | null>>((acc, curr) => {
       acc[curr.settingKey] = curr.settingValue;
       return acc;
     }, {});
@@ -52,7 +52,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Thực hiện lưu từng cấu hình dưới dạng upsert
-    const updatePromises = Object.entries(settings).map(([key, value]) => {
+    const settingRules: Record<string, string[]> = {
+      site_status: ["active", "suspended"],
+      page_home_status: ["active", "inactive"],
+      page_tours_status: ["active", "inactive"],
+      page_visa_status: ["active", "inactive"],
+      page_news_status: ["active", "inactive"],
+      page_contact_status: ["active", "inactive"],
+      page_local_specialties_status: ["active", "inactive"],
+    };
+    const entries = Object.entries(settings as Record<string, unknown>);
+    const invalidEntry = entries.find(([key, value]) => {
+      return !settingRules[key] || typeof value !== "string" || !settingRules[key].includes(value);
+    });
+    if (entries.length === 0 || invalidEntry) {
+      return NextResponse.json({ error: "Giá trị cấu hình không hợp lệ." }, { status: 400 });
+    }
+
+    const updatePromises = entries.map(([key, value]) => {
       return prisma.siteSetting.upsert({
         where: { settingKey: key },
         update: { settingValue: String(value) },

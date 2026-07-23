@@ -264,6 +264,7 @@ async function main() {
             priceText: data.priceText,
             whereToBuy: data.whereToBuy,
           },
+          sourceHash: "manual-seed-v1",
           status: "published",
         },
         create: {
@@ -276,6 +277,7 @@ async function main() {
             priceText: data.priceText,
             whereToBuy: data.whereToBuy,
           },
+          sourceHash: "manual-seed-v1",
           status: "published",
         }
       });
@@ -292,7 +294,8 @@ async function main() {
               howToUse: data.detail.howToUse,
               preservation: data.detail.preservation,
             },
-            status: "published",
+            sourceHash: "manual-seed-v1",
+          status: "published",
           },
           create: {
             entityType: "local_specialty_detail",
@@ -305,7 +308,8 @@ async function main() {
               howToUse: data.detail.howToUse,
               preservation: data.detail.preservation,
             },
-            status: "published",
+            sourceHash: "manual-seed-v1",
+          status: "published",
           }
         });
       }

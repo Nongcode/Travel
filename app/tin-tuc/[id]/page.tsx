@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageDisabled } from "../../components/PageDisabled";
 import { JsonLd } from "../../components/JsonLd";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
@@ -8,6 +9,7 @@ import { PostSidebar } from "../../components/PostSidebar";
 import { PostCard } from "../../components/PostCard";
 import { ContentBlock } from "../../data/postsContent";
 import prisma from "@/lib/prisma";
+import { isSitePageInactive } from "@/lib/siteSettings";
 import { normalizeLocale, withLocalePrefix } from "@/lib/i18n/config";
 import { getStaticTranslationMap, localizeContent, translateFromMap } from "@/lib/i18n/server";
 import { getPublicPackageBySlug } from "@/lib/packages";
@@ -82,6 +84,10 @@ const slugify = (text: string) => {
 };
 
 export default async function PostDetailPage({ params }: PostDetailPageProps) {
+  if (await isSitePageInactive("page_news_status")) {
+    return <PageDisabled pageName="Tin tức & Cẩm nang" />;
+  }
+
   const { id } = await params;
   const locale = normalizeLocale((await headers()).get("x-locale"));
   const translations = await getStaticTranslationMap(locale).catch(() => ({}));

@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { PageDisabled } from "../components/PageDisabled";
 import { headers } from "next/headers";
 import { NewsPostGrid } from "../components/NewsPostGrid";
 import { SiteHeader } from "../components/SiteHeader";
 import prisma from "@/lib/prisma";
+import { isSitePageInactive } from "@/lib/siteSettings";
 import { normalizeLocale, withLocalePrefix } from "@/lib/i18n/config";
 import { getStaticTranslationMap, localizeContent, translateFromMap } from "@/lib/i18n/server";
 
@@ -21,6 +23,10 @@ function getDateLocale(locale: string) {
 }
 
 export default async function NewsPage() {
+  if (await isSitePageInactive("page_news_status")) {
+    return <PageDisabled pageName="Tin tức & Cẩm nang" />;
+  }
+
   const locale = normalizeLocale((await headers()).get("x-locale"));
   const translations = await getStaticTranslationMap(locale).catch(() => ({}));
   const t = (namespace: string, key: string, fallback: string) => translateFromMap(translations, namespace, key, fallback);
