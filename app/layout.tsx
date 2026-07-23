@@ -16,8 +16,34 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "VietVista | Blog du l\u1ecbch Vi\u1ec7t Nam",
-  description: "Blog du l\u1ecbch hi\u1ec7n \u0111\u1ea1i v\u1ec1 \u0111i\u1ec3m \u0111\u1ebfn, l\u1ecbch tr\u00ecnh v\u00e0 t\u01b0 v\u1ea5n g\u00f3i du l\u1ecbch Vi\u1ec7t Nam kh\u00f4ng thanh to\u00e1n online.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"),
+  title: {
+    template: "%s | VietVista",
+    default: "VietVista | Blog du lịch Việt Nam",
+  },
+  description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không thanh toán online.",
+  openGraph: {
+    title: "VietVista | Blog du lịch Việt Nam",
+    description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không thanh toán online.",
+    url: "/",
+    siteName: "VietVista",
+    locale: "vi_VN",
+    type: "website",
+    images: [
+      {
+        url: "/vietvista-logo.png",
+        width: 1200,
+        height: 630,
+        alt: "VietVista Logo",
+      }
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "VietVista | Blog du lịch Việt Nam",
+    description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không thanh toán online.",
+    images: ["/vietvista-logo.png"],
+  },
 };
 
 function DisabledScreen({ locale, title, message, actionLabel }: { locale: string; title: string; message: React.ReactNode; actionLabel?: string }) {

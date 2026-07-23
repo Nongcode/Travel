@@ -4,15 +4,16 @@ import AdminSidebar from "./AdminSidebar";
 import AdminTopbar from "./AdminTopbar";
 import React from "react";
 import { usePathname } from "next/navigation";
+import styles from "./AdminShell.module.css";
+
+const emptySubscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isLoginPage = pathname === "/admin/login";
-  const [isMounted, setIsMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const isMounted = React.useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
 
   if (!isMounted) {
     // Tránh lỗi hydration bằng cách render nội dung rỗng trên server
@@ -28,7 +29,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <div className="h-screen bg-[#fcf9f2] text-[#17211d] antialiased flex flex-col md:flex-row overflow-hidden">
+    <div className={styles.root + " bg-[#fcf9f2] text-[#17211d] antialiased"}>
       {/* Sidebar for Desktop */}
       <aside className="hidden md:flex md:flex-col md:w-64 bg-[#083b31] text-white shrink-0 border-r border-[#17211d]/10 sticky top-0 h-screen">
         <div className="px-6 py-5 flex items-center justify-between border-b border-white/10">
@@ -38,14 +39,13 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <AdminSidebar />
       </aside>
       
-      {/* Main Content Area */}
-      <div className="flex-1 h-screen flex flex-col overflow-hidden">
+      <div className={styles.contentColumn}>
         <AdminTopbar />
-        <main className="p-4 md:p-6 flex-1 overflow-y-auto">
+        <div className={styles.content + " p-4 md:p-6"}>
           <div className="max-w-full w-full mx-auto">
             {children}
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );

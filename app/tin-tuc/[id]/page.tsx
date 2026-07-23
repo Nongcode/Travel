@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { JsonLd } from "../../components/JsonLd";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "../../components/SiteHeader";
@@ -45,9 +46,27 @@ export async function generateMetadata({ params }: PostDetailPageProps) {
     return { title: "Không tìm thấy bài viết | VietVista" };
   }
 
+  const title = `${post.title} | Cẩm nang VietVista`;
+  const description = post.seoDescription || post.summary || undefined;
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/tin-tuc/${post.id}`;
+  const imageUrl = post.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/vietvista-logo.png`;
+
   return {
-    title: `${post.title} | Cẩm nang VietVista`,
-    description: post.seoDescription || post.summary || undefined,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "article",
+      images: [{ url: imageUrl }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [imageUrl],
+    },
   };
 }
 
@@ -131,8 +150,22 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
       : new Date(relatedPost.createdAt).toLocaleDateString(dateLocale),
   }));
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    image: [post.image],
+    datePublished: localizedDbPost.publishedAt || localizedDbPost.createdAt,
+    dateModified: localizedDbPost.updatedAt,
+    author: [{
+      "@type": "Person",
+      name: post.author.name,
+    }]
+  };
+
   return (
     <main className="post-detail-page">
+      <JsonLd data={jsonLd} />
       <ReadingProgressBar />
       <SiteHeader variant="hero" />
 

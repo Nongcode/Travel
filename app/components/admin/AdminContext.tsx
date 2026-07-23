@@ -262,6 +262,7 @@ type AdminContextValue = {
   updateSeoConfig: (id: number, updated: Partial<SeoConfig>) => void;
 
   isAuthenticated: boolean;
+  authReady: boolean;
   currentAdmin: { id: number; email: string; fullName: string; role: string } | null;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
@@ -489,8 +490,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
-    return !!window.localStorage.getItem(authStorageKey);
+    // HTTP-only cookie mới là nguồn xác thực chính; chờ /api/admin/me trước khi kết luận.
+    return true;
   });
+  const [authReady, setAuthReady] = useState(false);
   const [currentAdmin, setCurrentAdmin] = useState<{ id: number; email: string; fullName: string; role: string } | null>(null);
   // Kiá»ƒm tra phiÃªn lÃ m viá»‡c ngay khi load trang
   useEffect(() => {
@@ -513,6 +516,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (err) {
         console.error("Lá»—i kiá»ƒm tra phiÃªn lÃ m viá»‡c:", err);
+        setIsAuthenticated(false);
+        setCurrentAdmin(null);
+      } finally {
+        setAuthReady(true);
       }
     }
     checkSession();
@@ -521,7 +528,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   // Tải danh sách bài viết từ database khi đã đăng nhập
   useEffect(() => {
     async function loadDbPosts() {
-      if (isAuthenticated) {
+      if (authReady && isAuthenticated) {
         try {
           const res = await fetch("/api/admin/posts");
           if (res.ok) {
@@ -536,11 +543,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       }
     }
     loadDbPosts();
-  }, [isAuthenticated]);
+  }, [authReady, isAuthenticated]);
 
   useEffect(() => {
     async function loadDbPackages() {
-      if (isAuthenticated) {
+      if (authReady && isAuthenticated) {
         try {
           const res = await fetch("/api/admin/packages");
           if (res.ok) {
@@ -555,11 +562,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       }
     }
     loadDbPackages();
-  }, [isAuthenticated]);
+  }, [authReady, isAuthenticated]);
 
   useEffect(() => {
     async function loadDbBookings() {
-      if (isAuthenticated) {
+      if (authReady && isAuthenticated) {
         try {
           const res = await fetch("/api/admin/bookings");
           if (res.ok) {
@@ -574,11 +581,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       }
     }
     loadDbBookings();
-  }, [isAuthenticated]);
+  }, [authReady, isAuthenticated]);
 
   useEffect(() => {
     async function loadDbReviews() {
-      if (isAuthenticated) {
+      if (authReady && isAuthenticated) {
         try {
           const res = await fetch("/api/admin/reviews");
           if (res.ok) {
@@ -593,11 +600,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       }
     }
     loadDbReviews();
-  }, [isAuthenticated]);
+  }, [authReady, isAuthenticated]);
 
   useEffect(() => {
     async function loadDbCustomers() {
-      if (isAuthenticated) {
+      if (authReady && isAuthenticated) {
         try {
           const res = await fetch("/api/admin/customers");
           if (res.ok) {
@@ -612,7 +619,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       }
     }
     loadDbCustomers();
-  }, [isAuthenticated]);
+  }, [authReady, isAuthenticated]);
 
   // Effects to save states to localstorage
   useEffect(() => { if (typeof window !== "undefined") window.localStorage.setItem(postStorageKey, JSON.stringify(posts)); }, [posts]);
@@ -1062,7 +1069,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         // NÃ©m lá»—i nháº­n Ä‘Æ°á»£c tá»« API Ä‘á»ƒ Client báº¯t Ä‘Æ°á»£c thÃ´ng bÃ¡o lá»—i cá»¥ thá»ƒ
         throw new Error(data.error || "TÃªn Ä‘Äƒng nháº­p hoáº·c máº­t kháº©u khÃ´ng há»£p lá»‡.");
       }
-    } catch (error: any) {
+    } catch (error) {
       setIsAuthenticated(false);
       setCurrentAdmin(null);
       if (typeof window !== "undefined") {
@@ -1076,6 +1083,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     try {
       await fetch("/api/admin/logout", {
         method: "POST",
+        credentials: "same-origin",
       });
     } catch (error) {
       console.error("Lá»—i gá»i API Ä‘Äƒng xuáº¥t:", error);
@@ -1209,6 +1217,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     updateSeoConfig,
 
     isAuthenticated,
+    authReady,
     currentAdmin,
     login,
     logout,

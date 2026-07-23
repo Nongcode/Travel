@@ -89,8 +89,6 @@ export default function TranslationsPage() {
     void loadData();
   }, [loadData]);
 
-  if (!isAuthenticated) return null;
-
   // Reset trang khi tìm kiếm
   useEffect(() => {
     setCurrentPage(1);
@@ -115,7 +113,7 @@ export default function TranslationsPage() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentTranslations = useMemo(() => {
     return filteredTranslations.slice(indexOfFirstItem, indexOfLastItem);
-  }, [filteredTranslations, currentPage, indexOfFirstItem, indexOfLastItem]);
+  }, [filteredTranslations, indexOfFirstItem, indexOfLastItem]);
 
   // Điều chỉnh trang hiện tại nếu vượt quá tổng số trang sau khi lọc/xóa
   useEffect(() => {
@@ -123,7 +121,7 @@ export default function TranslationsPage() {
       setCurrentPage(totalPages);
     }
   }, [totalPages, currentPage]);
-
+  if (!isAuthenticated) return null;
   async function saveTranslation(payload: {
     namespace: string;
     key: string;

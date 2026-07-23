@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { JsonLd } from "./components/JsonLd";
 import { DestinationTabs } from "./components/DestinationTabs";
 import { PackageCarousel } from "./components/PackageCarousel";
 import { PostCarousel } from "./components/PostCarousel";
@@ -11,6 +13,16 @@ import { getRequestLocale, getStaticTranslationMap, localizeContent, translateFr
 import { getPublicPackageCollections, getPublicPackages } from "@/lib/packages";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "VietVista | Blog du lịch & Hành trình chọn lọc",
+  description: "Khám phá Việt Nam qua lăng kính VietVista. Những chuyến đi, lịch trình, đặc sản và cẩm nang hữu ích.",
+  openGraph: {
+    title: "VietVista | Blog du lịch & Hành trình chọn lọc",
+    description: "Khám phá Việt Nam qua lăng kính VietVista. Những chuyến đi, lịch trình, đặc sản và cẩm nang hữu ích.",
+    url: "/",
+  }
+};
 
 const legacyDecoder = new TextDecoder("windows-1252");
 const toLegacyMojibake = (value: string) => legacyDecoder.decode(Buffer.from(value, "utf8"));
@@ -64,8 +76,34 @@ export default async function Home() {
     date: p.publishedAt ? new Date(p.publishedAt).toLocaleDateString("vi-VN") : new Date(p.createdAt).toLocaleDateString("vi-VN"),
   }));
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        url: process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net",
+        name: "VietVista",
+        description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không thanh toán online.",
+        publisher: {
+          "@id": `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/#organization`
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/#organization`,
+        name: "VietVista",
+        url: process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net",
+        logo: {
+          "@type": "ImageObject",
+          url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/vietvista-logo.png`
+        }
+      }
+    ]
+  };
+
   return (
     <main>
+      <JsonLd data={jsonLd} />
       <section className="hero-section">
         {heroMediaType === "video" ? (
           <video autoPlay loop muted playsInline className="hero-video">

@@ -1,21 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAdmin } from "../../components/admin/AdminContext";
 
 export default function LoginPage() {
-  const { login, isAuthenticated } = useAdmin();
-  const router = useRouter();
+  const { login, isAuthenticated, authReady } = useAdmin();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/admin/dashboard");
+    if (authReady && isAuthenticated) {
+      window.location.href = "/admin/dashboard";
     }
-  }, [isAuthenticated, router]);
+  }, [authReady, isAuthenticated]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -37,14 +35,14 @@ export default function LoginPage() {
       const ok = await login(username, password);
       setLoading(false);
       if (ok) {
-        router.push("/admin/dashboard");
+        window.location.href = "/admin/dashboard";
       } else {
         setError("Tên đăng nhập hoặc mật khẩu không chính xác.");
       }
-    } catch (err: any) {
+    } catch (err) {
       setLoading(false);
       // Hiển thị trực tiếp thông báo lỗi cụ thể từ Server trả về
-      setError(err.message || "?? x?y ra l?i k?t n?i ??n m?y ch?.");
+      setError(err instanceof Error ? err.message : "Lỗi kết nối máy chủ.");
     }
   }
 

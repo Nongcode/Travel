@@ -88,9 +88,9 @@ export default function AdminTopbar() {
     return () => window.removeEventListener("click", handleCloseAll);
   }, []);
 
-  const handleLogout = () => {
-    logout();
-    router.push("/admin/login");
+  const handleLogout = async () => {
+    await logout();
+    router.replace("/admin/login");
   };
 
   const toggleProfileMenu = (e: React.MouseEvent) => {

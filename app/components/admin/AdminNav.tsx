@@ -8,9 +8,9 @@ export default function AdminNav() {
   const { isAuthenticated, logout } = useAdmin();
   const router = useRouter();
 
-  function handleLogout() {
-    logout();
-    router.push("/admin/login");
+  async function handleLogout() {
+    await logout();
+    router.replace("/admin/login");
   }
 
   return (

@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { JsonLd } from "../../components/JsonLd";
 import { LeadForm } from "../../components/LeadForm";
 import { PackageDetailGallery } from "../../components/PackageDetailGallery";
 import { SiteHeader } from "../../components/SiteHeader";
@@ -24,9 +25,27 @@ export async function generateMetadata({ params }: SpecialtyDetailPageProps) {
     return { title: "Không tìm thấy đặc sản | VietVista" };
   }
 
+  const title = item.name + " | VietVista";
+  const description = item.description || "";
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/dac-san/${item.slug}`;
+  const imageUrl = item.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/vietvista-logo.png`;
+
   return {
-    title: item.name + " | VietVista",
-    description: item.description,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "website",
+      images: [{ url: imageUrl }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [imageUrl],
+    },
   };
 }
 
@@ -75,8 +94,24 @@ export default async function SpecialtyDetailPage({ params }: SpecialtyDetailPag
     { icon: "pin", label: t("localSpecialty", "whereToBuy", "Nơi mua"), value: item.whereToBuy },
   ];
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: item.name,
+    description: item.description || "",
+    image: [item.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/vietvista-logo.png`],
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "VND",
+      price: item.priceText ? item.priceText.replace(/[^0-9]/g, "") || "0" : "0",
+      availability: "https://schema.org/InStock",
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/dac-san/${item.slug}`
+    }
+  };
+
   return (
     <main>
+      <JsonLd data={jsonLd} />
       <SiteHeader variant="hero" />
 
       <section className="page-hero detail-hero" style={{ backgroundImage: "linear-gradient(90deg, rgba(10, 20, 17, 0.78), rgba(10, 20, 17, 0.26)), url(" + bannerImage + ")" }}>
