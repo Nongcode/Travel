@@ -48,22 +48,18 @@ export default async function SpecialtyDetailPage({ params }: SpecialtyDetailPag
   const item = await localizeContent("local_specialty", itemRaw, locale);
 
   const detailRaw = itemRaw.detail;
-  let detail = {
-    bannerImageUrl: "",
-    overview: "",
-    history: "",
-    ingredients: "",
-    howToUse: "",
-    preservation: "",
+  const detailLocalized = detailRaw ? await localizeContent("local_specialty_detail", detailRaw, locale) : null;
+  const detail = {
+    bannerImageUrl: detailLocalized?.bannerImageUrl || "",
+    overview: detailLocalized?.overview || "",
+    history: detailLocalized?.history || "",
+    ingredients: detailLocalized?.ingredients || "",
+    howToUse: detailLocalized?.howToUse || "",
+    preservation: detailLocalized?.preservation || "",
   };
 
-  if (detailRaw) {
-    const detailLocalized = await localizeContent("local_specialty_detail", detailRaw, locale);
-    detail = { ...detailRaw, ...detailLocalized };
-  }
-
   const allSpecialtiesRaw = await prisma.localSpecialty.findMany({ where: { status: "Hiển thị" } });
-  
+
   const specialtyNames = await Promise.all(
     allSpecialtiesRaw.map(async (s) => {
       const localized = await localizeContent("local_specialty", s, locale);
