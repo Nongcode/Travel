@@ -2,7 +2,7 @@ name: Deploy Frontend to Server (Self-hosted PM2)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   deploy:
@@ -13,7 +13,7 @@ jobs:
         run: |
           d:
           cd D:\Travel
-          git pull origin main
+          git pull origin master
 
       - name: Cài đặt thư viện mới (nếu có)
         run: npm install
