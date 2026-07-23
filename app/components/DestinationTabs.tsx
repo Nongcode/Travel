@@ -1,4 +1,8 @@
+"use client";
+
+import { useState, type ReactNode } from "react";
 import { PackageCard } from "./PackageCard";
+import { ScrollProgressIndicator, useHorizontalScrollProgress } from "./ScrollProgressIndicator";
 
 type PackageItem = {
   id: number;
@@ -29,7 +33,29 @@ function toTabId(destination: string, index = 0) {
   return `destination-${base || "item"}-${index}`;
 }
 
+function DestinationPackageScroller({ children, active }: { children: ReactNode; active: boolean }) {
+  const { viewportRef, hasOverflow, progress } =
+    useHorizontalScrollProgress<HTMLDivElement>(active);
+
+  return (
+    <>
+      <div className="destination-package-grid" ref={viewportRef}>
+        {children}
+      </div>
+      {hasOverflow ? (
+        <ScrollProgressIndicator
+          className="destination-scroll-indicator"
+          label="Destination package position"
+          progress={progress}
+        />
+      ) : null}
+    </>
+  );
+}
+
+
 export function DestinationTabs({ destinations, packages }: DestinationTabsProps) {
+  const [activeTab, setActiveTab] = useState(() => destinations.length > 0 ? toTabId(destinations[0], 0) : "");
   const fallbackPackages = packages.slice(0, 3);
   const tabStyles = destinations
     .map((destination, index) => {
@@ -62,7 +88,7 @@ export function DestinationTabs({ destinations, packages }: DestinationTabsProps
 
           return (
             <div className="destination-tab-item" key={`${destination}-${index}`}>
-              <input suppressHydrationWarning defaultChecked={index === 0} id={tabId} name="destination-tab" type="radio" />
+              <input suppressHydrationWarning defaultChecked={index === 0} id={tabId} name="destination-tab" type="radio" onChange={() => setActiveTab(tabId)} />
               <label className="destination-tab-label" htmlFor={tabId}>
                 {getTranslatedDestination(destination)}
               </label>
@@ -83,11 +109,11 @@ export function DestinationTabs({ destinations, packages }: DestinationTabsProps
                 <div className="destination-result-heading">
                   <p className="eyebrow">{getTranslatedDestination(destination)}</p>
                 </div>
-                <div className="destination-package-grid">
+                <DestinationPackageScroller active={activeTab === tabId}>
                   {visiblePackages.slice(0, 3).map((item, packageIndex) => (
                     <PackageCard item={item} key={`${item.id}-${item.slug}-${packageIndex}`} />
                   ))}
-                </div>
+                </DestinationPackageScroller>
               </div>
             </section>
           );

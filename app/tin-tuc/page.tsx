@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
-import { PostCard } from "../components/PostCard";
+import { NewsPostGrid } from "../components/NewsPostGrid";
 import { SiteHeader } from "../components/SiteHeader";
 import prisma from "@/lib/prisma";
 import { normalizeLocale, withLocalePrefix } from "@/lib/i18n/config";
@@ -57,7 +57,7 @@ export default async function NewsPage() {
   };
 
   return (
-    <main>
+    <main className="news-page">
       <SiteHeader variant="hero" />
       <section className="page-hero news-hero">
         <p className="eyebrow">{t("news", "hero_eyebrow", "Tin tức & cẩm nang")}</p>
@@ -83,11 +83,7 @@ export default async function NewsPage() {
           <p className="eyebrow">{t("news", "latest_eyebrow", "Bài mới nhất")}</p>
           <h2>{t("news", "all_title", "Tất cả bài viết")}</h2>
         </div>
-        <div className="post-grid">
-          {posts.map((post) => (
-            <PostCard post={post} key={post.id} />
-          ))}
-        </div>
+        <NewsPostGrid posts={posts.length > 1 ? posts.slice(1) : []} />
       </section>
     </main>
   );

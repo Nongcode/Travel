@@ -6,8 +6,16 @@ import { normalizeLocale } from "@/lib/i18n/config";
 import { getStaticTranslationMap, translateFromMap } from "@/lib/i18n/server";
 import { getPublicPackageCollections, getPublicPackages } from "@/lib/packages";
 
-export default async function PackagesPage() {
+type PackagesPageProps = {
+  searchParams?: Promise<{
+    group?: string | string[];
+  }>;
+};
+
+export default async function PackagesPage({ searchParams }: PackagesPageProps) {
   const locale = normalizeLocale((await headers()).get("x-locale"));
+  const params = await searchParams;
+  const groupParam = Array.isArray(params?.group) ? params.group[0] : params?.group;
   const translations = await getStaticTranslationMap(locale).catch(() => ({}));
   const t = (namespace: string, key: string, fallback: string) => translateFromMap(translations, namespace, key, fallback);
   const [packages, collections] = await Promise.all([getPublicPackages(locale), getPublicPackageCollections(locale)]);
@@ -21,7 +29,7 @@ export default async function PackagesPage() {
         <p>{t("packages", "hero_copy", "Mỗi gói là một đề xuất khởi đầu. Hãy cho chúng tôi biết số người, phong cách và ngân sách để hoàn thiện hành trình phù hợp nhất.")}</p>
       </section>
 
-      <PackageExplorer packages={packages} collections={collections} destinations={destinations} />
+      <PackageExplorer key={groupParam || "all"} packages={packages} collections={collections} destinations={destinations} initialGroup={groupParam} />
     </main>
   );
 }

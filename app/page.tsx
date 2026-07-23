@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { DestinationTabs } from "./components/DestinationTabs";
 import { PackageCarousel } from "./components/PackageCarousel";
-import { PostCard } from "./components/PostCard";
+import { PostCarousel } from "./components/PostCarousel";
 import { CustomSelect } from "./components/CustomSelect";
 import { SiteHeader } from "./components/SiteHeader";
 import { destinations, tripStyles } from "./data/travel";
@@ -26,6 +26,7 @@ export default async function Home() {
   const translations = await getStaticTranslationMap(locale).catch(() => ({}));
   const t = (namespace: string, key: string, fallback: string) => translateFromMap(translations, namespace, key, fallback);
   const href = (path: string) => withLocalePrefix(path, locale);
+  const packageGroupHref = (group: string) => `${href("/goi-du-lich")}?group=${encodeURIComponent(group)}`;
   const [allPackages, packageCollections] = await Promise.all([getPublicPackages(locale), getPublicPackageCollections(locale)]);
 
   const dbPosts = await prisma.post.findMany({
@@ -143,7 +144,7 @@ export default async function Home() {
                 <p className="eyebrow">{collection.eyebrow}</p>
                 <h3>{collection.title}</h3>
                 <p>{collection.description}</p>
-                <Link href={href("/lien-he")}>{t("home", "package_consult", "Nh\u1eadn t\u01b0 v\u1ea5n nh\u00f3m g\u00f3i n\u00e0y")}</Link>
+                <Link href={packageGroupHref(collection.key || collection.accent)}>{t("home", "package_view_current", "Xem g\u00f3i n\u00e0y")}</Link>
               </div>
               <PackageCarousel items={collection.items} fallbackItems={allPackages} minItems={5} />
             </section>
@@ -195,11 +196,7 @@ export default async function Home() {
           <p>{t("home", "news_copy", "Nh\u1eefng b\u00e0i vi\u1ebft \u0111\u01b0\u1ee3c ch\u1ecdn \u0111\u1ec3 g\u1ee3i \u00fd l\u1ecbch tr\u00ecnh, m\u00f9a \u0111i \u0111\u1eb9p v\u00e0 tr\u1ea3i nghi\u1ec7m b\u1ea3n \u0111\u1ecba tr\u01b0\u1edbc khi b\u1ea1n \u0111\u1ec3 l\u1ea1i th\u00f4ng tin t\u01b0 v\u1ea5n.")}</p>
         </div>
 
-        <div className="post-grid news-grid">
-          {posts.map((post) => (
-            <PostCard post={post} key={post.id} />
-          ))}
-        </div>
+        <PostCarousel posts={posts} />
       </section>
     </main>
   );

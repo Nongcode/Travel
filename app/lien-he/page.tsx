@@ -2,8 +2,8 @@ import Image from "next/image";
 import { headers } from "next/headers";
 import { LeadForm } from "../components/LeadForm";
 import { ReviewsHeader } from "../components/ReviewsHeader";
+import { ReviewCarousel } from "../components/ReviewCarousel";
 import { SiteHeader } from "../components/SiteHeader";
-import { destinations } from "../data/travel";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { getStaticTranslationMap, translateFromMap } from "@/lib/i18n/server";
 import { getPublicPackages } from "@/lib/packages";
@@ -35,6 +35,14 @@ export default async function ContactPage() {
     take: 6,
   });
 
+  const reviewItems = dbReviews.map((review) => ({
+    id: review.id,
+    customerName: review.customerName,
+    packageName: reviewTranslations[review.customerName]?.[locale]?.package || review.packageName,
+    rating: review.rating,
+    comment: reviewTranslations[review.customerName]?.[locale]?.comment || review.comment,
+    avatar: review.avatar,
+  }));
   const packages = await getPublicPackages(locale);
   const packageNames = packages.map((p) => p.name);
 
@@ -98,30 +106,7 @@ export default async function ContactPage() {
           destinations={packageNames}
         />
         
-        {dbReviews.length > 0 && (
-          <div className="reviews-grid" style={{ marginBottom: "56px" }}>
-            {dbReviews.map((review) => {
-              const localizedComment = reviewTranslations[review.customerName]?.[locale]?.comment || review.comment;
-              const localizedPackage = reviewTranslations[review.customerName]?.[locale]?.package || review.packageName;
-
-              return (
-                <article key={review.id} className="review-card">
-                  <div className="review-header">
-                    <div className="review-avatar" style={{ backgroundImage: `url(${review.avatar || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&w=150&q=80'})` }} />
-                    <div className="review-meta">
-                      <h4>{review.customerName}</h4>
-                      <span className="review-package">{localizedPackage}</span>
-                    </div>
-                    <div className="review-rating">
-                      {"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}
-                    </div>
-                  </div>
-                  <p className="review-comment">"{localizedComment}"</p>
-                </article>
-              );
-            })}
-          </div>
-        )}
+        {reviewItems.length > 0 && <ReviewCarousel reviews={reviewItems} />}
       </section>
     </main>
   );

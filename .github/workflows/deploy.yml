@@ -1,19 +1,25 @@
-name: Deploy Frontend to Server (Self-hosted)
+name: Deploy Frontend to Server (Self-hosted PM2)
 
 on:
   push:
-    branches: [ "main" ] # Hoặc "Long" tùy vào nhánh bạn đang dùng
+    branches: [ "main" ]
 
 jobs:
   deploy:
-    runs-on: self-hosted # Đây là lệnh gọi con bot trên máy chủ của bạn
+    runs-on: self-hosted
 
     steps:
-      - name: Cap nhat code va Build
+      - name: Kéo mã nguồn mới nhất
         run: |
           d:
           cd D:\Travel
           git pull origin main
-          npm install
-          npm run build
-          pm2 restart travel
+
+      - name: Cài đặt thư viện mới (nếu có)
+        run: npm install
+
+      - name: Đóng gói dự án Next.js
+        run: npm run build
+
+      - name: Khởi động lại ứng dụng qua PM2
+        run: pm2 restart travel || pm2 start ecosystem.config.js

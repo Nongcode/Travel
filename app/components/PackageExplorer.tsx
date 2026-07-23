@@ -29,6 +29,7 @@ type PackageExplorerProps = {
   packages: TravelPackage[];
   collections: PackageCollection[];
   destinations: string[];
+  initialGroup?: string;
 };
 
 function normalizeText(value: string) {
@@ -55,13 +56,16 @@ function getPriceInMillions(price: string) {
   return Number(match[0].replace(/\./g, "")) / 1000000;
 }
 
-export function PackageExplorer({ packages, collections, destinations }: PackageExplorerProps) {
+export function PackageExplorer({ packages, collections, destinations, initialGroup }: PackageExplorerProps) {
   const { t } = useI18n();
-  const [activeTab, setActiveTab] = useState("all");
+  const hasInitialGroup = collections.some((collection) => (collection.key || collection.accent) === initialGroup);
+  const initialTab = hasInitialGroup && initialGroup ? initialGroup : "all";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [query, setQuery] = useState("");
   const [destination, setDestination] = useState("");
   const [duration, setDuration] = useState("");
   const [budget, setBudget] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const durationOptions = [
     { value: "", label: t("packages", "duration_all", "Mọi thời lượng") },
@@ -103,12 +107,45 @@ export function PackageExplorer({ packages, collections, destinations }: Package
       return matchesQuery && matchesDestination && matchesDuration && matchesBudget;
     });
   }, [basePackages, budget, destination, duration, normalizedQuery]);
+  const pageSize = 6;
+  const totalPages = Math.max(1, Math.ceil(filteredPackages.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedPackages = filteredPackages.slice(
+    (safePage - 1) * pageSize,
+    safePage * pageSize,
+  );
+
+  const paginationItems: Array<number | "ellipsis"> = [];
+  if (totalPages <= 5) {
+    paginationItems.push(...Array.from({ length: totalPages }, (_, index) => index + 1));
+  } else {
+    paginationItems.push(1);
+
+    if (safePage > 3) {
+      paginationItems.push("ellipsis");
+    }
+
+    const startPage = Math.max(2, safePage - 1);
+    const endPage = Math.min(totalPages - 1, safePage + 1);
+    for (let page = startPage; page <= endPage; page += 1) {
+      paginationItems.push(page);
+    }
+
+    if (safePage < totalPages - 2) {
+      paginationItems.push("ellipsis");
+    }
+
+    paginationItems.push(totalPages);
+  }
+
+
 
   const resetFilters = () => {
     setQuery("");
     setDestination("");
     setDuration("");
     setBudget("");
+    setCurrentPage(1);
   };
 
   return (
@@ -128,14 +165,14 @@ export function PackageExplorer({ packages, collections, destinations }: Package
             <input
               suppressHydrationWarning
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => { setQuery(event.target.value); setCurrentPage(1); }}
               placeholder={t("packages", "keyword_placeholder", "Ví dụ: Phú Quốc, gia đình, roadtrip...")}
               type="search"
             />
           </label>
           <label className="search-field">
             {t("packages", "destination", "Điểm đến")}
-            <select suppressHydrationWarning value={destination} onChange={(event) => setDestination(event.target.value)}>
+            <select suppressHydrationWarning value={destination} onChange={(event) => { setDestination(event.target.value); setCurrentPage(1); }}>
               <option value="">{t("packages", "all_destinations", "Tất cả điểm đến")}</option>
               {destinations.map((item) => (
                 <option value={item} key={item}>
@@ -146,7 +183,7 @@ export function PackageExplorer({ packages, collections, destinations }: Package
           </label>
           <label className="search-field">
             {t("packages", "duration", "Thời lượng")}
-            <select suppressHydrationWarning value={duration} onChange={(event) => setDuration(event.target.value)}>
+            <select suppressHydrationWarning value={duration} onChange={(event) => { setDuration(event.target.value); setCurrentPage(1); }}>
               {durationOptions.map((item) => (
                 <option value={item.value} key={item.value}>
                   {item.label}
@@ -156,7 +193,7 @@ export function PackageExplorer({ packages, collections, destinations }: Package
           </label>
           <label className="search-field">
             {t("packages", "budget", "Ngân sách")}
-            <select suppressHydrationWarning value={budget} onChange={(event) => setBudget(event.target.value)}>
+            <select suppressHydrationWarning value={budget} onChange={(event) => { setBudget(event.target.value); setCurrentPage(1); }}>
               {budgetOptions.map((item) => (
                 <option value={item.value} key={item.value}>
                   {item.label}
@@ -174,7 +211,7 @@ export function PackageExplorer({ packages, collections, destinations }: Package
             suppressHydrationWarning
             className={activeTab === "all" ? "active" : ""}
             type="button"
-            onClick={() => setActiveTab("all")}
+            onClick={() => { setActiveTab("all"); setCurrentPage(1); }}
           >
             {t("packages", "all_packages", "Tất cả gói")}
           </button>
@@ -184,7 +221,7 @@ export function PackageExplorer({ packages, collections, destinations }: Package
               className={activeTab === (collection.key || collection.accent) ? "active" : ""}
               type="button"
               key={collection.key || `${collection.accent}-${index}`}
-              onClick={() => setActiveTab(collection.key || collection.accent)}
+              onClick={() => { setActiveTab(collection.key || collection.accent); setCurrentPage(1); }}
             >
               {collection.eyebrow}
             </button>
@@ -198,11 +235,59 @@ export function PackageExplorer({ packages, collections, destinations }: Package
       </div>
 
       {filteredPackages.length > 0 ? (
-        <div className="package-grid wide">
-          {filteredPackages.map((item, index) => (
+        <>
+          <div className="package-grid wide">
+          {paginatedPackages.map((item, index) => (
             <PackageCard item={item} key={`${item.slug}-${item.id}-${index}`} />
           ))}
-        </div>
+          </div>
+          {totalPages > 1 ? (
+          <nav className="package-pagination" aria-label="Package pages">
+            <button
+              type="button"
+              className="package-pagination-arrow"
+              aria-label={t("packages", "previous_page", "Previous page")}
+              title={t("packages", "previous_page", "Previous page")}
+              disabled={safePage === 1}
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            >
+              <span aria-hidden="true">‹</span>
+            </button>
+
+            <div className="package-pagination-pages">
+              {paginationItems.map((item, index) =>
+                item === "ellipsis" ? (
+                  <span className="package-pagination-ellipsis" aria-hidden="true" key={"ellipsis-" + index}>
+                    …
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    className={safePage === item ? "active" : ""}
+                    aria-current={safePage === item ? "page" : undefined}
+                    onClick={() => setCurrentPage(item)}
+                    key={item}
+                  >
+                    {item}
+                  </button>
+                ),
+              )}
+            </div>
+
+            <button
+              type="button"
+              className="package-pagination-arrow"
+              aria-label={t("packages", "next_page", "Next page")}
+              title={t("packages", "next_page", "Next page")}
+              disabled={safePage === totalPages}
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+            >
+              <span aria-hidden="true">›</span>
+            </button>
+          </nav>
+          ) : null}
+        </>
+
       ) : (
         <div className="empty-package-state">
           <h3>{t("packages", "empty_title", "Chưa có gói trùng bộ lọc")}</h3>
