@@ -56,6 +56,7 @@ export async function generateMetadata({ params }: PostDetailPageProps) {
   return {
     title,
     description,
+    alternates: { canonical: url },
     openGraph: {
       title,
       description,
@@ -156,17 +157,32 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
       : new Date(relatedPost.createdAt).toLocaleDateString(dateLocale),
   }));
 
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/tin-tuc/${post.id}`;
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: post.title,
+    description: post.summary,
     image: [post.image],
+    url: canonicalUrl,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": canonicalUrl,
+    },
     datePublished: localizedDbPost.publishedAt || localizedDbPost.createdAt,
     dateModified: localizedDbPost.updatedAt,
     author: [{
       "@type": "Person",
       name: post.author.name,
-    }]
+    }],
+    publisher: {
+      "@type": "Organization",
+      name: "VietVista",
+      logo: {
+        "@type": "ImageObject",
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/vietvista-logo.png`,
+      },
+    },
   };
 
   return (

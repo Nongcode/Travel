@@ -39,6 +39,7 @@ export async function generateMetadata({ params }: PackageDetailPageProps) {
   return {
     title,
     description,
+    alternates: { canonical: url },
     openGraph: {
       title,
       description,
@@ -93,19 +94,53 @@ export default async function PackageDetailPage({ params }: PackageDetailPagePro
     image: gallery[index + 1] ?? gallery[0],
   }));
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net";
+  const canonicalUrl = `${baseUrl}/goi-du-lich/${item.slug}`;
+  const packageImage = item.image || `${baseUrl}/vietvista-logo.png`;
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product",
-    name: item.name,
-    description: item.description || item.summary,
-    image: [item.image || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/vietvista-logo.png`],
-    offers: {
-      "@type": "Offer",
-      priceCurrency: "VND",
-      price: item.price ? item.price.replace(/[^0-9]/g, "") || "0" : "0",
-      availability: "https://schema.org/InStock",
-      url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/goi-du-lich/${item.slug}`
-    }
+    "@graph": [
+      {
+        "@type": "Product",
+        name: item.name,
+        description: item.description || item.summary,
+        image: [packageImage],
+        url: canonicalUrl,
+        brand: {
+          "@type": "Organization",
+          name: "VietVista",
+        },
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "VND",
+          price: item.price ? item.price.replace(/[^0-9]/g, "") || "0" : "0",
+          availability: "https://schema.org/InStock",
+          url: canonicalUrl,
+        },
+      },
+      {
+        "@type": "TouristTrip",
+        name: item.name,
+        description: item.description || item.summary,
+        image: packageImage,
+        url: canonicalUrl,
+        touristType: peopleRange || undefined,
+        itinerary: item.destination,
+        provider: {
+          "@type": "Organization",
+          name: "VietVista",
+          url: baseUrl,
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "VietVista", item: baseUrl },
+          { "@type": "ListItem", position: 2, name: "Goi du lich", item: `${baseUrl}/goi-du-lich` },
+          { "@type": "ListItem", position: 3, name: item.name, item: canonicalUrl },
+        ],
+      },
+    ],
   };
 
   return (

@@ -19,6 +19,10 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"),
+  alternates: { canonical: "/" },
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
   title: {
     template: "%s | VietVista",
     default: "VietVista | Blog du lịch Việt Nam",
@@ -111,19 +115,19 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       if (!isSuspended) {
         if (pathname === "/" && settingsMap.page_home_status === "inactive") {
           isPageDisabled = true;
-          disabledPageName = "Trang ch\u1ee7";
+          disabledPageName = "Trang chủ";
         } else if (pathname.startsWith("/goi-du-lich") && settingsMap.page_tours_status === "inactive") {
           isPageDisabled = true;
-          disabledPageName = "G\u00f3i du l\u1ecbch";
+          disabledPageName = "Gói du lịch";
         } else if (pathname.startsWith("/huong-dan-visa") && settingsMap.page_visa_status === "inactive") {
           isPageDisabled = true;
-          disabledPageName = "H\u01b0\u1edbng d\u1eabn Visa";
+          disabledPageName = "Hướng dẫn Visa";
         } else if (pathname.startsWith("/tin-tuc") && settingsMap.page_news_status === "inactive") {
           isPageDisabled = true;
-          disabledPageName = "Tin t\u1ee9c & C\u1ea9m nang";
+          disabledPageName = "Tin tức & Cẩm nang";
         } else if (pathname.startsWith("/lien-he") && settingsMap.page_contact_status === "inactive") {
           isPageDisabled = true;
-          disabledPageName = "Li\u00ean h\u1ec7";
+          disabledPageName = "Liên hệ";
         } else if (pathname.startsWith("/dac-san") && settingsMap.page_local_specialties_status === "inactive") {
           isPageDisabled = true;
           disabledPageName = "Đặc sản";
@@ -148,16 +152,16 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   }
 
   if (isSuspended) {
-    return <DisabledScreen locale={locale} title="D\u1ecbch v\u1ee5 t\u1ea1m ng\u01b0ng ho\u1ea1t \u0111\u1ed9ng" message="Website hi\u1ec7n \u0111ang t\u1ea1m ng\u01b0ng do ch\u01b0a ho\u00e0n t\u1ea5t th\u1ee7 t\u1ee5c thanh to\u00e1n ho\u1eb7c \u0111ang b\u1ea3o tr\u00ec k\u1ef9 thu\u1eadt." />;
+    return <DisabledScreen locale={locale} title="Dịch vụ tạm ngưng hoạt động" message="Website hiện đang tạm ngưng do chưa hoàn tất thủ tục thanh toán hoặc đang bảo trì kỹ thuật." />;
   }
 
   if (isPageDisabled) {
     return (
       <DisabledScreen
         locale={locale}
-        title="K\u00eanh d\u1ecbch v\u1ee5 t\u1ea1m \u0111\u00f3ng"
-        message={<><strong className="text-emerald-700 font-bold">{disabledPageName}</strong> hi\u1ec7n \u0111ang t\u1ea1m \u0111\u00f3ng \u0111\u1ec3 n\u00e2ng c\u1ea5p c\u1ea5u h\u00ecnh ho\u1eb7c t\u00f9y ch\u1ec9nh n\u1ed9i dung.</>}
-        actionLabel="Quay l\u1ea1i Trang ch\u1ee7"
+        title="Kênh dịch vụ tạm đóng"
+        message={<><strong className="text-emerald-700 font-bold">{disabledPageName}</strong> hiện đang tạm đóng để nâng cấp cấu hình hoặc tùy chỉnh nội dung.</>}
+        actionLabel="Quay lại Trang chủ"
       />
     );
   }

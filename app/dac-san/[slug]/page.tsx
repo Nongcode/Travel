@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: SpecialtyDetailPageProps) {
   return {
     title,
     description,
+    alternates: { canonical: url },
     openGraph: {
       title,
       description,
@@ -102,19 +103,39 @@ export default async function SpecialtyDetailPage({ params }: SpecialtyDetailPag
     { icon: "pin", label: t("localSpecialty", "whereToBuy", "Nơi mua"), value: item.whereToBuy },
   ];
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net";
+  const canonicalUrl = `${baseUrl}/dac-san/${item.slug}`;
+  const specialtyImage = item.imageUrl || `${baseUrl}/vietvista-logo.png`;
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product",
-    name: item.name,
-    description: item.description || "",
-    image: [item.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/vietvista-logo.png`],
-    offers: {
-      "@type": "Offer",
-      priceCurrency: "VND",
-      price: item.priceText ? item.priceText.replace(/[^0-9]/g, "") || "0" : "0",
-      availability: "https://schema.org/InStock",
-      url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/dac-san/${item.slug}`
-    }
+    "@graph": [
+      {
+        "@type": "Product",
+        name: item.name,
+        description: item.description || "",
+        image: [specialtyImage],
+        url: canonicalUrl,
+        brand: {
+          "@type": "Organization",
+          name: "VietVista",
+        },
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "VND",
+          price: item.priceText ? item.priceText.replace(/[^0-9]/g, "") || "0" : "0",
+          availability: "https://schema.org/InStock",
+          url: canonicalUrl,
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "VietVista", item: baseUrl },
+          { "@type": "ListItem", position: 2, name: "Dac san", item: `${baseUrl}/dac-san` },
+          { "@type": "ListItem", position: 3, name: item.name, item: canonicalUrl },
+        ],
+      },
+    ],
   };
 
   return (
