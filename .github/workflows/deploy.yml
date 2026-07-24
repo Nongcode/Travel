@@ -14,6 +14,14 @@ jobs:
         run: |
           d:
           cd D:\Travel
+          set "PM2_CMD="
+          for /f "delims=" %%p in ('where pm2.cmd 2^>nul') do if not defined PM2_CMD set "PM2_CMD=%%p"
+          if not defined PM2_CMD if exist "C:\Users\Administrator\AppData\Roaming\npm\pm2.cmd" set "PM2_CMD=C:\Users\Administrator\AppData\Roaming\npm\pm2.cmd"
+          if not defined PM2_CMD (
+            echo ::error::PM2 command was not found for the GitHub Actions runner.
+            exit /b 1
+          )
+          if exist "C:\Users\Administrator\.pm2" set "PM2_HOME=C:\Users\Administrator\.pm2"
           for /f %%i in ('git rev-parse HEAD') do set "OLD_COMMIT=%%i"
           git pull --ff-only origin master || exit /b 1
           set "NEED_INSTALL=0"
@@ -24,17 +32,21 @@ jobs:
           if not exist node_modules\dotenv\package.json set "NEED_INSTALL=1"
           if not exist node_modules\next\package.json set "NEED_INSTALL=1"
           if "%NEED_INSTALL%"=="1" (
-            echo Dependencies changed or node_modules is missing. Running npm ci...
-            pm2 stop travel
-            npm ci
+            echo Dependencies changed or node_modules is incomplete. Running incremental npm install...
+            call "%PM2_CMD%" stop travel
             if errorlevel 1 (
-              pm2 restart travel
+              echo ::error::PM2 could not stop travel. Check PM2_HOME and the runner service account.
+              exit /b 1
+            )
+            npm install --prefer-offline --no-audit --no-fund
+            if errorlevel 1 (
+              call "%PM2_CMD%" restart travel
               exit /b 1
             )
           ) else (
-            echo Dependencies unchanged. Skipping npm ci.
+            echo Dependencies unchanged. Skipping dependency install.
           )
           npm run db:generate || exit /b 1
           npm run db:deploy || exit /b 1
           npm run build || exit /b 1
-          pm2 restart travel || pm2 start ecosystem.config.js
+          call "%PM2_CMD%" restart travel || call "%PM2_CMD%" start ecosystem.config.js
