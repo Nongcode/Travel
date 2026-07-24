@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "../../components/admin/AdminContext";
+import { uploadAssetToCloudinary } from "@/lib/adminCloudinaryUpload";
 
 export type AdminBanner = {
   id: number;
@@ -174,30 +175,34 @@ export default function BannerManagerPage({
   };
 
   const submitBanner = async (method: "POST" | "PUT", fields: Record<string, string>, file: File | null) => {
-    const formData = new FormData();
-    Object.entries(fields).forEach(([key, value]) => formData.append(key, value));
-    if (file) formData.append("file", file);
-
     setSaving(true);
     setError("");
 
     try {
+      const payload = { ...fields };
+      if (file) {
+        const uploaded = await uploadAssetToCloudinary(file);
+        payload.image = uploaded.url;
+        payload.mediaType = detectMediaType(file, payload.mediaType || "image");
+      }
+
       const res = await fetch("/api/admin/banners", {
         method,
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        setError(data.error || "Không thể lưu banner.");
+        setError(data.error || "Khong the luu banner.");
         return false;
       }
 
       await fetchBanners();
       return true;
     } catch (err) {
-      console.error("Lỗi khi lưu banner:", err);
-      setError("Không thể lưu banner.");
+      console.error("Failed to save banner:", err);
+      setError(err instanceof Error ? err.message : "Khong the luu banner.");
       return false;
     } finally {
       setSaving(false);

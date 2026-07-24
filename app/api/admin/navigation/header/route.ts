@@ -14,10 +14,11 @@ export async function PUT(request: NextRequest) {
     const logoAlt = typeof body.logoAlt === "string" ? body.logoAlt.trim() : "";
     const companyName = typeof body.companyName === "string" ? body.companyName.trim() : "";
 
-    if (!logoUrl.startsWith("/") || logoUrl.length > 500) {
-      return NextResponse.json({ error: "Logo phải là đường dẫn nội bộ bắt đầu bằng dấu /." }, { status: 400 });
-    }
-    if (!logoAlt || logoAlt.length > 160 || !companyName || companyName.length > 120) {
+    const isInternalLogo = logoUrl.startsWith("/") && !logoUrl.startsWith("//");
+    const isRemoteLogo = /^https?:\/\//i.test(logoUrl);
+    if ((!isInternalLogo && !isRemoteLogo) || logoUrl.length > 500) {
+      return NextResponse.json({ error: "Logo phai la duong dan noi bo bat dau bang / hoac URL http/https hop le." }, { status: 400 });
+    }    if (!logoAlt || logoAlt.length > 160 || !companyName || companyName.length > 120) {
       return NextResponse.json({ error: "Tên công ty hoặc mô tả logo không hợp lệ." }, { status: 400 });
     }
 

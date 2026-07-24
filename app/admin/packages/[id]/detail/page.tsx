@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAdmin } from "../../../../components/admin/AdminContext";
+import AdminAssetUploadField from "../../../../components/admin/AdminAssetUploadField";
+import { uploadAssetToCloudinary } from "@/lib/adminCloudinaryUpload";
 
 type DetailForm = {
   bannerImageUrl: string;
@@ -74,6 +76,7 @@ export default function PackageDetailAdminPage() {
   const [form, setForm] = useState<DetailForm>(emptyForm);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -117,6 +120,27 @@ export default function PackageDetailAdminPage() {
 
   function updateField(field: keyof DetailForm, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  async function uploadGalleryFiles(event: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.currentTarget.files || []);
+    event.currentTarget.value = "";
+    if (files.length === 0) return;
+
+    setUploadingGallery(true);
+    setError("");
+    try {
+      const uploaded = await Promise.all(files.map((file) => uploadAssetToCloudinary(file)));
+      const uploadedLines = uploaded.map((asset) => asset.url).join("\n");
+      setForm((current) => ({
+        ...current,
+        galleryText: [current.galleryText.trim(), uploadedLines].filter(Boolean).join("\n"),
+      }));
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "Khong the tai gallery len Cloudinary.");
+    } finally {
+      setUploadingGallery(false);
+    }
   }
 
   async function handleSubmit(event: React.FormEvent) {
@@ -171,8 +195,9 @@ export default function PackageDetailAdminPage() {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <section className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-4">
             <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Media & tổng quan</h3>
-            <Field label="Banner chi tiết" value={form.bannerImageUrl} onChange={(value) => updateField("bannerImageUrl", value)} placeholder="/banners/halong-detail.jpg" />
-            <TextField label="Gallery, mỗi dòng một ảnh" value={form.galleryText} onChange={(value) => updateField("galleryText", value)} rows={5} />
+            <AssetField label="Banner chi tiet"><AdminAssetUploadField value={form.bannerImageUrl} onChange={(value) => updateField("bannerImageUrl", value)} placeholder="URL banner hoac upload len Cloudinary" inputClassName="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700" disabled={saving} previewAlt={packageName || "Package banner"} /></AssetField>
+            <TextField label="Gallery, moi dong mot anh" value={form.galleryText} onChange={(value) => updateField("galleryText", value)} rows={5} />
+            <label className={`inline-flex w-fit cursor-pointer items-center rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-slate-700 ${uploadingGallery || saving ? "pointer-events-none opacity-60" : ""}`}>{uploadingGallery ? "Dang tai gallery..." : "Upload nhieu anh gallery"}<input type="file" accept="image/*" multiple onChange={uploadGalleryFiles} disabled={uploadingGallery || saving} className="sr-only" /></label>
             <TextField label="Tổng quan" value={form.overview} onChange={(value) => updateField("overview", value)} rows={5} />
             <TextField label="Highlights, mỗi dòng: Tiêu đề | Mô tả" value={form.highlightsText} onChange={(value) => updateField("highlightsText", value)} rows={6} />
           </section>
@@ -206,6 +231,14 @@ export default function PackageDetailAdminPage() {
   );
 }
 
+function AssetField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="block space-y-1.5">
+      <span className="text-xs font-extrabold uppercase tracking-widest text-slate-500 block">{label}</span>
+      {children}
+    </div>
+  );
+}
 function Field({ label, value, onChange, placeholder = "" }: { label: string; value: string; onChange: (value: string) => void; placeholder?: string }) {
   return (
     <label className="block space-y-1.5">

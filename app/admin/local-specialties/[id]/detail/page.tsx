@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAdmin } from "../../../../components/admin/AdminContext";
+import AdminAssetUploadField from "../../../../components/admin/AdminAssetUploadField";
 
 type DetailForm = {
   bannerImageUrl: string;
@@ -158,7 +159,7 @@ export default function LocalSpecialtyDetailAdminPage() {
                   <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest border-b border-slate-100 pb-2">Media & Tổng quan</h3>
                   <div className="space-y-2">
                     <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500 block">Banner chi tiết (URL)</label>
-                    <input value={form.bannerImageUrl} onChange={(e) => updateField("bannerImageUrl", e.target.value)} placeholder="/banners/nem-chua-detail.jpg" className={inputClass} />
+                    <AdminAssetUploadField value={form.bannerImageUrl} onChange={(value) => updateField("bannerImageUrl", value)} placeholder="URL banner hoac upload len Cloudinary" inputClassName={inputClass} disabled={saving} previewAlt={specialtyName || "Specialty banner"} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500 block">Tổng quan</label>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAdmin } from "../../../components/admin/AdminContext";
 import { useRouter } from "next/navigation";
+import AdminAssetUploadField from "../../../components/admin/AdminAssetUploadField";
 
 export default function ReviewsAdminPage() {
   const { reviews, isAuthenticated, addReview, updateReview, removeReview } = useAdmin();
@@ -147,13 +148,7 @@ export default function ReviewsAdminPage() {
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Link ảnh đại diện (Tùy chọn)</label>
-              <input
-                type="url"
-                value={avatar}
-                onChange={(e) => setAvatar(e.target.value)}
-                placeholder="https://images.unsplash.com/..."
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold text-slate-700"
-              />
+              <AdminAssetUploadField value={avatar} onChange={setAvatar} placeholder="URL avatar hoac upload len Cloudinary" inputClassName="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold text-slate-700" previewAlt={customerName || "Avatar"} />
             </div>
             <div className="md:col-span-3 flex justify-end gap-2 pt-2">
               <button

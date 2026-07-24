@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAdmin } from "../../../components/admin/AdminContext";
 import { useRouter } from "next/navigation";
+import { formatFileSize, getAssetTypeFromFile, uploadAssetToCloudinary } from "@/lib/adminCloudinaryUpload";
 
 export default function MediaAdminPage() {
   const { mediaFiles, isAuthenticated, addMediaFile, removeMediaFile } = useAdmin();
@@ -18,6 +19,8 @@ export default function MediaAdminPage() {
   const [fileSize, setFileSize] = useState("120 KB");
   const [fileDimensions, setFileDimensions] = useState("1200x800");
   const [showUploadForm, setShowUploadForm] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   // Copy indicator state
   const [copiedId, setCopiedId] = useState<number | null>(null);
@@ -33,6 +36,25 @@ export default function MediaAdminPage() {
 
   if (!isAuthenticated) return null;
 
+  async function handleCloudinaryFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (!file) return;
+
+    setUploadingFile(true);
+    setUploadError("");
+    setFileName(file.name);
+    setFileType(getAssetTypeFromFile(file));
+    setFileSize(formatFileSize(file.size));
+    try {
+      const uploaded = await uploadAssetToCloudinary(file);
+      setFileUrl(uploaded.url);
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Khong the tai file len Cloudinary.");
+    } finally {
+      setUploadingFile(false);
+    }
+  }
   const handleUploadFile = (e: React.FormEvent) => {
     e.preventDefault();
     if (!fileName.trim() || !fileUrl.trim()) return;
@@ -50,6 +72,7 @@ export default function MediaAdminPage() {
     setFileUrl("");
     setFileSize("120 KB");
     setFileDimensions("1200x800");
+    setUploadError("");
     setShowUploadForm(false);
   };
 
@@ -106,6 +129,18 @@ export default function MediaAdminPage() {
             Upload File vào Thư Viện (Simulated)
           </h3>
           <form onSubmit={handleUploadFile} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1.5 md:col-span-3">
+              <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Chon file upload Cloudinary</label>
+              <input
+                type="file"
+                accept="image/*,video/*"
+                onChange={handleCloudinaryFileChange}
+                disabled={uploadingFile}
+                className="w-full rounded-xl border border-dashed border-slate-300 bg-slate-50/50 px-4 py-3 text-sm text-slate-700 file:mr-4 file:rounded-lg file:border-0 file:bg-emerald-600 file:px-3 file:py-2 file:text-xs file:font-bold file:text-white hover:file:bg-emerald-700 disabled:opacity-60"
+              />
+              {uploadingFile && <p className="text-xs font-semibold text-emerald-700">Dang tai file len Cloudinary...</p>}
+              {uploadError && <p className="text-xs font-semibold text-rose-600">{uploadError}</p>}
+            </div>
             <div className="space-y-1.5">
               <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Tên File (đầy đủ định dạng)</label>
               <input

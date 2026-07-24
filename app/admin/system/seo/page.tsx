@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAdmin } from "../../../components/admin/AdminContext";
 import { useRouter } from "next/navigation";
+import AdminAssetUploadField from "../../../components/admin/AdminAssetUploadField";
 
 export default function SeoAdminPage() {
   const { seoConfigs, isAuthenticated, updateSeoConfig } = useAdmin();
@@ -210,13 +211,7 @@ export default function SeoAdminPage() {
 
               <div className="space-y-1.5">
                 <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Link ảnh chia sẻ OpenGraph Image (URL)</label>
-                <input
-                  type="url"
-                  value={editOgImage}
-                  onChange={(e) => setEditOgImage(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 focus:outline-none transition-all font-semibold text-slate-700 animate-in fade-in"
-                />
+                <AdminAssetUploadField value={editOgImage} onChange={setEditOgImage} placeholder="URL OpenGraph hoac upload len Cloudinary" inputClassName="w-full px-4 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 focus:outline-none transition-all font-semibold text-slate-700 animate-in fade-in" previewAlt="Preview OpenGraph" />
                 {editOgImage && (
                   <div className="mt-2 aspect-[16/9] w-full rounded-xl overflow-hidden bg-slate-50 border border-slate-200">
                     <img

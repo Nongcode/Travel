@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAdmin, AdminPost } from "../../components/admin/AdminContext";
 import { useRouter } from "next/navigation";
+import AdminAssetUploadField from "../../components/admin/AdminAssetUploadField";
 
 export default function PostsAdminPage() {
   const { posts, isAuthenticated, addPost, updatePost, removePost, postCategories } = useAdmin();
@@ -467,13 +468,7 @@ export default function PostsAdminPage() {
                   <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500 block">
                     Đường dẫn Ảnh đại diện (URL)
                   </label>
-                  <input
-                    type="text"
-                    value={addImageUrl}
-                    onChange={(e) => setAddImageUrl(e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/30 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold"
-                  />
+                  <AdminAssetUploadField value={addImageUrl} onChange={setAddImageUrl} placeholder="URL hinh anh hoac upload len Cloudinary" inputClassName="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/30 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold" previewAlt={addTitle || "Post image"} />
                   {addImageUrl && addImageUrl.startsWith("http") && (
                     <div className="mt-2 rounded-xl overflow-hidden border border-slate-100 max-h-32 w-fit">
                       <img src={addImageUrl} alt="Preview" className="max-h-32 object-cover" />
@@ -542,13 +537,7 @@ export default function PostsAdminPage() {
                   <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500 block">
                     Đường dẫn ảnh trong bài viết (URL)
                   </label>
-                  <input
-                    type="text"
-                    value={addContentImageUrl}
-                    onChange={(e) => setAddContentImageUrl(e.target.value)}
-                    placeholder="https://example.com/content-image.jpg"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/30 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold"
-                  />
+                  <AdminAssetUploadField value={addContentImageUrl} onChange={setAddContentImageUrl} placeholder="URL hinh anh hoac upload len Cloudinary" inputClassName="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/30 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold" previewAlt={addTitle || "Content image"} />
                   {addContentImageUrl && addContentImageUrl.startsWith("http") && (
                     <div className="mt-2 rounded-xl overflow-hidden border border-slate-100 max-h-32 w-fit">
                       <img src={addContentImageUrl} alt="Content Preview" className="max-h-32 object-cover" />
@@ -664,13 +653,7 @@ export default function PostsAdminPage() {
                   <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500 block">
                     Đường dẫn Ảnh đại diện (URL)
                   </label>
-                  <input
-                    type="text"
-                    value={editImageUrl}
-                    onChange={(e) => setEditImageUrl(e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/30 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold"
-                  />
+                  <AdminAssetUploadField value={editImageUrl} onChange={setEditImageUrl} placeholder="URL hinh anh hoac upload len Cloudinary" inputClassName="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/30 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold" previewAlt={editTitle || "Post image"} />
                   {editImageUrl && editImageUrl.startsWith("http") && (
                     <div className="mt-2 rounded-xl overflow-hidden border border-slate-100 max-h-32 w-fit">
                       <img src={editImageUrl} alt="Preview" className="max-h-32 object-cover" />
@@ -739,13 +722,7 @@ export default function PostsAdminPage() {
                   <label className="text-xs font-extrabold uppercase tracking-widest text-slate-500 block">
                     Đường dẫn ảnh trong bài viết (URL)
                   </label>
-                  <input
-                    type="text"
-                    value={editContentImageUrl}
-                    onChange={(e) => setEditContentImageUrl(e.target.value)}
-                    placeholder="https://example.com/content-image.jpg"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/30 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold"
-                  />
+                  <AdminAssetUploadField value={editContentImageUrl} onChange={setEditContentImageUrl} placeholder="URL hinh anh hoac upload len Cloudinary" inputClassName="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/30 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all font-semibold" previewAlt={editTitle || "Content image"} />
                   {editContentImageUrl && editContentImageUrl.startsWith("http") && (
                     <div className="mt-2 rounded-xl overflow-hidden border border-slate-100 max-h-32 w-fit">
                       <img src={editContentImageUrl} alt="Content Preview" className="max-h-32 object-cover" />

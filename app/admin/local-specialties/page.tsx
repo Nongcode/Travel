@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "../../components/admin/AdminContext";
+import AdminAssetUploadField from "../../components/admin/AdminAssetUploadField";
 
 type AdminLocalSpecialty = {
   id: number;
@@ -396,7 +397,7 @@ function SpecialtyModal({ title, submitLabel, saving, form, updateField, onClose
               <Field label="Mô tả chi tiết"><textarea value={form.description} onChange={(e) => updateField("description", e.target.value)} placeholder="Mô tả về nguồn gốc, hương vị..." rows={4} className={`${inputClass} resize-none`} /></Field>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Field label="Ảnh đại diện (URL)"><input value={form.imageUrl} onChange={(e) => updateField("imageUrl", e.target.value)} placeholder="URL hình ảnh (https://... hoặc /images/...)" className={inputClass} /></Field>
+                <Field label="Anh dai dien (URL)"><AdminAssetUploadField value={form.imageUrl} onChange={(value) => updateField("imageUrl", value)} placeholder="URL hinh anh hoac upload len Cloudinary" inputClassName={inputClass} disabled={saving} previewAlt={form.name || "Specialty image"} /></Field>
                 <Field label="Trạng thái">
                   <select value={form.status} onChange={(e) => updateField("status", e.target.value)} className={inputClass}>
                     {statusOptions.map((option) => <option key={option} value={option}>{option}</option>)}

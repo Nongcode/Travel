@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "../../components/admin/AdminContext";
+import AdminAssetUploadField from "../../components/admin/AdminAssetUploadField";
 
 type PackageTranslationField = "name" | "destination" | "duration" | "summary" | "description" | "peopleNote";
 type PackageTranslationMap = Record<string, Record<string, string>>;
@@ -464,7 +465,7 @@ function PackageModal({ title, submitLabel, saving, form, translations, setTrans
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Field label="Ảnh đại diện (URL)"><input value={form.imageUrl} onChange={(e) => updateField("imageUrl", e.target.value)} placeholder="URL hình ảnh (https://... hoặc /images/...)" className={inputClass} /></Field>
+            <Field label="Anh dai dien (URL)"><AdminAssetUploadField value={form.imageUrl} onChange={(value) => updateField("imageUrl", value)} placeholder="URL hinh anh hoac upload len Cloudinary" inputClassName={inputClass} disabled={saving} previewAlt={form.name || "Package image"} /></Field>
             <Field label="Trạng thái gói">
               <select value={form.status} onChange={(e) => updateField("status", e.target.value)} className={inputClass}>
                 {statusOptions.map((option) => <option key={option} value={option}>{option}</option>)}

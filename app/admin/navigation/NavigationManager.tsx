@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "../../components/admin/AdminContext";
+import { uploadAssetToCloudinary } from "@/lib/adminCloudinaryUpload";
 import {
   DEFAULT_SITE_CHROME_CONFIG,
   type FooterSiteConfig,
@@ -195,18 +196,19 @@ export default function NavigationManager() {
     setUploadingLogo(true);
     setError("");
     try {
-      const formData = new FormData();
-      formData.append("logo", file);
-      const response = await fetch("/api/admin/navigation/logo", {
-        method: "POST",
-        body: formData,
+      const uploaded = await uploadAssetToCloudinary(file);
+      const nextHeader = { ...headerForm, logoUrl: uploaded.url };
+      const response = await fetch("/api/admin/navigation/header", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nextHeader),
       });
-      const data = await readJson(response) as { logoUrl: string };
-      setHeaderForm((current) => ({ ...current, logoUrl: data.logoUrl }));
+      await readJson(response);
+      setHeaderForm(nextHeader);
       await loadConfiguration();
-      showSuccess("Đã tải lên và thay đổi logo.");
+      showSuccess("Da tai logo len Cloudinary va ap dung vao Header.");
     } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : "Không thể tải logo lên.");
+      setError(uploadError instanceof Error ? uploadError.message : "Khong the tai logo len Cloudinary.");
     } finally {
       setUploadingLogo(false);
     }
@@ -282,7 +284,7 @@ export default function NavigationManager() {
                   <Field label="Tên công ty" value={headerForm.companyName} onChange={(value) => setHeaderForm((current) => ({ ...current, companyName: value }))} required />
                   <Field label="Mô tả logo (alt)" value={headerForm.logoAlt} onChange={(value) => setHeaderForm((current) => ({ ...current, logoAlt: value }))} required />
                   <div className="md:col-span-2">
-                    <Field label="Đường dẫn logo" value={headerForm.logoUrl} onChange={(value) => setHeaderForm((current) => ({ ...current, logoUrl: value }))} placeholder="/vietvista-logo.png" required mono />
+                    <Field label="Đường dẫn logo" value={headerForm.logoUrl} onChange={(value) => setHeaderForm((current) => ({ ...current, logoUrl: value }))} placeholder="/vietvista-logo.png hoặc https://res.cloudinary.com/..." required mono />
                   </div>
                   <div className="md:col-span-2">
                     <label className={`inline-flex cursor-pointer items-center rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-slate-700 ${uploadingLogo ? "pointer-events-none opacity-50" : ""}`}>
@@ -295,9 +297,7 @@ export default function NavigationManager() {
                         className="sr-only"
                       />
                     </label>
-                    <p className="mt-2 text-xs text-slate-400">
-                      Hỗ trợ PNG, JPG, WebP; dung lượng tối đa 5 MB. Logo được áp dụng ngay sau khi tải lên.
-                    </p>
+                    <p className="mt-2 text-xs text-slate-400">Ho tro PNG, JPG, WebP. Logo duoc upload len Cloudinary va ap dung ngay sau khi tai len.</p>
                   </div>
                 </div>
               </div>
