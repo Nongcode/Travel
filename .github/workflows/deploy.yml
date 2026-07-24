@@ -20,6 +20,9 @@ jobs:
           git diff --quiet "%OLD_COMMIT%" HEAD -- package-lock.json
           if errorlevel 1 set "NEED_INSTALL=1"
           if not exist node_modules set "NEED_INSTALL=1"
+          if not exist node_modules\.bin\prisma.cmd set "NEED_INSTALL=1"
+          if not exist node_modules\dotenv\package.json set "NEED_INSTALL=1"
+          if not exist node_modules\next\package.json set "NEED_INSTALL=1"
           if "%NEED_INSTALL%"=="1" (
             echo Dependencies changed or node_modules is missing. Running npm ci...
             pm2 stop travel
@@ -31,7 +34,7 @@ jobs:
           ) else (
             echo Dependencies unchanged. Skipping npm ci.
           )
-          npx prisma generate || exit /b 1
+          npm run db:generate || exit /b 1
           npm run db:deploy || exit /b 1
           npm run build || exit /b 1
           pm2 restart travel || pm2 start ecosystem.config.js
