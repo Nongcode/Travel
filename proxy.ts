@@ -14,6 +14,13 @@ function isPublicPageRequest(pathname: string) {
   return !/\.[a-z0-9]+$/i.test(pathname);
 }
 
+function isDocumentNavigationRequest(request: NextRequest) {
+  const accept = request.headers.get("accept") || "";
+  const fetchMode = request.headers.get("sec-fetch-mode");
+
+  return request.method === "GET" && (fetchMode === "navigate" || accept.includes("text/html"));
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const localized = stripLocaleFromPath(pathname);
@@ -30,6 +37,7 @@ export function proxy(request: NextRequest) {
     !hasExplicitLocale &&
     preferredPrefix.length > 0 &&
     isPublicPageRequest(pathname) &&
+    isDocumentNavigationRequest(request) &&
     !isCrawler(request.headers.get("user-agent"));
 
   if (shouldAutoRedirectLocale) {
