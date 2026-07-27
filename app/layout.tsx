@@ -24,15 +24,15 @@ export const metadata: Metadata = {
     ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
     : undefined,
   title: {
-    template: "%s | VietVista",
-    default: "VietVista | Blog du lịch Việt Nam",
+    template: "%s | TimesGreen",
+    default: "TimesGreen | Blog du lịch Việt Nam",
   },
   description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không thanh toán online.",
   openGraph: {
-    title: "VietVista | Blog du lịch Việt Nam",
+    title: "TimesGreen | Blog du lịch Việt Nam",
     description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không thanh toán online.",
     url: "/",
-    siteName: "VietVista",
+    siteName: "TimesGreen",
     locale: "vi_VN",
     type: "website",
     images: [
@@ -40,14 +40,14 @@ export const metadata: Metadata = {
         url: "/vietvista-logo.png",
         width: 1200,
         height: 630,
-        alt: "VietVista Logo",
+        alt: "TimesGreen Logo",
       }
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "VietVista | Blog du lịch Việt Nam",
-    description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không thanh toán online.",
+    title: "TimesGreen | Blog du lịch Việt Nam",
+    description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không yêu cầu thanh toán online.",
     images: ["/vietvista-logo.png"],
   },
 };
