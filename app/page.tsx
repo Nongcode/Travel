@@ -17,8 +17,8 @@ import { getPublicPackageCollections, getPublicPackages } from "@/lib/packages";
 export const dynamic = "force-dynamic";
 
 export const metadata = publicPageMetadata({
-  title: "TimesGreen - Blog du lịch Việt Nam, lịch trình và trải nghiệm bản địa",
-  description: "TimesGreen truyền cảm hứng khám phá Việt Nam qua các cẩm nang du lịch thực tế, gợi ý lịch trình linh hoạt, đặc sản địa phương và những trải nghiệm bản địa đáng nhớ cho từng phong cách chuyến đi.",
+  title: "TimesGreen - Vietnam Travel Blog, Local Guides & Curated Trips",
+  description: "TimesGreen helps international travelers discover Vietnam through practical travel guides, curated itineraries, local food stories, visa tips and friendly trip consultation for families, couples and small groups.",
   path: "/",
 });
 
@@ -63,8 +63,8 @@ export default async function Home() {
 
   const heroMedia = homepageBanner ? homepageBanner.imageUrl : "/Drone_flight_Vietnam_landscapes_202606220932.mp4";
   const heroMediaType = heroMedia.match(/\.(mp4|webm|mov)(\?|$)/i) ? "video" : "image";
-  const heroTitle = locale === "vi" && homepageBanner?.title ? homepageBanner.title : t("home", "hero_title", "Những chuyến đi cùng bạn như một kí ức đẹp không thể quên.");
-  const heroSubtitle = locale === "vi" && homepageBanner?.subtitle ? homepageBanner.subtitle : t("home", "hero_subtitle", "Blog du lịch hiện đại dành cho người muốn tìm cảm hứng, đọc kinh nghiệm thực tế và để lại thông tin khi cần gợi ý lịch trình phù hợp.");
+  const heroTitle = locale === "vi" && homepageBanner?.title ? homepageBanner.title : t("home", "hero_title", "Khám phá Việt Nam chân thực cùng TimesGreen.");
+  const heroSubtitle = locale === "vi" && homepageBanner?.subtitle ? homepageBanner.subtitle : t("home", "hero_subtitle", "TimesGreen kết nối du khách quốc tế với cẩm nang du lịch thực tế, gợi ý lịch trình linh hoạt, câu chuyện ẩm thực địa phương và tư vấn thân thiện trước mỗi chuyến đi.");
 
   const localizedDbPosts = await Promise.all(dbPosts.map((post) => localizeContent("post", post, locale)));
 
@@ -85,7 +85,7 @@ export default async function Home() {
         "@type": "WebSite",
         url: process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net",
         name: "TimesGreen",
-        description: "TimesGreen truyền cảm hứng khám phá Việt Nam qua các cẩm nang du lịch thực tế, gợi ý lịch trình linh hoạt, đặc sản địa phương và những trải nghiệm bản địa đáng nhớ cho từng phong cách chuyến đi.",
+        description: "TimesGreen helps international travelers discover Vietnam through practical travel guides, curated itineraries, local food stories, visa tips and friendly trip consultation for families, couples and small groups.",
         publisher: {
           "@id": `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/#organization`
         }
@@ -131,15 +131,15 @@ export default async function Home() {
         <SiteHeader variant="hero" />
 
         <div className="hero-content" id="top">
-          <p className="eyebrow">{t("home", "hero_eyebrow", "Blog du l\u1ecbch & h\u00e0nh tr\u00ecnh ch\u1ecdn l\u1ecdc")}</p>
+          <p className="eyebrow">{t("home", "hero_eyebrow", "TimesGreen Vietnam Travel Guide")}</p>
           <h1>{heroTitle}</h1>
           <p className="hero-copy">{heroSubtitle}</p>
           <div className="hero-actions">
             <a className="primary-action" href="#travel-packages">
-              {t("home", "hero_cta_primary", "Đọc bài mới")}
+              {t("home", "hero_cta_primary", "Read Vietnam guides")}
             </a>
             <Link className="secondary-action" href={href("/goi-du-lich")}>
-              {t("home", "hero_cta_secondary", "Xem gói du lịch")}
+              {t("home", "hero_cta_secondary", "Explore curated trips")}
             </Link>
           </div>
           <form className="hero-search" id="trip-search" action={href("/goi-du-lich")}>
@@ -173,7 +173,7 @@ export default async function Home() {
 
       <section className="package-showcase" id="travel-packages">
         <div className="package-showcase-heading">
-          <h2>{t("home", "package_heading", "Chọn hành trình theo người đi cùng bạn")}</h2>
+          <h2>{t("home", "package_heading", "Curated Vietnam journeys for every travel style")}</h2>
           <Link href={href("/goi-du-lich")}>{t("home", "package_all", "Xem tất cả gói du lịch")}</Link>
         </div>
 
@@ -199,7 +199,7 @@ export default async function Home() {
             {t("home", "feature_title", "Chọn điểm đến theo cảm xúc,")}
             <span>{t("home", "feature_title_span", "không chỉ theo địa danh.")}</span>
           </h2>
-          <p>{t("home", "feature_copy", "Vì đó là kỷ niệm mà bạn sẽ đem theo mãi bên mình.")}</p>
+          <p>{t("home", "feature_copy", "From Hanoi and Ha Long Bay to Hoi An, Da Nang, Phu Quoc and the northern highlands, TimesGreen helps you choose places by season, pace and the feeling you want to bring home.")}</p>
         </div>
         <DestinationTabs destinations={destinations} packages={allPackages} />
       </section>
@@ -233,7 +233,7 @@ export default async function Home() {
             <p className="eyebrow">{t("home", "news_eyebrow", "Câu chuyện du lịch")}</p>
             <h2>{t("home", "news_title", "Bài viết nổi bật")}</h2>
           </div>
-          <p>{t("home", "news_copy", "Những bài viết được chọn để gợi ý lịch trình, mùa đi đẹp và trải nghiệm bản địa trước khi bạn để lại thông tin tư vấn.")}</p>
+          <p>{t("home", "news_copy", "Fresh Vietnam travel stories, itinerary notes, local food ideas and planning tips designed to help international travelers feel confident before requesting consultation.")}</p>
         </div>
 
         <PostCarousel posts={posts} />

@@ -31,12 +31,12 @@ export const metadata: Metadata = {
     : undefined,
   title: {
     template: "%s | TimesGreen",
-    default: "TimesGreen - Blog du lịch Việt Nam, lịch trình và trải nghiệm bản địa",
+    default: "TimesGreen - Vietnam Travel Blog, Local Guides & Curated Trips",
   },
-  description: "TimesGreen truyền cảm hứng khám phá Việt Nam qua các cẩm nang du lịch thực tế, gợi ý lịch trình linh hoạt, đặc sản địa phương và những trải nghiệm bản địa đáng nhớ cho từng phong cách chuyến đi.",
+  description: "TimesGreen helps international travelers discover Vietnam through practical travel guides, curated itineraries, local food stories, visa tips and friendly trip consultation for families, couples and small groups.",
   openGraph: {
-    title: "TimesGreen - Blog du lịch Việt Nam, lịch trình và trải nghiệm bản địa",
-    description: "TimesGreen truyền cảm hứng khám phá Việt Nam qua các cẩm nang du lịch thực tế, gợi ý lịch trình linh hoạt, đặc sản địa phương và những trải nghiệm bản địa đáng nhớ cho từng phong cách chuyến đi.",
+    title: "TimesGreen - Vietnam Travel Blog, Local Guides & Curated Trips",
+    description: "TimesGreen helps international travelers discover Vietnam through practical travel guides, curated itineraries, local food stories, visa tips and friendly trip consultation for families, couples and small groups.",
     url: "/",
     siteName: SITE_NAME,
     locale: "vi_VN",
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "TimesGreen - Blog du lịch Việt Nam, lịch trình và trải nghiệm bản địa",
-    description: "TimesGreen truyền cảm hứng khám phá Việt Nam qua các cẩm nang du lịch thực tế, gợi ý lịch trình linh hoạt, đặc sản địa phương và những trải nghiệm bản địa đáng nhớ cho từng phong cách chuyến đi.",
+    title: "TimesGreen - Vietnam Travel Blog, Local Guides & Curated Trips",
+    description: "TimesGreen helps international travelers discover Vietnam through practical travel guides, curated itineraries, local food stories, visa tips and friendly trip consultation for families, couples and small groups.",
     images: [DEFAULT_OG_IMAGE.url],
   },
 };

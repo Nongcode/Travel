@@ -13,8 +13,8 @@ import { getStaticTranslationMap, localizeContent, translateFromMap } from "@/li
 export const dynamic = "force-dynamic";
 
 export const metadata = publicPageMetadata({
-  title: "Tin tức & Cẩm nang du lịch | TimesGreen",
-  description: "Cập nhật cẩm nang du lịch, kinh nghiệm lịch trình và gợi ý điểm đến Việt Nam từ TimesGreen.",
+  title: "Vietnam Travel Guides, Tips & Local Stories | TimesGreen",
+  description: "Read practical Vietnam travel guides, local food stories, itinerary ideas, seasonal tips and cultural notes curated by TimesGreen for first-time and returning international travelers.",
   path: "/tin-tuc",
 });
 

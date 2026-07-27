@@ -14,8 +14,8 @@ import { PageDisabled } from "../components/PageDisabled";
 
 export const dynamic = "force-dynamic";
 export const metadata = publicPageMetadata({
-  title: "Liên hệ tư vấn hành trình | TimesGreen",
-  description: "Liên hệ TimesGreen để nhận tư vấn lịch trình du lịch Việt Nam, gói du lịch phù hợp và hỗ trợ phản hồi trong 24 giờ.",
+  title: "Contact TimesGreen for Vietnam Trip Consultation",
+  description: "Contact TimesGreen to receive friendly Vietnam itinerary advice, private trip suggestions, visa preparation notes and local travel support within 24 hours. No online payment is required.",
   path: "/lien-he",
 });
 

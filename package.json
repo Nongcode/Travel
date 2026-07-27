@@ -9,6 +9,7 @@
     "lint": "eslint",
     "db:deploy": "prisma db push",
     "db:generate": "prisma generate",
+    "db:sync-content": "tsx scripts/sync-public-content.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

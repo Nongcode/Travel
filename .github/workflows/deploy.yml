@@ -30,6 +30,7 @@ jobs:
           if not exist node_modules\.bin\prisma.cmd set "NEED_INSTALL=1"
           if not exist node_modules\dotenv\package.json set "NEED_INSTALL=1"
           if not exist node_modules\next\package.json set "NEED_INSTALL=1"
+          if not exist node_modules\.bin\tsx.cmd set "NEED_INSTALL=1"
           
           if "%NEED_INSTALL%"=="1" (
             echo Dependencies changed or node_modules is incomplete. Running incremental npm install...
@@ -46,6 +47,7 @@ jobs:
           :: ĐÃ THÊM LỆNH CALL VÀO ĐÂY ĐỂ WINDOWS KHÔNG BỊ THOÁT NGANG
           call npm run db:generate || exit /b 1
           call npm run db:deploy || exit /b 1
+          call npm run db:sync-content || exit /b 1
           call npm run build || exit /b 1
           
           :: Khởi động lại ứng dụng (KÈM --update-env ĐỂ NHẬN CLOUDINARY)

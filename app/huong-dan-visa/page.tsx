@@ -124,8 +124,8 @@ const pageCopy = {
 
 export const dynamic = "force-dynamic";
 export const metadata = publicPageMetadata({
-  title: "Hướng dẫn visa du lịch | TimesGreen",
-  description: "Tổng hợp giấy tờ, quy trình và lưu ý quan trọng khi chuẩn bị hồ sơ visa du lịch.",
+  title: "Vietnam Travel Visa Guide & Application Tips | TimesGreen",
+  description: "Prepare travel visa documents with TimesGreen's practical guide to checklists, timelines, destination notes and consultation support for smoother international trips.",
   path: "/huong-dan-visa",
 });
 

@@ -38,8 +38,8 @@ const collectionTranslations: Record<string, Record<string, { eyebrow: string; t
   family: {
     en: {
       eyebrow: "Family travel",
-      title: "Gentle holidays for extended families",
-      description: "Easy-paced itineraries, comfortable hotels, child-friendly meals, and enough rest time for every generation.",
+      title: "Easy Vietnam holidays for families and multi-generation groups",
+      description: "Easy-paced Vietnam itineraries with comfortable hotels, child-friendly meals, reliable transfers and enough rest time for every generation.",
     },
     "zh-CN": {
       eyebrow: "\u5bb6\u5ead\u65c5\u884c",
@@ -50,8 +50,8 @@ const collectionTranslations: Record<string, Record<string, { eyebrow: string; t
   youth: {
     en: {
       eyebrow: "Trips with friends",
-      title: "Adventurous journeys for friends who collect memories",
-      description: "A livelier pace with photo stops, local experiences, and food suggestions made for young groups.",
+      title: "Vietnam adventures for friends who collect stories",
+      description: "A livelier Vietnam travel pace with scenic photo stops, local experiences, street-food suggestions and flexible days made for young groups.",
     },
     "zh-CN": {
       eyebrow: "\u670b\u53cb\u51fa\u884c",
@@ -62,8 +62,8 @@ const collectionTranslations: Record<string, Record<string, { eyebrow: string; t
   vietnam: {
     en: {
       eyebrow: "Best destinations in Vietnam",
-      title: "Signature journeys across Vietnam",
-      description: "Selected scenic destinations for first-time travelers or guests who need an easy itinerary to consult and customize.",
+      title: "Signature Vietnam journeys for first-time visitors",
+      description: "Selected scenic Vietnam destinations for first-time visitors who want an easy itinerary to understand, consult and customize before arrival.",
     },
     "zh-CN": {
       eyebrow: "\u8d8a\u5357\u7cbe\u9009\u76ee\u7684\u5730",

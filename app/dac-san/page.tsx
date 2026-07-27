@@ -12,8 +12,8 @@ import { getStaticTranslationMap, translateFromMap, localizeContent } from "@/li
 export const dynamic = "force-dynamic";
 
 export const metadata = publicPageMetadata({
-  title: "Đặc sản địa phương Việt Nam | TimesGreen",
-  description: "Khám phá đặc sản địa phương, sản phẩm thủ công và hương vị vùng miền Việt Nam cùng TimesGreen.",
+  title: "Vietnam Local Specialties, Food Gifts & Regional Flavors | TimesGreen",
+  description: "Discover Vietnam local specialties, regional food gifts, craft products and authentic flavors with TimesGreen travel stories and destination recommendations.",
   path: "/dac-san",
 });
 

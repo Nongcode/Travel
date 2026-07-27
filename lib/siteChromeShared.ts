@@ -57,13 +57,13 @@ export const DEFAULT_FOOTER_MENU: SiteMenuItem[] = [
 export const DEFAULT_SITE_CHROME_CONFIG: SiteChromeConfig = {
   header: {
     logoUrl: "/vietvista-logo.png",
-    logoAlt: "TimesGreen Travel & Discover",
+    logoAlt: "TimesGreen Vietnam Travel Guide",
     companyName: "TimesGreen",
     menu: DEFAULT_HEADER_MENU,
   },
   footer: {
     brandName: "TimesGreen",
-    description: "Blog du lịch và kênh tư vấn hành trình Việt Nam. Website chỉ thu thập thông tin liên hệ, không xử lý thanh toán trực tuyến.",
+    description: "TimesGreen is a Vietnam travel blog and itinerary consultation channel for international travelers seeking local insight, flexible trip ideas, food stories and practical planning support.",
     address: "",
     phone: "090 123 4567",
     email: "hello@vietvista.vn",
