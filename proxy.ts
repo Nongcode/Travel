@@ -1,7 +1,18 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { stripLocaleFromPath } from "@/lib/i18n/config";
+import { detectLocaleFromAcceptLanguage, localePrefix, stripLocaleFromPath } from "@/lib/i18n/config";
 import { verifyToken } from "@/lib/auth";
+
+function isCrawler(userAgent: string | null) {
+  if (!userAgent) return false;
+  return /bot|crawler|spider|crawling|google|bing|yandex|baidu|duckduck|slurp|facebookexternalhit|twitterbot|linkedinbot|telegrambot|zalo/i.test(userAgent);
+}
+
+function isPublicPageRequest(pathname: string) {
+  if (pathname.startsWith("/admin") || pathname.startsWith("/api") || pathname.startsWith("/_next")) return false;
+  if (pathname === "/favicon.ico" || pathname === "/robots.txt" || pathname === "/sitemap.xml") return false;
+  return !/\.[a-z0-9]+$/i.test(pathname);
+}
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -9,6 +20,23 @@ export function proxy(request: NextRequest) {
   const effectivePathname = localized.pathname;
 
   const token = request.cookies.get("admin_token")?.value;
+
+  const isInternalLocaleRewrite = request.headers.has("x-locale");
+  const hasExplicitLocale = localized.pathname !== pathname;
+  const preferredLocale = detectLocaleFromAcceptLanguage(request.headers.get("accept-language"));
+  const preferredPrefix = localePrefix(preferredLocale);
+  const shouldAutoRedirectLocale =
+    !isInternalLocaleRewrite &&
+    !hasExplicitLocale &&
+    preferredPrefix.length > 0 &&
+    isPublicPageRequest(pathname) &&
+    !isCrawler(request.headers.get("user-agent"));
+
+  if (shouldAutoRedirectLocale) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = pathname === "/" ? preferredPrefix : `${preferredPrefix}${pathname}`;
+    return NextResponse.redirect(redirectUrl);
+  }
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-pathname", effectivePathname);

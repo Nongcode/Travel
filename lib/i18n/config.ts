@@ -50,3 +50,26 @@ export function withLocalePrefix(href: string, locale: string) {
   if (href.startsWith(prefix + "/") || href === prefix) return href;
   return prefix + (href.startsWith("/") ? href : "/" + href);
 }
+
+export function detectLocaleFromAcceptLanguage(headerValue?: string | null): SupportedLocale {
+  if (!headerValue) return DEFAULT_LOCALE;
+
+  const preferences = headerValue
+    .split(",")
+    .map((part) => {
+      const [rawTag, ...params] = part.trim().split(";");
+      const qParam = params.find((param) => param.trim().startsWith("q="));
+      const q = qParam ? Number(qParam.trim().slice(2)) : 1;
+      return { tag: rawTag.trim().toLowerCase(), q: Number.isFinite(q) ? q : 0 };
+    })
+    .filter((item) => item.tag && item.q > 0)
+    .sort((a, b) => b.q - a.q);
+
+  for (const { tag } of preferences) {
+    if (tag === "vi" || tag.startsWith("vi-")) return "vi";
+    if (tag === "zh" || tag.startsWith("zh-")) return "zh-CN";
+    if (tag === "en" || tag.startsWith("en-")) return "en";
+  }
+
+  return DEFAULT_LOCALE;
+}
