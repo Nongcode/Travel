@@ -351,7 +351,7 @@ export default function SettingsAdminPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
           <h2 className="text-[24px] font-bold text-slate-800 tracking-tight leading-7">Quản lý tài khoản</h2>
-          <p className="text-xs text-slate-500 mt-1">Quản lý và cấp quyền truy cập tài khoản quản trị viên cho VietVista.</p>
+          <p className="text-xs text-slate-500 mt-1">Quản lý và cấp quyền truy cập tài khoản quản trị viên cho TimesGreen.</p>
         </div>
         <button
           onClick={() => {

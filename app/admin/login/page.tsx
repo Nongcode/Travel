@@ -66,7 +66,7 @@ export default function LoginPage() {
             <div className="flex items-center gap-2">
               <img
                 src="/vietvista-logo.png"
-                alt="VietVista"
+                alt="TimesGreen"
                 className="w-24 object-contain brightness-0 invert"
               />
               <span className="text-[10px] bg-emerald-700/80 text-emerald-100 px-1.5 py-0.5 rounded font-mono font-bold tracking-wider ml-2">PORTAL</span>
@@ -78,7 +78,7 @@ export default function LoginPage() {
               Quản lý hành trình <br />trải nghiệm khách hàng
             </h2>
             <p className="text-sm text-emerald-100/70 leading-relaxed font-medium">
-              Chào mừng bạn trở lại! Cổng quản trị nội dung bài viết, tin tức du lịch và gói sản phẩm lữ hành của VietVista.
+              Chào mừng bạn trở lại! Cổng quản trị nội dung bài viết, tin tức du lịch và gói sản phẩm lữ hành của TimesGreen.
             </p>
           </div>
         </div>
@@ -89,7 +89,7 @@ export default function LoginPage() {
             <div className="mb-8 flex justify-center md:justify-start">
               <img
                 src="/vietvista-logo.png"
-                alt="VietVista"
+                alt="TimesGreen"
                 className="w-32 object-contain"
               />
             </div>

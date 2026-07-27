@@ -71,7 +71,7 @@ export function ReviewForm({ destinations }: ReviewFormProps) {
     <div className="review-form-container">
       <div className="review-form-header">
         <h3>{t("reviews", "form_title", "Chia sẻ trải nghiệm của bạn")}</h3>
-        <p>{t("reviews", "form_subtitle", "Những đóng góp của bạn sẽ giúp VietVista nâng cao chất lượng dịch vụ tốt hơn mỗi ngày.")}</p>
+        <p>{t("reviews", "form_subtitle", "Những đóng góp của bạn sẽ giúp TimesGreen nâng cao chất lượng dịch vụ tốt hơn mỗi ngày.")}</p>
       </div>
 
       <form className="review-form" onSubmit={handleSubmit}>

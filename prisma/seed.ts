@@ -132,7 +132,7 @@ async function main() {
   // Define default author since travel.ts doesn't have it
   const defaultAuthor = await prisma.author.create({
     data: {
-      name: "Admin VietVista",
+      name: "Admin TimesGreen",
       role: "Content Manager",
     },
   });

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { isSitePageInactive } from "@/lib/siteSettings";
 import { PageDisabled } from "../components/PageDisabled";
@@ -24,7 +25,7 @@ const pageCopy = {
     notesTitle: "Mỗi quốc gia có trọng tâm xét duyệt khác nhau.",
     consultEyebrow: "Tư vấn visa",
     consultTitle: "Gửi thông tin để nhận tư vấn visa.",
-    consultCopy: "Form này sẽ lưu yêu cầu vào mục quản trị Liên hệ & Tư vấn. Đội ngũ VietVista có thể xem tên, email, số điện thoại, điểm đến và ghi chú hồ sơ để phản hồi cho khách hàng.",
+    consultCopy: "Form này sẽ lưu yêu cầu vào mục quản trị Liên hệ & Tư vấn. Đội ngũ TimesGreen có thể xem tên, email, số điện thoại, điểm đến và ghi chú hồ sơ để phản hồi cho khách hàng.",
     checklist: [
       "Hộ chiếu còn hạn tối thiểu 6 tháng và còn trang trống để dán visa.",
       "Ảnh chân dung đúng kích thước, nền trắng, chụp trong 6 tháng gần nhất.",
@@ -61,7 +62,7 @@ const pageCopy = {
     notesTitle: "Each country reviews different priorities.",
     consultEyebrow: "Visa consultation",
     consultTitle: "Send your information to receive visa advice.",
-    consultCopy: "This form stores the request in the admin Contact & Consultation area. VietVista can review the name, email, phone, destination, and file notes to respond to the customer.",
+    consultCopy: "This form stores the request in the admin Contact & Consultation area. TimesGreen can review the name, email, phone, destination, and file notes to respond to the customer.",
     checklist: [
       "Passport valid for at least 6 months with blank pages for visa stamps.",
       "Portrait photo in the required size, white background, taken within the last 6 months.",
@@ -98,7 +99,7 @@ const pageCopy = {
     notesTitle: "每个国家的审核重点不同。",
     consultEyebrow: "签证咨询",
     consultTitle: "提交信息以获取签证咨询。",
-    consultCopy: "此表单会把请求保存到后台的联系与咨询模块。VietVista 团队可查看姓名、邮箱、电话、目的地和材料备注以便回复客户。",
+    consultCopy: "此表单会把请求保存到后台的联系与咨询模块。TimesGreen 团队可查看姓名、邮箱、电话、目的地和材料备注以便回复客户。",
     checklist: [
       "护照有效期至少 6 个月，并有空白签证页。",
       "符合尺寸要求的白底近 6 个月证件照。",
@@ -122,6 +123,19 @@ const pageCopy = {
 };
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "Hướng dẫn visa du lịch | TimesGreen",
+  description: "Tổng hợp giấy tờ, quy trình và lưu ý quan trọng khi chuẩn bị hồ sơ visa du lịch.",
+  alternates: {
+    canonical: "/huong-dan-visa",
+  },
+  openGraph: {
+    title: "Hướng dẫn visa du lịch | TimesGreen",
+    description: "Tổng hợp giấy tờ, quy trình và lưu ý quan trọng khi chuẩn bị hồ sơ visa du lịch.",
+    url: "/huong-dan-visa",
+  },
+};
+
 
 export default async function VisaGuidePage() {
   if (await isSitePageInactive("page_visa_status")) {
@@ -140,7 +154,7 @@ export default async function VisaGuidePage() {
       <section className="page-hero visa-hero">
         <p className="eyebrow">{t("visa", "hero_eyebrow", "Hướng dẫn làm visa du lịch")}</p>
         <h1>{t("visa", "hero_title", "Chuẩn bị hồ sơ visa rõ ràng trước khi lên đường.")}</h1>
-        <p>{t("visa", "hero_copy", "Tổng hợp giấy tờ, quy trình và lưu ý quan trọng khi xin visa du lịch. Nếu hồ sơ của bạn có điểm cần kiểm tra, hãy gửi thông tin để VietVista tư vấn hướng xử lý phù hợp.")}</p>
+        <p>{t("visa", "hero_copy", "Tổng hợp giấy tờ, quy trình và lưu ý quan trọng khi xin visa du lịch. Nếu hồ sơ của bạn có điểm cần kiểm tra, hãy gửi thông tin để TimesGreen tư vấn hướng xử lý phù hợp.")}</p>
       </section>
 
       <section className="visa-overview">

@@ -339,7 +339,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   ];
 
   const initialFooterInfo: FooterInfo = {
-    brandName: "VietVista",
+    brandName: "TimesGreen",
     description: "Your ultimate gateway to exploring local, authentic, and customized journeys across Vietnam.",
     address: "123 Le Loi Street, Hai Chau, Da Nang, Vietnam",
     phone: "+84 1900 1234",
@@ -347,7 +347,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     facebook: "https://facebook.com/vietvista",
     instagram: "https://instagram.com/vietvista",
     twitter: "https://twitter.com/vietvista",
-    copyright: "Â© 2026 VietVista Travel. All Rights Reserved.",
+    copyright: "Â© 2026 TimesGreen Travel. All Rights Reserved.",
   };
 
   const initialBookings: AdminBooking[] = [
@@ -394,10 +394,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   ];
 
   const initialSeoConfigs: SeoConfig[] = [
-    { id: 1, page: "Trang chá»§", urlPath: "/", metaTitle: "VietVista - Tour du lá»‹ch Viá»‡t Nam Ä‘á»™c báº£n cho khÃ¡ch nÆ°á»›c ngoÃ i", metaDescription: "Thiáº¿t káº¿ tour du lá»‹ch riÃªng tÆ°, Ä‘á»™c Ä‘Ã¡o khÃ¡m phÃ¡ vÄƒn hÃ³a báº£n Ä‘á»‹a, áº©m thá»±c vÃ  danh lam tháº¯ng cáº£nh Viá»‡t Nam vá»›i dá»‹ch vá»¥ 5 sao.", metaKeywords: "vietnam travel, private tour vietnam, luxury vietnam holiday, customized tour", ogImage: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80" },
-    { id: 2, page: "Danh sÃ¡ch Tour", urlPath: "/goi-du-lich", metaTitle: "GÃ³i Tour Du Lá»‹ch Viá»‡t Nam Tá»± Chá»n - VietVista Travel", metaDescription: "Danh sÃ¡ch gÃ³i tour nghá»‰ dÆ°á»¡ng biá»ƒn Ä‘áº£o Phú Quốc, trekking Hà Giang, khÃ¡m phÃ¡ vÄƒn hÃ³a di sáº£n Há»™i An. Äáº·t tour trá»±c tuyáº¿n tÆ° váº¥n miá»…n phÃ­.", metaKeywords: "tours vietnam, sapa tour, hoi an package, phu quoc vacation", ogImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80" },
-    { id: 3, page: "BÃ i viáº¿t Cáº©m nang", urlPath: "/tin-tuc", metaTitle: "Blog Chia Sáº» Cáº©m Nang Du Lá»‹ch Viá»‡t Nam Tá»± TÃºc - VietVista", metaDescription: "Lá»i khuyÃªn, hÆ°á»›ng dáº«n chi tiáº¿t, Ä‘iá»ƒm check-in áº©n vÃ  máº¹o Äƒn uá»‘ng báº£n Ä‘á»‹a tá»« cÃ¡c chuyÃªn gia lá»¯ hÃ nh VietVista.", metaKeywords: "vietnam blog, travel guide vietnam, sapa guide, local tips", ogImage: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80" },
-    { id: 4, page: "Liên hệ", urlPath: "/lien-he", metaTitle: "LiÃªn Há»‡ Thiáº¿t Káº¿ Tour RiÃªng - VietVista Support 24/7", metaDescription: "Liên hệ vá»›i Ä‘á»™i ngÅ© VietVista Ä‘á»ƒ nháº­n lá»‹ch trÃ¬nh Ä‘Æ°á»£c cÃ¡ nhÃ¢n hÃ³a miá»…n phÃ­ trong vÃ²ng 24 giá». Gá»i ngay hotline hoáº·c gá»­i tin nháº¯n.", metaKeywords: "contact travel agency, customized tour service, vietnam travel agent", ogImage: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80" }
+    { id: 1, page: "Trang chá»§", urlPath: "/", metaTitle: "TimesGreen - Tour du lá»‹ch Viá»‡t Nam Ä‘á»™c báº£n cho khÃ¡ch nÆ°á»›c ngoÃ i", metaDescription: "Thiáº¿t káº¿ tour du lá»‹ch riÃªng tÆ°, Ä‘á»™c Ä‘Ã¡o khÃ¡m phÃ¡ vÄƒn hÃ³a báº£n Ä‘á»‹a, áº©m thá»±c vÃ  danh lam tháº¯ng cáº£nh Viá»‡t Nam vá»›i dá»‹ch vá»¥ 5 sao.", metaKeywords: "vietnam travel, private tour vietnam, luxury vietnam holiday, customized tour", ogImage: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80" },
+    { id: 2, page: "Danh sÃ¡ch Tour", urlPath: "/goi-du-lich", metaTitle: "GÃ³i Tour Du Lá»‹ch Viá»‡t Nam Tá»± Chá»n - TimesGreen Travel", metaDescription: "Danh sÃ¡ch gÃ³i tour nghá»‰ dÆ°á»¡ng biá»ƒn Ä‘áº£o Phú Quốc, trekking Hà Giang, khÃ¡m phÃ¡ vÄƒn hÃ³a di sáº£n Há»™i An. Äáº·t tour trá»±c tuyáº¿n tÆ° váº¥n miá»…n phÃ­.", metaKeywords: "tours vietnam, sapa tour, hoi an package, phu quoc vacation", ogImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80" },
+    { id: 3, page: "BÃ i viáº¿t Cáº©m nang", urlPath: "/tin-tuc", metaTitle: "Blog Chia Sáº» Cáº©m Nang Du Lá»‹ch Viá»‡t Nam Tá»± TÃºc - TimesGreen", metaDescription: "Lá»i khuyÃªn, hÆ°á»›ng dáº«n chi tiáº¿t, Ä‘iá»ƒm check-in áº©n vÃ  máº¹o Äƒn uá»‘ng báº£n Ä‘á»‹a tá»« cÃ¡c chuyÃªn gia lá»¯ hÃ nh TimesGreen.", metaKeywords: "vietnam blog, travel guide vietnam, sapa guide, local tips", ogImage: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80" },
+    { id: 4, page: "Liên hệ", urlPath: "/lien-he", metaTitle: "LiÃªn Há»‡ Thiáº¿t Káº¿ Tour RiÃªng - TimesGreen Support 24/7", metaDescription: "Liên hệ vá»›i Ä‘á»™i ngÅ© TimesGreen Ä‘á»ƒ nháº­n lá»‹ch trÃ¬nh Ä‘Æ°á»£c cÃ¡ nhÃ¢n hÃ³a miá»…n phÃ­ trong vÃ²ng 24 giá». Gá»i ngay hotline hoáº·c gá»­i tin nháº¯n.", metaKeywords: "contact travel agency, customized tour service, vietnam travel agent", ogImage: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80" }
   ];
 
   // State Definitions with lazy localstorage loading

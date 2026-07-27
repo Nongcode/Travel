@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PageDisabled } from "../components/PageDisabled";
 import { headers } from "next/headers";
@@ -9,6 +10,20 @@ import { normalizeLocale, withLocalePrefix } from "@/lib/i18n/config";
 import { getStaticTranslationMap, localizeContent, translateFromMap } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Tin tức & Cẩm nang du lịch | TimesGreen",
+  description: "Cập nhật cẩm nang du lịch, kinh nghiệm lịch trình và gợi ý điểm đến Việt Nam từ TimesGreen.",
+  alternates: {
+    canonical: "/tin-tuc",
+  },
+  openGraph: {
+    title: "Tin tức & Cẩm nang du lịch | TimesGreen",
+    description: "Cập nhật cẩm nang du lịch, kinh nghiệm lịch trình và gợi ý điểm đến Việt Nam từ TimesGreen.",
+    url: "/tin-tuc",
+  },
+};
+
 
 const legacyDecoder = new TextDecoder("windows-1252");
 const toLegacyMojibake = (value: string) => legacyDecoder.decode(Buffer.from(value, "utf8"));

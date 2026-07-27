@@ -38,7 +38,7 @@ export const defaultPackageDetailContent: PackageDetailContent = {
   itinerary: packageDetailExtras.itinerary,
   benefits: packageDetailExtras.benefits,
   consultTitle: "Giữ lại gói này và nhận tư vấn phù hợp với nhu cầu thực tế.",
-  consultCopy: "Chỉ cần để lại email hoặc số điện thoại. VietVista sẽ liên hệ để điều chỉnh lịch trình, gợi ý ngân sách và chọn điểm lưu trú phù hợp.",
+  consultCopy: "Chỉ cần để lại email hoặc số điện thoại. TimesGreen sẽ liên hệ để điều chỉnh lịch trình, gợi ý ngân sách và chọn điểm lưu trú phù hợp.",
   consultPoints: [
     "Không cần thanh toán ngay",
     "Điều chỉnh theo gia đình hoặc nhóm bạn",

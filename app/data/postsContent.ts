@@ -80,7 +80,7 @@ export const detailedPosts: Record<number, DetailedPost> = {
       },
       {
         type: "tip-box",
-        title: "Lời khuyên từ VietVista",
+        title: "Lời khuyên từ TimesGreen",
         text: "Đừng mua đèn hoa đăng bằng nhựa thả xuống sông để bảo vệ môi trường. Hãy chọn những chiếc đèn làm hoàn toàn bằng giấy thủ công tự phân hủy được bán bởi các cụ già bên sông."
       },
       {

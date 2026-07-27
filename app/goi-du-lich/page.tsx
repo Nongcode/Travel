@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { isSitePageInactive } from "@/lib/siteSettings";
 import { PageDisabled } from "../components/PageDisabled";
@@ -15,6 +16,19 @@ type PackagesPageProps = {
 };
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "Gói du lịch Việt Nam chọn lọc | TimesGreen",
+  description: "Khám phá các gói du lịch Việt Nam chọn lọc theo điểm đến, phong cách chuyến đi và nhu cầu tư vấn riêng.",
+  alternates: {
+    canonical: "/goi-du-lich",
+  },
+  openGraph: {
+    title: "Gói du lịch Việt Nam chọn lọc | TimesGreen",
+    description: "Khám phá các gói du lịch Việt Nam chọn lọc theo điểm đến, phong cách chuyến đi và nhu cầu tư vấn riêng.",
+    url: "/goi-du-lich",
+  },
+};
+
 
 export default async function PackagesPage({ searchParams }: PackagesPageProps) {
   if (await isSitePageInactive("page_tours_status")) {

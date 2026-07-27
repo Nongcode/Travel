@@ -57,12 +57,12 @@ export const DEFAULT_FOOTER_MENU: SiteMenuItem[] = [
 export const DEFAULT_SITE_CHROME_CONFIG: SiteChromeConfig = {
   header: {
     logoUrl: "/vietvista-logo.png",
-    logoAlt: "VietVista Travel & Discover",
-    companyName: "VietVista",
+    logoAlt: "TimesGreen Travel & Discover",
+    companyName: "TimesGreen",
     menu: DEFAULT_HEADER_MENU,
   },
   footer: {
-    brandName: "VietVista",
+    brandName: "TimesGreen",
     description: "Blog du lịch và kênh tư vấn hành trình Việt Nam. Website chỉ thu thập thông tin liên hệ, không xử lý thanh toán trực tuyến.",
     address: "",
     phone: "090 123 4567",
@@ -70,7 +70,7 @@ export const DEFAULT_SITE_CHROME_CONFIG: SiteChromeConfig = {
     facebook: "",
     instagram: "",
     twitter: "",
-    copyright: "© 2026 VietVista. All rights reserved.",
+    copyright: "© 2026 TimesGreen. All rights reserved.",
     menu: DEFAULT_FOOTER_MENU,
   },
 };

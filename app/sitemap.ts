@@ -9,7 +9,7 @@ const PUBLISHED_STATUS = "Đã xuất bản";
 const PUBLISHED_STATUSES = [PUBLISHED_STATUS, toLegacyMojibake(PUBLISHED_STATUS), toDoubleLegacyMojibake(PUBLISHED_STATUS)];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net";
 
   const posts = await prisma.post.findMany({
     where: { status: { in: PUBLISHED_STATUSES } },
@@ -26,11 +26,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     select: { slug: true, updatedAt: true },
   });
 
-  const routes = ["", "/goi-du-lich", "/huong-dan-visa", "/tin-tuc", "/lien-he"].map((route) => ({
-    url: `${baseUrl}${route}`,
+  const routes = [
+    { path: "", priority: 1 },
+    { path: "/goi-du-lich", priority: 0.9 },
+    { path: "/huong-dan-visa", priority: 0.8 },
+    { path: "/tin-tuc", priority: 0.8 },
+    { path: "/dac-san", priority: 0.8 },
+    { path: "/lien-he", priority: 0.5 },
+  ].map((route) => ({
+    url: `${baseUrl}${route.path}`,
     lastModified: new Date(),
     changeFrequency: "daily" as const,
-    priority: route === "" ? 1 : 0.9,
+    priority: route.priority,
   }));
 
   const postRoutes = posts.map((post) => ({

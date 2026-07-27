@@ -42,12 +42,12 @@ export default function AdminTopbar() {
     if (path.startsWith("/admin/system/seo")) return "Quản lý SEO";
     if (path.startsWith("/admin/navigation")) return "Cấu hình Header & Footer";
     if (path.startsWith("/admin/settings")) return "Cài đặt hệ thống";
-    return "Quản trị VietVista";
+    return "Quản trị TimesGreen";
   };
 
   const getBreadcrumb = (path: string) => {
     const labels: Record<string, string> = {
-      admin: "VietVista",
+      admin: "TimesGreen",
       posts: "Bài viết",
       packages: "Gói du lịch",
       banners: "Banner",
@@ -184,7 +184,7 @@ export default function AdminTopbar() {
               {showProfileMenu && (
                 <div onClick={(e) => e.stopPropagation()} className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in slide-in-from-top-3 duration-200">
                   <div className="px-4 py-2 border-b border-slate-50">
-                    <p className="text-sm font-black text-slate-800">VietVista Admin</p>
+                    <p className="text-sm font-black text-slate-800">TimesGreen Admin</p>
                     <p className="text-xs text-slate-500 font-medium">Administrator</p>
                   </div>
                   <div className="py-1">

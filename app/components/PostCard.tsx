@@ -29,8 +29,8 @@ export function PostCard({ post }: PostCardProps) {
         </div>
         <h3>{post.title}</h3>
         <p>{post.excerpt}</p>
-        <Link href={href("/tin-tuc/" + post.id)} aria-label={t("common", "read_more", "??c ti?p") + " " + post.title}>
-          {t("common", "read_more", "??c ti?p")}
+        <Link href={href("/tin-tuc/" + post.id)} aria-label={t("common", "read_more", "Đọc thêm") + " " + post.title}>
+          {t("common", "read_more", "Đọc thêm")}
         </Link>
       </div>
     </article>

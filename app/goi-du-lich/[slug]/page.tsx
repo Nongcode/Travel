@@ -28,13 +28,13 @@ export async function generateMetadata({ params }: PackageDetailPageProps) {
   const item = await getPublicPackageBySlug(slug, "vi");
 
   if (!item) {
-    return { title: "Không tìm thấy gói du lịch | VietVista" };
+    return { title: "Không tìm thấy gói du lịch | TimesGreen" };
   }
 
-  const title = item.name + " | VietVista";
+  const title = item.name + " | TimesGreen";
   const description = item.description || item.summary || "";
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/goi-du-lich/${item.slug}`;
-  const imageUrl = item.image || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/vietvista-logo.png`;
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/goi-du-lich/${item.slug}`;
+  const imageUrl = item.image || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/vietvista-logo.png`;
 
   return {
     title,
@@ -94,7 +94,7 @@ export default async function PackageDetailPage({ params }: PackageDetailPagePro
     image: gallery[index + 1] ?? gallery[0],
   }));
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net";
   const canonicalUrl = `${baseUrl}/goi-du-lich/${item.slug}`;
   const packageImage = item.image || `${baseUrl}/vietvista-logo.png`;
   const jsonLd = {
@@ -108,7 +108,7 @@ export default async function PackageDetailPage({ params }: PackageDetailPagePro
         url: canonicalUrl,
         brand: {
           "@type": "Organization",
-          name: "VietVista",
+          name: "TimesGreen",
         },
         offers: {
           "@type": "Offer",
@@ -128,14 +128,14 @@ export default async function PackageDetailPage({ params }: PackageDetailPagePro
         itinerary: item.destination,
         provider: {
           "@type": "Organization",
-          name: "VietVista",
+          name: "TimesGreen",
           url: baseUrl,
         },
       },
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "VietVista", item: baseUrl },
+          { "@type": "ListItem", position: 1, name: "TimesGreen", item: baseUrl },
           { "@type": "ListItem", position: 2, name: "Goi du lich", item: `${baseUrl}/goi-du-lich` },
           { "@type": "ListItem", position: 3, name: item.name, item: canonicalUrl },
         ],

@@ -18,8 +18,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"),
-  alternates: { canonical: "/" },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"),
   verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
     ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
     : undefined,
@@ -27,10 +26,10 @@ export const metadata: Metadata = {
     template: "%s | TimesGreen",
     default: "TimesGreen | Blog du lịch Việt Nam",
   },
-  description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không thanh toán online.",
+  description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không yêu cầu thanh toán online.",
   openGraph: {
     title: "TimesGreen | Blog du lịch Việt Nam",
-    description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không thanh toán online.",
+    description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không yêu cầu thanh toán online.",
     url: "/",
     siteName: "TimesGreen",
     locale: "vi_VN",

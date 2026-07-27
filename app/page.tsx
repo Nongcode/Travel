@@ -19,6 +19,9 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "TimesGreen | Blog du lịch & Hành trình chọn lọc",
   description: "Khám phá Việt Nam qua lăng kính TimesGreen. Những chuyến đi, lịch trình, đặc sản và cẩm nang hữu ích.",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "TimesGreen | Blog du lịch & Hành trình chọn lọc",
     description: "Khám phá Việt Nam qua lăng kính TimesGreen. Những chuyến đi, lịch trình, đặc sản và cẩm nang hữu ích.",
@@ -87,21 +90,21 @@ export default async function Home() {
     "@graph": [
       {
         "@type": "WebSite",
-        url: process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net",
+        url: process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net",
         name: "TimesGreen",
         description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không thanh toán online.",
         publisher: {
-          "@id": `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/#organization`
+          "@id": `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/#organization`
         }
       },
       {
         "@type": "Organization",
-        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/#organization`,
+        "@id": `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/#organization`,
         name: "TimesGreen",
-        url: process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net",
+        url: process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net",
         logo: {
           "@type": "ImageObject",
-          url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/vietvista-logo.png`
+          url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/vietvista-logo.png`
         }
       }
     ]
@@ -198,7 +201,7 @@ export default async function Home() {
 
       <section className="feature-band" id="destinations">
         <div className="feature-copy">
-          <p className="slogan-kicker">VietVista journeys</p>
+          <p className="slogan-kicker">TimesGreen journeys</p>
           <h2>
             {t("home", "feature_title", "Chọn điểm đến theo cảm xúc,")}
             <span>{t("home", "feature_title_span", "không chỉ theo địa danh.")}</span>

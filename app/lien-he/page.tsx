@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { headers } from "next/headers";
 import { LeadForm } from "../components/LeadForm";
@@ -12,6 +13,19 @@ import { isSitePageInactive } from "@/lib/siteSettings";
 import { PageDisabled } from "../components/PageDisabled";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "Liên hệ tư vấn hành trình | TimesGreen",
+  description: "Liên hệ TimesGreen để nhận tư vấn lịch trình du lịch Việt Nam, gói du lịch phù hợp và hỗ trợ phản hồi trong 24 giờ.",
+  alternates: {
+    canonical: "/lien-he",
+  },
+  openGraph: {
+    title: "Liên hệ tư vấn hành trình | TimesGreen",
+    description: "Liên hệ TimesGreen để nhận tư vấn lịch trình du lịch Việt Nam, gói du lịch phù hợp và hỗ trợ phản hồi trong 24 giờ.",
+    url: "/lien-he",
+  },
+};
+
 
 export default async function ContactPage() {
   if (await isSitePageInactive("page_contact_status")) {
@@ -61,7 +75,7 @@ export default async function ContactPage() {
         <div className="contact-hero-copy">
           <p className="eyebrow">{t("contact", "hero_eyebrow", "Liên hệ tư vấn")}</p>
           <h1>{t("contact", "hero_title", "Bắt đầu chuyến đi của bạn ngay từ bây giờ nhé!")}</h1>
-          <p>{t("contact", "hero_copy", "Cho VietVista biết điểm đến, thời gian du lịch và phong cách chuyến đi bạn mong muốn. Chúng tôi sẽ liên hệ lại để gợi ý lịch trình phù hợp, không yêu cầu thanh toán trực tuyến.")}</p>
+          <p>{t("contact", "hero_copy", "Cho TimesGreen biết điểm đến, thời gian du lịch và phong cách chuyến đi bạn mong muốn. Chúng tôi sẽ liên hệ lại để gợi ý lịch trình phù hợp, không yêu cầu thanh toán trực tuyến.")}</p>
         </div>
       </section>
 
@@ -87,7 +101,7 @@ export default async function ContactPage() {
         <div className="contact-form-wrapper">
           <div className="contact-form-header">
             <h2>{t("contact", "form_title", "Gửi yêu cầu tư vấn hành trình")}</h2>
-            <p>{t("contact", "form_copy", "Hãy điền thông tin dưới đây. Các chuyên gia hành trình của VietVista sẽ liên hệ lại để gợi ý lịch trình phù hợp với nhu cầu thực tế của bạn.")}</p>
+            <p>{t("contact", "form_copy", "Hãy điền thông tin dưới đây. Các chuyên gia hành trình của TimesGreen sẽ liên hệ lại để gợi ý lịch trình phù hợp với nhu cầu thực tế của bạn.")}</p>
           </div>
 
           <div className="contact-form-content">
@@ -98,7 +112,7 @@ export default async function ContactPage() {
             <div className="contact-form-image">
               <Image
                 src="/vietnam-map-light.png"
-                alt="VietVista destination map"
+                alt="TimesGreen destination map"
                 width={720}
                 height={720}
               />

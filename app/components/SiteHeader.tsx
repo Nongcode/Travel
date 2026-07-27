@@ -302,7 +302,7 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
       <div className={`mobile-search-modal ${isMobileSearchOpen ? "open" : ""}`} role="dialog" aria-modal="true" aria-label={t("nav", "search_trip", "Tìm chuyến đi")}>
         <div className="mobile-search-modal-header">
           <div>
-            <p className="mobile-search-kicker">VietVista</p>
+            <p className="mobile-search-kicker">TimesGreen</p>
             <h2>{t("nav", "search_trip", "Tìm chuyến đi")}</h2>
           </div>
           <button type="button" className="mobile-search-close" onClick={() => setIsMobileSearchOpen(false)} aria-label="Close search">

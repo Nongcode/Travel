@@ -24,13 +24,13 @@ export async function generateMetadata({ params }: SpecialtyDetailPageProps) {
   const item = await prisma.localSpecialty.findUnique({ where: { slug } });
 
   if (!item || item.status !== "Hiển thị") {
-    return { title: "Không tìm thấy đặc sản | VietVista" };
+    return { title: "Không tìm thấy đặc sản | TimesGreen" };
   }
 
-  const title = item.name + " | VietVista";
+  const title = item.name + " | TimesGreen";
   const description = item.description || "";
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/dac-san/${item.slug}`;
-  const imageUrl = item.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/vietvista-logo.png`;
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/dac-san/${item.slug}`;
+  const imageUrl = item.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/vietvista-logo.png`;
 
   return {
     title,
@@ -103,7 +103,7 @@ export default async function SpecialtyDetailPage({ params }: SpecialtyDetailPag
     { icon: "pin", label: t("localSpecialty", "whereToBuy", "Nơi mua"), value: item.whereToBuy },
   ];
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net";
   const canonicalUrl = `${baseUrl}/dac-san/${item.slug}`;
   const specialtyImage = item.imageUrl || `${baseUrl}/vietvista-logo.png`;
   const jsonLd = {
@@ -117,7 +117,7 @@ export default async function SpecialtyDetailPage({ params }: SpecialtyDetailPag
         url: canonicalUrl,
         brand: {
           "@type": "Organization",
-          name: "VietVista",
+          name: "TimesGreen",
         },
         offers: {
           "@type": "Offer",
@@ -130,7 +130,7 @@ export default async function SpecialtyDetailPage({ params }: SpecialtyDetailPag
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "VietVista", item: baseUrl },
+          { "@type": "ListItem", position: 1, name: "TimesGreen", item: baseUrl },
           { "@type": "ListItem", position: 2, name: "Dac san", item: `${baseUrl}/dac-san` },
           { "@type": "ListItem", position: 3, name: item.name, item: canonicalUrl },
         ],

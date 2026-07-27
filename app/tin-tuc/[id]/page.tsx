@@ -45,13 +45,13 @@ export async function generateMetadata({ params }: PostDetailPageProps) {
   const post = await prisma.post.findUnique({ where: { id: Number(id) } });
 
   if (!post || !PUBLISHED_STATUSES.includes(post.status)) {
-    return { title: "Không tìm thấy bài viết | VietVista" };
+    return { title: "Không tìm thấy bài viết | TimesGreen" };
   }
 
-  const title = `${post.title} | Cẩm nang VietVista`;
+  const title = `${post.title} | Cẩm nang TimesGreen`;
   const description = post.seoDescription || post.summary || undefined;
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/tin-tuc/${post.id}`;
-  const imageUrl = post.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/vietvista-logo.png`;
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/tin-tuc/${post.id}`;
+  const imageUrl = post.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/vietvista-logo.png`;
 
   return {
     title,
@@ -118,7 +118,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
       : new Date(localizedDbPost.createdAt).toLocaleDateString(dateLocale),
     readTime: localizedDbPost.readTime || t("news", "read_time_default", "5 phút đọc"),
     author: {
-      name: localizedDbPost.author?.name || "VietVista Editor",
+      name: localizedDbPost.author?.name || "TimesGreen Editor",
       avatar: localizedDbPost.author?.avatarUrl || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80",
       role: localizedDbPost.author?.role || "Travel Writer",
     },
@@ -157,7 +157,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
       : new Date(relatedPost.createdAt).toLocaleDateString(dateLocale),
   }));
 
-  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/tin-tuc/${post.id}`;
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/tin-tuc/${post.id}`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -177,10 +177,10 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
     }],
     publisher: {
       "@type": "Organization",
-      name: "VietVista",
+      name: "TimesGreen",
       logo: {
         "@type": "ImageObject",
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesqreen.net"}/vietvista-logo.png`,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/vietvista-logo.png`,
       },
     },
   };
@@ -282,7 +282,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                 <div className="cta-package-image" style={{ backgroundImage: `url(${relatedPackage.image})` }} />
                 <div className="cta-package-content">
                   <span className="cta-badge">{t("postDetail", "package_badge", "Gợi ý hành trình")}</span>
-                  <h3>{t("postDetail", "package_title_prefix", "Hành trình VietVista")}: {relatedPackage.name}</h3>
+                  <h3>{t("postDetail", "package_title_prefix", "Hành trình TimesGreen")}: {relatedPackage.name}</h3>
                   <p>{relatedPackage.summary}</p>
                   <div className="cta-package-details">
                     <span>{relatedPackage.duration}</span>

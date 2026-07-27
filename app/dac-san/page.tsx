@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { PageDisabled } from "../components/PageDisabled";
 import { SiteHeader } from "../components/SiteHeader";
@@ -8,6 +9,20 @@ import { normalizeLocale } from "@/lib/i18n/config";
 import { getStaticTranslationMap, translateFromMap, localizeContent } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Đặc sản địa phương Việt Nam | TimesGreen",
+  description: "Khám phá đặc sản địa phương, sản phẩm thủ công và hương vị vùng miền Việt Nam cùng TimesGreen.",
+  alternates: {
+    canonical: "/dac-san",
+  },
+  openGraph: {
+    title: "Đặc sản địa phương Việt Nam | TimesGreen",
+    description: "Khám phá đặc sản địa phương, sản phẩm thủ công và hương vị vùng miền Việt Nam cùng TimesGreen.",
+    url: "/dac-san",
+  },
+};
+
 
 export default async function LocalSpecialtiesPage() {
   if (await isSitePageInactive("page_local_specialties_status")) {
