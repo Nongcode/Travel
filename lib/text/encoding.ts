@@ -1,5 +1,6 @@
-const MOJIBAKE_PATTERN = /Ã.|Ä.|Æ.|áº|á»|\uFFFD/;
-const GOOD_TEXT_PATTERN = /[\u4e00-\u9fffăâđêôơưáàảãạấầẩẫậắằẳẵặéèẻẽẹếềểễệíìỉĩịóòỏõọốồổỗộớờởỡợúùủũụứừửữựýỳỷỹỵ]/i;
+const MOJIBAKE_PATTERN = /Ã.|Â.|Ä.|Æ.|Å.|áº|á»|[æåçèéäãïðÐ¢€™œšŽ¥ƒ¼½¾»ºª¤][\s\S]?|\uFFFD/;
+const MOJIBAKE_MATCH_PATTERN = /Ã.|Â.|Ä.|Æ.|Å.|áº|á»|[æåçèéäãïðÐ¢€™œšŽ¥ƒ¼½¾»ºª¤][\s\S]?|\uFFFD/g;
+const GOOD_TEXT_PATTERN = /[\u4e00-\u9fffăâđêôơưáàảãạấầẩẫậắằẳẵặéèẻẽẹếềểễệíìỉĩịóòỏõọốồổỗộớờởỡợúùủũụứừửữựýỳỷỹỵ]/gi;
 
 const CP1252_SPECIAL_BYTES = new Map<number, number>([
   [0x20ac, 0x80],
@@ -48,7 +49,7 @@ function decodeAsUtf8(value: string, unknownByte = 0x3f) {
 }
 
 function textScore(value: string) {
-  const mojibakeCount = (value.match(MOJIBAKE_PATTERN) || []).length;
+  const mojibakeCount = (value.match(MOJIBAKE_MATCH_PATTERN) || []).length;
   const replacementCount = (value.match(/�/g) || []).length;
   const c1ControlCount = (value.match(/[\u0080-\u009f]/g) || []).length;
   const goodCount = (value.match(GOOD_TEXT_PATTERN) || []).length;
@@ -72,5 +73,3 @@ export function normalizeLegacyText(value: string) {
 
   return textScore(current) > textScore(best) ? current : best;
 }
-
-

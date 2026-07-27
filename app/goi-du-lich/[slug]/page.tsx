@@ -7,10 +7,10 @@ import { JsonLd } from "../../components/JsonLd";
 import { LeadForm } from "../../components/LeadForm";
 import { PackageDetailGallery } from "../../components/PackageDetailGallery";
 import { SiteHeader } from "../../components/SiteHeader";
-import { destinations, packageDetailExtras, packageDetailMediaBySlug } from "../../data/travel";
+import { packageDetailExtras, packageDetailMediaBySlug } from "../../data/travel";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { getStaticTranslationMap, translateFromMap } from "@/lib/i18n/server";
-import { normalizePackageDetailContent } from "@/lib/packageDetailContent";
+import { localizePackageDetailContent, normalizePackageDetailContent } from "@/lib/packageDetailContent";
 import { getPublicPackageBySlug, getPublicPackages } from "@/lib/packages";
 
 type PackageDetailPageProps = {
@@ -79,7 +79,7 @@ export default async function PackageDetailPage({ params }: PackageDetailPagePro
   const packageNames = packages.map((p) => p.name);
 
   const media = packageDetailMediaBySlug[item.slug];
-  const detailContent = normalizePackageDetailContent(item.detailContent);
+  const detailContent = localizePackageDetailContent(normalizePackageDetailContent(item.detailContent), locale);
   const detailGallery = detailContent.gallery.length ? detailContent.gallery : [];
   const gallery = detailGallery.length ? detailGallery : media?.gallery?.length ? media.gallery : [item.image, ...packageDetailExtras.gallery].slice(0, 5);
   const flexibleConsulting = t("packageDetail", "flexible", "Tư vấn linh hoạt");

@@ -1,8 +1,9 @@
-﻿/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import prisma from "@/lib/prisma";
 import { allPackages, packageCollections as staticCollections } from "@/app/data/travel";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { localizeContent } from "@/lib/i18n/server";
+import { normalizeLegacyText } from "@/lib/text/encoding";
 
 export type PublicPackage = {
   id: number;
@@ -85,55 +86,55 @@ function formatPriceText(price: string, locale: string) {
 const staticPackageTranslations: Record<string, Record<string, { name: string; summary: string }>> = {
   "hoi-an-di-cham": {
     en: { name: "Slow-paced Hoi An", summary: "Slow itinerary, boutique hotel, cooking class and Hoai river sunset boat tour." },
-    "zh-CN": { name: "Ã¦â€¦Â¢Ã¨Å â€šÃ¥Â¥ÂÃ¤Â¼Å¡Ã¥Â®â€°", summary: "Ã¦â€¦Â¢Ã¨Å â€šÃ¥Â¥ÂÃ¨Â¡Å’Ã§Â¨â€¹Ã¯Â¼Å’Ã§Â²Â¾Ã¥â€œÂÃ©â€¦â€™Ã¥Âºâ€”Ã¯Â¼Å’Ã§Æ’Â¹Ã©Â¥ÂªÃ¨Â¯Â¾Ã§Â¨â€¹Ã¥â€™Å’Ã¦Â·Â®Ã¦Â²Â³Ã¦â€”Â¥Ã¨ÂÂ½Ã¦Â¸Â¸Ã¨Ë†Â¹Ã£â‚¬â€š" }
+    "zh-CN": { name: "慢节奏会安", summary: "慢节奏行程，精品酒店，烹饪课程和淮河日落游船。" }
   },
   "cung-duong-anh-ha-giang": {
     en: { name: "Ha Giang Photo Tour", summary: "Sunrise photography route, terraced fields, Dong Van old town and Hmong villages." },
-    "zh-CN": { name: "Ã¦Â²Â³Ã¦Â±Å¸Ã¦â€˜â€žÃ¥Â½Â±Ã¤Â¹â€¹Ã¦â€”â€¦", summary: "Ã¦â€”Â¥Ã¥â€¡ÂºÃ¦â€˜â€žÃ¥Â½Â±Ã¨Â·Â¯Ã§ÂºÂ¿Ã¯Â¼Å’Ã¦Â¢Â¯Ã§â€Â°Ã¯Â¼Å’Ã¥ÂÅ’Ã¦â€“â€¡Ã¥ÂÂ¤Ã©â€¢â€¡Ã¥â€™Å’Ã¨â€¹â€”Ã¦â€”ÂÃ¦Ââ€˜Ã¨ÂÂ½Ã£â‚¬â€š" }
+    "zh-CN": { name: "河江摄影之旅", summary: "日出摄影路线，梯田，同文古镇和苗族村落。" }
   },
   "ky-nghi-gia-dinh-phu-quoc": {
     en: { name: "Phu Quoc Family Holiday", summary: "Beachfront resort, minimal travel itinerary, kid-friendly restaurant recommendations." },
-    "zh-CN": { name: "Ã¥Â¯Å’Ã¥â€ºÂ½Ã¥Â²â€ºÃ¥Â®Â¶Ã¥ÂºÂ­Ã¥Ââ€¡Ã¦Å“Å¸", summary: "Ã¦ÂµÂ·Ã¦Â»Â¨Ã¥ÂºÂ¦Ã¥Ââ€¡Ã¦Ââ€˜Ã¯Â¼Å’Ã¦Å¾ÂÃ§Â®â‚¬Ã¨Â¡Å’Ã§Â¨â€¹Ã¯Â¼Å’Ã©â‚¬â€šÃ¥ÂË†Ã¥â€žÂ¿Ã§Â«Â¥Ã§Å¡â€žÃ©Â¤ÂÃ¥Å½â€¦Ã¦Å½Â¨Ã¨ÂÂÃ£â‚¬â€š" }
+    "zh-CN": { name: "富国岛家庭假期", summary: "海滨度假村，极简行程，适合儿童的餐厅推荐。" }
   },
   "ninh-binh-cuoi-tuan": {
     en: { name: "Ninh Binh Weekend", summary: "Trang An boat trip, green resort stay and just enough itinerary for families with kids." },
-    "zh-CN": { name: "Ã¥Â®ÂÃ¥Â¹Â³Ã¥â€˜Â¨Ã¦Å“Â«", summary: "Ã©â€¢Â¿Ã¥Â®â€°Ã¤Â¹ËœÃ¨Ë†Â¹Ã¦Â¸Â¸Ã¨Â§Ë†Ã¯Â¼Å’Ã§Â»Â¿Ã¨â€°Â²Ã¥ÂºÂ¦Ã¥Ââ€¡Ã¦Ââ€˜Ã¤Â½ÂÃ¥Â®Â¿Ã¤Â»Â¥Ã¥ÂÅ Ã©â‚¬â€šÃ¥ÂË†Ã¦Å“â€°Ã¥Â­Â©Ã¥Â­ÂÃ§Å¡â€žÃ¥Â®Â¶Ã¥ÂºÂ­Ã§Å¡â€žÃ¨Â¡Å’Ã§Â¨â€¹Ã£â‚¬â€š" }
+    "zh-CN": { name: "宁平周末", summary: "长安乘船游览，绿色度假村住宿以及适合有孩子的家庭的行程。" }
   },
   "da-nang-nghi-duong-bien": {
     en: { name: "Da Nang Beach Retreat", summary: "Beachfront resort, private transfer, combined with Hoi An ancient town and accessible attractions." },
-    "zh-CN": { name: "Ã¥Â²ËœÃ¦Â¸Â¯Ã¦ÂµÂ·Ã¦Â»Â©Ã¥ÂºÂ¦Ã¥Ââ€¡", summary: "Ã¦ÂµÂ·Ã¦Â»Â¨Ã¥ÂºÂ¦Ã¥Ââ€¡Ã¦Ââ€˜Ã¯Â¼Å’Ã§Â§ÂÃ¤ÂºÂºÃ¦Å½Â¥Ã©â‚¬ÂÃ¯Â¼Å’Ã§Â»â€œÃ¥ÂË†Ã¤Â¼Å¡Ã¥Â®â€°Ã¥ÂÂ¤Ã©â€¢â€¡Ã¥â€™Å’Ã¦â€”Â Ã©Å¡Å“Ã§Â¢ÂÃ¦â„¢Â¯Ã§â€šÂ¹Ã£â‚¬â€š" }
+    "zh-CN": { name: "岘港海滩度假", summary: "海滨度假村，私人接送，结合会安古镇和无障碍景点。" }
   },
   "quy-nhon-roadtrip": {
     en: { name: "Quy Nhon Roadtrip", summary: "Coastal road, Eo Gio, Ky Co and local seafood restaurants for freedom lovers." },
-    "zh-CN": { name: "Ã¥Â½â€™Ã¤Â»ÂÃ¥â€¦Â¬Ã¨Â·Â¯Ã¦â€”â€¦Ã¨Â¡Å’", summary: "Ã¦Â²Â¿Ã¦ÂµÂ·Ã¥â€¦Â¬Ã¨Â·Â¯Ã¯Â¼Å’Eo GioÃ¯Â¼Å’Ky Co Ã¥â€™Å’Ã©â‚¬â€šÃ¥ÂË†Ã¨â€¡ÂªÃ§â€Â±Ã§Ë†Â±Ã¥Â¥Â½Ã¨â‚¬â€¦Ã§Å¡â€žÃ¥Â½â€œÃ¥Å“Â°Ã¦ÂµÂ·Ã©Â²Å“Ã©Â¤ÂÃ¥Å½â€¦Ã£â‚¬â€š" }
+    "zh-CN": { name: "归仁公路旅行", summary: "沿海公路，Eo Gio，Ky Co 和适合自由爱好者的当地海鲜餐厅。" }
   },
   "da-lat-san-may": {
     en: { name: "Da Lat Cloud Hunting", summary: "Cloud hunting, forest cafe, night market and homestay with communal space." },
-    "zh-CN": { name: "Ã¥Â¤Â§Ã¥ÂÂ»Ã¥Â¯Â»Ã¤Âºâ€˜", summary: "Ã¥Â¯Â»Ã¤Âºâ€˜Ã¯Â¼Å’Ã¦Â£Â®Ã¦Å¾â€”Ã¥â€™â€“Ã¥â€¢Â¡Ã©Â¦â€ Ã¯Â¼Å’Ã¥Â¤Å“Ã¥Â¸â€šÃ¥â€™Å’Ã¥Â¸Â¦Ã¥â€¦Â¬Ã¥â€¦Â±Ã§Â©ÂºÃ©â€”Â´Ã§Å¡â€žÃ¥Â¯â€žÃ¥Â®Â¿Ã¥Â®Â¶Ã¥ÂºÂ­Ã£â‚¬â€š" }
+    "zh-CN": { name: "大叻寻云", summary: "寻云，森林咖啡馆，夜市和带公共空间的寄宿家庭。" }
   },
   "con-dao-nghi-duong-rieng-tu": {
     en: { name: "Con Dao Private Retreat", summary: "Quiet beach space, private resort, suitable for families needing rest and recharge." },
-    "zh-CN": { name: "Ã¦Ëœâ€ Ã¤Â»â€˜Ã¥Â²â€ºÃ§Â§ÂÃ¤ÂºÂºÃ¥ÂºÂ¦Ã¥Ââ€¡", summary: "Ã¥Â®â€°Ã©Ââ„¢Ã§Å¡â€žÃ¦ÂµÂ·Ã¦Â»Â©Ã§Â©ÂºÃ©â€”Â´Ã¯Â¼Å’Ã§Â§ÂÃ¤ÂºÂºÃ¥ÂºÂ¦Ã¥Ââ€¡Ã¦Ââ€˜Ã¯Â¼Å’Ã©â‚¬â€šÃ¥ÂË†Ã©Å“â‚¬Ã¨Â¦ÂÃ¤Â¼â€˜Ã¦ÂÂ¯Ã¥â€™Å’Ã¥â€¦â€¦Ã§â€ÂµÃ§Å¡â€žÃ¥Â®Â¶Ã¥ÂºÂ­Ã£â‚¬â€š" }
+    "zh-CN": { name: "昆仑岛私人度假", summary: "安静的海滩空间，私人度假村，适合需要休息和充电的家庭。" }
   },
   "ha-long-gia-dinh-du-thuyen": {
     en: { name: "Ha Long Family Cruise", summary: "Overnight bay experience, light meals and itinerary suitable for multi-generational families." },
-    "zh-CN": { name: "Ã¤Â¸â€¹Ã©Â¾â„¢Ã¦Â¹Â¾Ã¥Â®Â¶Ã¥ÂºÂ­Ã¦Â¸Â¸Ã¨Â½Â®", summary: "Ã¨Â¿â€¡Ã¥Â¤Å“Ã¦ÂµÂ·Ã¦Â¹Â¾Ã¤Â½â€œÃ©ÂªÅ’Ã¯Â¼Å’Ã¤Â¾Â¿Ã©Â¤ÂÃ¥â€™Å’Ã©â‚¬â€šÃ¥ÂË†Ã¥Â¤Å¡Ã¤Â»Â£Ã¥Â®Â¶Ã¥ÂºÂ­Ã§Å¡â€žÃ¨Â¡Å’Ã§Â¨â€¹Ã£â‚¬â€š" }
+    "zh-CN": { name: "下龙湾家庭游轮", summary: "过夜海湾体验，便餐和适合多代家庭的行程。" }
   },
   "phu-yen-tuoi-tre-bien-xanh": {
     en: { name: "Phu Yen Youth Blue Sea", summary: "Coastal route, local seafood and check-in spots for freedom-loving friend groups." },
-    "zh-CN": { name: "Ã¥Â¯Å’Ã¥Â®â€°Ã©Ââ€™Ã¦ËœÂ¥Ã§Â¢Â§Ã¦ÂµÂ·", summary: "Ã¦Â²Â¿Ã¦ÂµÂ·Ã¨Â·Â¯Ã§ÂºÂ¿Ã¯Â¼Å’Ã¥Â½â€œÃ¥Å“Â°Ã¦ÂµÂ·Ã©Â²Å“Ã¥â€™Å’Ã©â‚¬â€šÃ¥ÂË†Ã§Æ’Â­Ã§Ë†Â±Ã¨â€¡ÂªÃ§â€Â±Ã§Å¡â€žÃ¦Å“â€¹Ã¥Ââ€¹Ã¥â€ºÂ¢Ã¤Â½â€œÃ§Å¡â€žÃ¦â€°â€œÃ¥ÂÂ¡Ã§â€šÂ¹Ã£â‚¬â€š" }
+    "zh-CN": { name: "富安青春碧海", summary: "沿海路线，当地海鲜和适合热爱自由的朋友团体的打卡点。" }
   },
   "hoi-an-dem-pho-co": {
     en: { name: "Hoi An Old Town Night", summary: "Old town photography, lantern release, craft workshop and optimal itinerary for young groups." },
-    "zh-CN": { name: "Ã¤Â¼Å¡Ã¥Â®â€°Ã¥ÂÂ¤Ã©â€¢â€¡Ã¤Â¹â€¹Ã¥Â¤Å“", summary: "Ã¥ÂÂ¤Ã©â€¢â€¡Ã¦â€˜â€žÃ¥Â½Â±Ã¯Â¼Å’Ã¦â€Â¾Ã¥Â­â€Ã¦ËœÅ½Ã§ÂÂ¯Ã¯Â¼Å’Ã¦â€°â€¹Ã¥Â·Â¥Ã¨â€°ÂºÃ¤Â½Å“Ã¥ÂÅ Ã¥â€™Å’Ã©â‚¬â€šÃ¥ÂË†Ã¥Â¹Â´Ã¨Â½Â»Ã¥â€ºÂ¢Ã¤Â½â€œÃ§Å¡â€žÃ¦Å“â‚¬Ã¤Â½Â³Ã¨Â¡Å’Ã§Â¨â€¹Ã£â‚¬â€š" }
+    "zh-CN": { name: "会安古镇之夜", summary: "古镇摄影，放孔明灯，手工艺作坊和适合年轻团体的最佳行程。" }
   },
   "sa-pa-mua-may": {
     en: { name: "Sa Pa Cloud Season", summary: "Terraced fields, highland villages, cloud hunting and Northwest cultural experience." },
-    "zh-CN": { name: "Ã¦Â²â„¢Ã¥ÂÂÃ¤Âºâ€˜Ã¥Â­Â£", summary: "Ã¦Â¢Â¯Ã§â€Â°Ã¯Â¼Å’Ã©Â«ËœÃ¥Å“Â°Ã¦Ââ€˜Ã¥Âºâ€žÃ¯Â¼Å’Ã¥Â¯Â»Ã¤Âºâ€˜Ã¥â€™Å’Ã¨Â¥Â¿Ã¥Å’â€”Ã¦â€“â€¡Ã¥Å’â€“Ã¤Â½â€œÃ©ÂªÅ’Ã£â‚¬â€š" }
+    "zh-CN": { name: "沙坝云季", summary: "梯田，高地村庄，寻云和西北文化体验。" }
   },
   "ninh-binh-di-san-xanh": {
     en: { name: "Ninh Binh Green Heritage", summary: "Trang An, Mua Cave, Tam Coc and typical Northern green viewpoints." },
-    "zh-CN": { name: "Ã¥Â®ÂÃ¥Â¹Â³Ã§Â»Â¿Ã¨â€°Â²Ã©Ââ€”Ã¤ÂºÂ§", summary: "Ã©â€¢Â¿Ã¥Â®â€°Ã¯Â¼Å’Mua CaveÃ¯Â¼Å’Tam Coc Ã¥â€™Å’Ã¥â€¦Â¸Ã¥Å¾â€¹Ã§Å¡â€žÃ¥Å’â€”Ã¦â€“Â¹Ã§Â»Â¿Ã¨â€°Â²Ã¨Â§â€šÃ¦â„¢Â¯Ã§â€šÂ¹Ã£â‚¬â€š" }
+    "zh-CN": { name: "宁平绿色遗产", summary: "长安，Mua Cave，Tam Coc 和典型的北方绿色观景点。" }
   }
 };
 
@@ -144,13 +145,13 @@ function fromStaticPackage(item: any, locale = "vi"): PublicPackage {
   return {
     id: item.id,
     slug: item.slug,
-    name: translated?.name || item.name,
-    destination: item.destination,
-    rawDestination: item.destination,
-    duration: item.duration,
+    name: normalizeLegacyText(translated?.name || item.name),
+    destination: normalizeLegacyText(item.destination),
+    rawDestination: normalizeLegacyText(item.destination),
+    duration: normalizeLegacyText(item.duration),
     price: formatPriceText(item.price || "", locale),
-    summary: translated?.summary || item.summary,
-    description: translated?.summary || item.description || item.summary,
+    summary: normalizeLegacyText(translated?.summary || item.summary),
+    description: normalizeLegacyText(translated?.summary || item.description || item.summary),
     minPeople: null,
     maxPeople: null,
     peopleNote: "",
@@ -164,13 +165,13 @@ function fromDbPackage(item: any, locale = "vi"): PublicPackage {
   return {
     id: item.id,
     slug: item.slug,
-    name: item.name,
-    destination: typeof item.destination === "string" ? item.destination : item.destination?.name || "",
-    rawDestination: item.rawDestination || (typeof item.destination === "string" ? item.destination : item.destination?.name || ""),
-    duration: item.duration || "",
+    name: normalizeLegacyText(item.name),
+    destination: normalizeLegacyText(typeof item.destination === "string" ? item.destination : item.destination?.name || ""),
+    rawDestination: normalizeLegacyText(item.rawDestination || (typeof item.destination === "string" ? item.destination : item.destination?.name || "")),
+    duration: normalizeLegacyText(item.duration || ""),
     price: formatPriceText(item.priceText || item.price || "", locale),
-    summary: item.summary || "",
-    description: item.description || item.summary || "",
+    summary: normalizeLegacyText(item.summary || ""),
+    description: normalizeLegacyText(item.description || item.summary || ""),
     minPeople: item.minPeople ?? null,
     maxPeople: item.maxPeople ?? null,
     peopleNote: item.peopleNote || "",

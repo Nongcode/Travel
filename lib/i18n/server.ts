@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
 import { DEFAULT_LOCALE, normalizeLocale, SupportedLocale } from "./config";
 import { defaultLanguages, defaultStaticTranslations } from "./defaults";
+import { localSpecialtyStaticTranslations } from "./localSpecialtyDefaults";
 import { normalizeLegacyText } from "@/lib/text/encoding";
 
 export type TranslationMap = Record<string, string>;
@@ -18,7 +19,7 @@ export type LanguageOption = {
 function getDefaultTranslationMap(locale: string): TranslationMap {
   const normalizedLocale = normalizeLocale(locale);
   const map: TranslationMap = {};
-  for (const item of defaultStaticTranslations) {
+  for (const item of [...defaultStaticTranslations, ...localSpecialtyStaticTranslations]) {
     const value = item.values[normalizedLocale] || item.values[DEFAULT_LOCALE];
     if (value) map[item.namespace + "." + item.key] = normalizeLegacyText(value);
   }
@@ -67,7 +68,7 @@ export async function ensureDefaultI18nData() {
   }
 
   if (keyCount === 0) {
-    for (const item of defaultStaticTranslations) {
+    for (const item of [...defaultStaticTranslations, ...localSpecialtyStaticTranslations]) {
       const key = await prisma.staticTranslationKey.upsert({
         where: { namespace_key: { namespace: item.namespace, key: item.key } },
         update: { description: normalizeLegacyText(item.description) },
@@ -157,19 +158,26 @@ export async function getActiveLanguages(): Promise<LanguageOption[]> {
 
   try {
     const languages = await client.language.findMany({
-      where: { isActive: true },
       orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
     });
 
-    if (languages.length === 0) return [];
-    return languages.map((language) => ({
-      code: language.code,
-      name: language.name,
-      nativeName: language.nativeName,
-      flag: language.flag || "",
-      isActive: language.isActive,
-      isDefault: language.isDefault,
-    }));
+    const activeLanguages = languages
+      .filter((language) => language.isActive)
+      .map((language) => ({
+        code: language.code,
+        name: language.name,
+        nativeName: language.nativeName,
+        flag: language.flag || "",
+        isActive: language.isActive,
+        isDefault: language.isDefault,
+      }));
+
+    const configuredCodes = new Set(languages.map((language) => language.code));
+    const fallbackMissingLanguages = getFallbackLanguages().filter(
+      (language) => language.isActive && !configuredCodes.has(language.code),
+    );
+
+    return [...activeLanguages, ...fallbackMissingLanguages];
   } catch (error) {
     console.error("Failed to query active languages, using defaults:", error);
     return getFallbackLanguages().filter((language) => language.isActive);

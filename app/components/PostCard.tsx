@@ -1,7 +1,5 @@
-
 "use client";
 
-import Link from "next/link";
 import { useI18n } from "./I18nProvider";
 
 type PostCardProps = {
@@ -18,6 +16,8 @@ type PostCardProps = {
 
 export function PostCard({ post }: PostCardProps) {
   const { t, href } = useI18n();
+  const postHref = href("/tin-tuc/" + post.id);
+  const readMoreLabel = t("common", "read_more", "\u0110\u1ecdc th\u00eam");
 
   return (
     <article className="post-card">
@@ -29,9 +29,9 @@ export function PostCard({ post }: PostCardProps) {
         </div>
         <h3>{post.title}</h3>
         <p>{post.excerpt}</p>
-        <Link href={href("/tin-tuc/" + post.id)} aria-label={t("common", "read_more", "Đọc thêm") + " " + post.title}>
-          {t("common", "read_more", "Đọc thêm")}
-        </Link>
+        <a href={postHref} aria-label={readMoreLabel + " " + post.title}>
+          {readMoreLabel}
+        </a>
       </div>
     </article>
   );

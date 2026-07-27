@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -20,10 +20,12 @@ type LocalSpecialtyExplorerProps = {
   specialties: SpecialtyItem[];
 };
 
-const REGION_RULES = [
+type RegionValue = "north" | "central" | "south" | "other";
+type Translator = (namespace: string, key: string, fallback: string) => string;
+
+const REGION_RULES: Array<{ value: RegionValue; keywords: string[] }> = [
   {
     value: "north",
-    label: "Miền Bắc",
     keywords: [
       "ha noi", "ha giang", "lao cai", "sa pa", "sapa", "cao bang",
       "bac kan", "lang son", "thai nguyen", "quang ninh", "ha long",
@@ -33,7 +35,6 @@ const REGION_RULES = [
   },
   {
     value: "central",
-    label: "Miền Trung",
     keywords: [
       "thanh hoa", "nghe an", "ha tinh", "quang binh", "phong nha",
       "quang tri", "hue", "thua thien", "da nang", "hoi an", "quang nam",
@@ -44,7 +45,6 @@ const REGION_RULES = [
   },
   {
     value: "south",
-    label: "Miền Nam",
     keywords: [
       "ho chi minh", "sai gon", "hcm", "binh duong", "dong nai",
       "vung tau", "ba ria", "tay ninh", "binh phuoc", "long an",
@@ -53,7 +53,7 @@ const REGION_RULES = [
       "ca mau", "kien giang", "phu quoc",
     ],
   },
-] as const;
+];
 
 function normalizeText(value: string) {
   return value
@@ -63,15 +63,18 @@ function normalizeText(value: string) {
     .trim();
 }
 
-function getRegion(destinationName: string) {
+function getRegion(destinationName: string): RegionValue {
   const normalized = normalizeText(destinationName);
   return REGION_RULES.find((region) =>
     region.keywords.some((keyword) => normalized.includes(keyword)),
   )?.value || "other";
 }
 
-function getRegionLabel(value: string) {
-  return REGION_RULES.find((region) => region.value === value)?.label || "Khác / chưa phân loại";
+function getRegionLabel(value: string, t: Translator) {
+  if (value === "north") return t("localSpecialty", "region_north", "Miền Bắc");
+  if (value === "central") return t("localSpecialty", "region_central", "Miền Trung");
+  if (value === "south") return t("localSpecialty", "region_south", "Miền Nam");
+  return t("localSpecialty", "region_other", "Khác / chưa phân loại");
 }
 
 export function LocalSpecialtyExplorer({ specialties }: LocalSpecialtyExplorerProps) {
@@ -189,7 +192,7 @@ export function LocalSpecialtyExplorer({ specialties }: LocalSpecialtyExplorerPr
             <option value="all">{t("localSpecialty", "all_regions", "Tất cả vùng miền")}</option>
             {regions.map((value) => (
               <option value={value} key={value}>
-                {getRegionLabel(value)}
+                {getRegionLabel(value, t)}
               </option>
             ))}
           </select>
@@ -218,7 +221,7 @@ export function LocalSpecialtyExplorer({ specialties }: LocalSpecialtyExplorerPr
       <div className="specialty-result-bar">
         <span>{filteredItems.length} {t("localSpecialty", "matching_suffix", "mục phù hợp")}</span>
         <strong>
-          {region === "all" ? t("localSpecialty", "all_regions", "Tất cả vùng miền") : getRegionLabel(region)}
+          {region === "all" ? t("localSpecialty", "all_regions", "Tất cả vùng miền") : getRegionLabel(region, t)}
         </strong>
       </div>
 
@@ -234,7 +237,7 @@ export function LocalSpecialtyExplorer({ specialties }: LocalSpecialtyExplorerPr
                   <span>{item.type === "FOOD" ? t("localSpecialty", "type_food", "Ẩm thực") : t("localSpecialty", "type_handicraft", "Thủ công mỹ nghệ")}</span>
                 </div>
                 <div className="offer-body">
-                  <p className="specialty-location">{item.destinationName || getRegionLabel(item.region)}</p>
+                  <p className="specialty-location">{item.destinationName || getRegionLabel(item.region, t)}</p>
                   <h2>{item.name}</h2>
                   <p>{item.description}</p>
                   <div className="offer-footer">
