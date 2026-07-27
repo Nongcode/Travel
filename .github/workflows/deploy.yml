@@ -33,9 +33,8 @@ jobs:
           
           if "%NEED_INSTALL%"=="1" (
             echo Dependencies changed or node_modules is incomplete. Running incremental npm install...
-            :: Dùng 'call npx' thay cho biến PM2_CMD cũ
             call npx pm2 stop travel
-            npm install --prefer-offline --no-audit --no-fund
+            call npm install --prefer-offline --no-audit --no-fund
             if errorlevel 1 (
               call npx pm2 restart travel
               exit /b 1
@@ -44,9 +43,10 @@ jobs:
             echo Dependencies unchanged. Skipping dependency install.
           )
           
-          npm run db:generate || exit /b 1
-          npm run db:deploy || exit /b 1
-          npm run build || exit /b 1
+          :: ĐÃ THÊM LỆNH CALL VÀO ĐÂY ĐỂ WINDOWS KHÔNG BỊ THOÁT NGANG
+          call npm run db:generate || exit /b 1
+          call npm run db:deploy || exit /b 1
+          call npm run build || exit /b 1
           
-          :: Khởi động lại ứng dụng
-          call npx pm2 restart travel || call npx pm2 start ecosystem.config.js
+          :: Khởi động lại ứng dụng (KÈM --update-env ĐỂ NHẬN CLOUDINARY)
+          call npx pm2 restart travel --update-env || call npx pm2 start ecosystem.config.js
