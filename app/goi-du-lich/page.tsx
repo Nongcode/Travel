@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import { absoluteUrl, publicPageMetadata } from "@/lib/seo";
 import { headers } from "next/headers";
 import { isSitePageInactive } from "@/lib/siteSettings";
 import { PageDisabled } from "../components/PageDisabled";
+import { JsonLd } from "../components/JsonLd";
 import { PackageExplorer } from "../components/PackageExplorer";
 import { SiteHeader } from "../components/SiteHeader";
 import { destinations } from "../data/travel";
@@ -16,19 +17,11 @@ type PackagesPageProps = {
 };
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
+export const metadata = publicPageMetadata({
   title: "Gói du lịch Việt Nam chọn lọc | TimesGreen",
   description: "Khám phá các gói du lịch Việt Nam chọn lọc theo điểm đến, phong cách chuyến đi và nhu cầu tư vấn riêng.",
-  alternates: {
-    canonical: "/goi-du-lich",
-  },
-  openGraph: {
-    title: "Gói du lịch Việt Nam chọn lọc | TimesGreen",
-    description: "Khám phá các gói du lịch Việt Nam chọn lọc theo điểm đến, phong cách chuyến đi và nhu cầu tư vấn riêng.",
-    url: "/goi-du-lich",
-    images: [{ url: "/uploads/logos/logo-1784804267099-cda8540c.png", width: 1774, height: 887, alt: "TimesGreen" }],
-  },
-};
+  path: "/goi-du-lich",
+});
 
 
 export default async function PackagesPage({ searchParams }: PackagesPageProps) {
@@ -43,8 +36,22 @@ export default async function PackagesPage({ searchParams }: PackagesPageProps) 
   const t = (namespace: string, key: string, fallback: string) => translateFromMap(translations, namespace, key, fallback);
   const [packages, collections] = await Promise.all([getPublicPackages(locale), getPublicPackageCollections(locale)]);
 
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: t("packages", "hero_eyebrow", "Gói du lịch"),
+    url: absoluteUrl("/goi-du-lich"),
+    itemListElement: packages.slice(0, 50).map((pkg, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: pkg.name,
+      url: absoluteUrl(`/goi-du-lich/${pkg.slug}`),
+    })),
+  };
+
   return (
     <main>
+      <JsonLd data={itemListJsonLd} />
       <SiteHeader variant="hero" />
       <section className="page-hero packages-hero">
         <p className="eyebrow">{t("packages", "hero_eyebrow", "Gói du lịch")}</p>

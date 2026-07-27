@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import { absoluteUrl, publicPageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { PageDisabled } from "../components/PageDisabled";
+import { JsonLd } from "../components/JsonLd";
 import { headers } from "next/headers";
 import { NewsPostGrid } from "../components/NewsPostGrid";
 import { SiteHeader } from "../components/SiteHeader";
@@ -11,19 +12,11 @@ import { getStaticTranslationMap, localizeContent, translateFromMap } from "@/li
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+export const metadata = publicPageMetadata({
   title: "Tin tức & Cẩm nang du lịch | TimesGreen",
   description: "Cập nhật cẩm nang du lịch, kinh nghiệm lịch trình và gợi ý điểm đến Việt Nam từ TimesGreen.",
-  alternates: {
-    canonical: "/tin-tuc",
-  },
-  openGraph: {
-    title: "Tin tức & Cẩm nang du lịch | TimesGreen",
-    description: "Cập nhật cẩm nang du lịch, kinh nghiệm lịch trình và gợi ý điểm đến Việt Nam từ TimesGreen.",
-    url: "/tin-tuc",
-    images: [{ url: "/uploads/logos/logo-1784804267099-cda8540c.png", width: 1774, height: 887, alt: "TimesGreen" }],
-  },
-};
+  path: "/tin-tuc",
+});
 
 
 const legacyDecoder = new TextDecoder("windows-1252");
@@ -78,8 +71,22 @@ export default async function NewsPage() {
     date: "",
   };
 
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: t("news", "all_title", "Tất cả bài viết"),
+    url: absoluteUrl("/tin-tuc"),
+    itemListElement: posts.slice(0, 50).map((post, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: post.title,
+      url: absoluteUrl(`/tin-tuc/${post.id}`),
+    })),
+  };
+
   return (
     <main className="news-page">
+      <JsonLd data={itemListJsonLd} />
       <SiteHeader variant="hero" />
       <section className="page-hero news-hero">
         <p className="eyebrow">{t("news", "hero_eyebrow", "Tin tức & cẩm nang")}</p>

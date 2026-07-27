@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { publicPageMetadata } from "@/lib/seo";
 import { PageDisabled } from "./components/PageDisabled";
 import Link from "next/link";
 import { JsonLd } from "./components/JsonLd";
@@ -16,19 +16,11 @@ import { getPublicPackageCollections, getPublicPackages } from "@/lib/packages";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+export const metadata = publicPageMetadata({
   title: "TimesGreen | Blog du lịch & Hành trình chọn lọc",
   description: "Khám phá Việt Nam qua lăng kính TimesGreen. Những chuyến đi, lịch trình, đặc sản và cẩm nang hữu ích.",
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: "TimesGreen | Blog du lịch & Hành trình chọn lọc",
-    description: "Khám phá Việt Nam qua lăng kính TimesGreen. Những chuyến đi, lịch trình, đặc sản và cẩm nang hữu ích.",
-    url: "/",
-    images: [{ url: "/uploads/logos/logo-1784804267099-cda8540c.png", width: 1774, height: 887, alt: "TimesGreen" }],
-  }
-};
+  path: "/",
+});
 
 const legacyDecoder = new TextDecoder("windows-1252");
 const toLegacyMojibake = (value: string) => legacyDecoder.decode(Buffer.from(value, "utf8"));

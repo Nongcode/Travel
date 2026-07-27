@@ -1,7 +1,8 @@
+import { getSiteUrl } from "@/lib/seo";
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net";
+  const baseUrl = getSiteUrl();
 
   return {
     rules: {

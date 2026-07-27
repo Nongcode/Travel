@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import { JsonLd } from "../components/JsonLd";
+import { absoluteUrl, publicPageMetadata } from "@/lib/seo";
 import { headers } from "next/headers";
 import { PageDisabled } from "../components/PageDisabled";
 import { SiteHeader } from "../components/SiteHeader";
@@ -10,19 +11,11 @@ import { getStaticTranslationMap, translateFromMap, localizeContent } from "@/li
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+export const metadata = publicPageMetadata({
   title: "Đặc sản địa phương Việt Nam | TimesGreen",
   description: "Khám phá đặc sản địa phương, sản phẩm thủ công và hương vị vùng miền Việt Nam cùng TimesGreen.",
-  alternates: {
-    canonical: "/dac-san",
-  },
-  openGraph: {
-    title: "Đặc sản địa phương Việt Nam | TimesGreen",
-    description: "Khám phá đặc sản địa phương, sản phẩm thủ công và hương vị vùng miền Việt Nam cùng TimesGreen.",
-    url: "/dac-san",
-    images: [{ url: "/uploads/logos/logo-1784804267099-cda8540c.png", width: 1774, height: 887, alt: "TimesGreen" }],
-  },
-};
+  path: "/dac-san",
+});
 
 
 export default async function LocalSpecialtiesPage() {
@@ -59,8 +52,22 @@ export default async function LocalSpecialtiesPage() {
     })
   );
 
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: t("localSpecialty", "hero_eyebrow", "Đặc sản địa phương"),
+    url: absoluteUrl("/dac-san"),
+    itemListElement: specialties.slice(0, 50).map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      url: absoluteUrl(`/dac-san/${item.slug}`),
+    })),
+  };
+
   return (
     <main className="specialty-page">
+      <JsonLd data={itemListJsonLd} />
       <SiteHeader variant="hero" />
       <section className="page-hero offers-hero" style={{ backgroundImage: "linear-gradient(90deg, rgba(10, 20, 17, 0.78), rgba(10, 20, 17, 0.26)), url('https://images.unsplash.com/photo-1555931202-3c1a7042fbd1?auto=format&fit=crop&q=80&w=1600')" }}>
         <p className="eyebrow">{t("localSpecialty", "hero_eyebrow", "Đặc sản địa phương")}</p>

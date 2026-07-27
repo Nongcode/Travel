@@ -1,3 +1,4 @@
+import { absoluteUrl, DEFAULT_OG_IMAGE_PATH, indexRobots, publicAlternates } from "@/lib/seo";
 import { headers } from "next/headers";
 import { PageDisabled } from "../../components/PageDisabled";
 import { notFound } from "next/navigation";
@@ -29,13 +30,14 @@ export async function generateMetadata({ params }: SpecialtyDetailPageProps) {
 
   const title = item.name + " | TimesGreen";
   const description = item.description || "";
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/dac-san/${item.slug}`;
-  const imageUrl = item.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/uploads/logos/logo-1784804267099-cda8540c.png`;
+  const path = `/dac-san/${item.slug}`;
+  const url = absoluteUrl(path);
+  const imageUrl = item.imageUrl || absoluteUrl(DEFAULT_OG_IMAGE_PATH);
 
   return {
     title,
     description,
-    alternates: { canonical: url },
+    alternates: publicAlternates(path),
     openGraph: {
       title,
       description,
@@ -43,6 +45,7 @@ export async function generateMetadata({ params }: SpecialtyDetailPageProps) {
       type: "website",
       images: [{ url: imageUrl }],
     },
+    robots: indexRobots,
     twitter: {
       card: "summary_large_image",
       title,

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { publicPageMetadata } from "@/lib/seo";
 import Image from "next/image";
 import { headers } from "next/headers";
 import { LeadForm } from "../components/LeadForm";
@@ -13,19 +13,11 @@ import { isSitePageInactive } from "@/lib/siteSettings";
 import { PageDisabled } from "../components/PageDisabled";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
+export const metadata = publicPageMetadata({
   title: "Liên hệ tư vấn hành trình | TimesGreen",
   description: "Liên hệ TimesGreen để nhận tư vấn lịch trình du lịch Việt Nam, gói du lịch phù hợp và hỗ trợ phản hồi trong 24 giờ.",
-  alternates: {
-    canonical: "/lien-he",
-  },
-  openGraph: {
-    title: "Liên hệ tư vấn hành trình | TimesGreen",
-    description: "Liên hệ TimesGreen để nhận tư vấn lịch trình du lịch Việt Nam, gói du lịch phù hợp và hỗ trợ phản hồi trong 24 giờ.",
-    url: "/lien-he",
-    images: [{ url: "/uploads/logos/logo-1784804267099-cda8540c.png", width: 1774, height: 887, alt: "TimesGreen" }],
-  },
-};
+  path: "/lien-he",
+});
 
 
 export default async function ContactPage() {

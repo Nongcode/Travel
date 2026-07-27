@@ -1,3 +1,4 @@
+import { absoluteUrl, DEFAULT_OG_IMAGE_PATH, indexRobots, publicAlternates } from "@/lib/seo";
 import { headers } from "next/headers";
 import { isSitePageInactive } from "@/lib/siteSettings";
 import { PageDisabled } from "../../components/PageDisabled";
@@ -33,13 +34,14 @@ export async function generateMetadata({ params }: PackageDetailPageProps) {
 
   const title = item.name + " | TimesGreen";
   const description = item.description || item.summary || "";
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/goi-du-lich/${item.slug}`;
-  const imageUrl = item.image || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/uploads/logos/logo-1784804267099-cda8540c.png`;
+  const path = `/goi-du-lich/${item.slug}`;
+  const url = absoluteUrl(path);
+  const imageUrl = item.image || absoluteUrl(DEFAULT_OG_IMAGE_PATH);
 
   return {
     title,
     description,
-    alternates: { canonical: url },
+    alternates: publicAlternates(path),
     openGraph: {
       title,
       description,
@@ -47,6 +49,7 @@ export async function generateMetadata({ params }: PackageDetailPageProps) {
       type: "website",
       images: [{ url: imageUrl }],
     },
+    robots: indexRobots,
     twitter: {
       card: "summary_large_image",
       title,

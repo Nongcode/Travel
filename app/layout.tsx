@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
 import { getSiteChromeConfig } from "@/lib/siteChrome";
 import { DEFAULT_SITE_CHROME_CONFIG } from "@/lib/siteChromeShared";
+import { DEFAULT_OG_IMAGE, getSiteUrl, indexRobots, SITE_NAME } from "@/lib/seo";
 import { normalizeLocale, withLocalePrefix } from "@/lib/i18n/config";
 import { getActiveLanguages, getStaticTranslationMap } from "@/lib/i18n/server";
 import type { LanguageOption, TranslationMap } from "@/lib/i18n/server";
@@ -18,7 +19,13 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"),
+  metadataBase: new URL(getSiteUrl()),
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME, url: getSiteUrl() }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  category: "travel",
+  robots: indexRobots,
   verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
     ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
     : undefined,
@@ -31,23 +38,16 @@ export const metadata: Metadata = {
     title: "TimesGreen | Blog du lịch Việt Nam",
     description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không yêu cầu thanh toán online.",
     url: "/",
-    siteName: "TimesGreen",
+    siteName: SITE_NAME,
     locale: "vi_VN",
     type: "website",
-    images: [
-      {
-        url: "/uploads/logos/logo-1784804267099-cda8540c.png",
-        width: 1200,
-        height: 630,
-        alt: "TimesGreen Logo",
-      }
-    ],
+    images: [DEFAULT_OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: "TimesGreen | Blog du lịch Việt Nam",
     description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không yêu cầu thanh toán online.",
-    images: ["/uploads/logos/logo-1784804267099-cda8540c.png"],
+    images: [DEFAULT_OG_IMAGE.url],
   },
 };
 

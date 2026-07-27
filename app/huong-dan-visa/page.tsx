@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { publicPageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { isSitePageInactive } from "@/lib/siteSettings";
 import { PageDisabled } from "../components/PageDisabled";
@@ -123,19 +123,11 @@ const pageCopy = {
 };
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
+export const metadata = publicPageMetadata({
   title: "Hướng dẫn visa du lịch | TimesGreen",
   description: "Tổng hợp giấy tờ, quy trình và lưu ý quan trọng khi chuẩn bị hồ sơ visa du lịch.",
-  alternates: {
-    canonical: "/huong-dan-visa",
-  },
-  openGraph: {
-    title: "Hướng dẫn visa du lịch | TimesGreen",
-    description: "Tổng hợp giấy tờ, quy trình và lưu ý quan trọng khi chuẩn bị hồ sơ visa du lịch.",
-    url: "/huong-dan-visa",
-    images: [{ url: "/uploads/logos/logo-1784804267099-cda8540c.png", width: 1774, height: 887, alt: "TimesGreen" }],
-  },
-};
+  path: "/huong-dan-visa",
+});
 
 
 export default async function VisaGuidePage() {

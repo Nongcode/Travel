@@ -9,6 +9,7 @@ import { PostSidebar } from "../../components/PostSidebar";
 import { PostCard } from "../../components/PostCard";
 import { ContentBlock } from "../../data/postsContent";
 import prisma from "@/lib/prisma";
+import { absoluteUrl, DEFAULT_OG_IMAGE_PATH, indexRobots, publicAlternates } from "@/lib/seo";
 import { isSitePageInactive } from "@/lib/siteSettings";
 import { normalizeLocale, withLocalePrefix } from "@/lib/i18n/config";
 import { getStaticTranslationMap, localizeContent, translateFromMap } from "@/lib/i18n/server";
@@ -50,13 +51,14 @@ export async function generateMetadata({ params }: PostDetailPageProps) {
 
   const title = `${post.title} | Cẩm nang TimesGreen`;
   const description = post.seoDescription || post.summary || undefined;
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/tin-tuc/${post.id}`;
-  const imageUrl = post.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/uploads/logos/logo-1784804267099-cda8540c.png`;
+  const path = `/tin-tuc/${post.id}`;
+  const url = absoluteUrl(path);
+  const imageUrl = post.imageUrl || absoluteUrl(DEFAULT_OG_IMAGE_PATH);
 
   return {
     title,
     description,
-    alternates: { canonical: url },
+    alternates: publicAlternates(path),
     openGraph: {
       title,
       description,
@@ -64,6 +66,7 @@ export async function generateMetadata({ params }: PostDetailPageProps) {
       type: "article",
       images: [{ url: imageUrl }],
     },
+    robots: indexRobots,
     twitter: {
       card: "summary_large_image",
       title,
@@ -180,7 +183,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
       name: "TimesGreen",
       logo: {
         "@type": "ImageObject",
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/uploads/logos/logo-1784804267099-cda8540c.png`,
+        url: absoluteUrl(DEFAULT_OG_IMAGE_PATH),
       },
     },
   };
