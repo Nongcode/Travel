@@ -26,6 +26,7 @@ export const metadata: Metadata = {
     title: "TimesGreen | Blog du lịch & Hành trình chọn lọc",
     description: "Khám phá Việt Nam qua lăng kính TimesGreen. Những chuyến đi, lịch trình, đặc sản và cẩm nang hữu ích.",
     url: "/",
+    images: [{ url: "/uploads/logos/logo-1784804267099-cda8540c.png", width: 1774, height: 887, alt: "TimesGreen" }],
   }
 };
 
@@ -104,7 +105,7 @@ export default async function Home() {
         url: process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net",
         logo: {
           "@type": "ImageObject",
-          url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/vietvista-logo.png`
+          url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/uploads/logos/logo-1784804267099-cda8540c.png`
         }
       }
     ]

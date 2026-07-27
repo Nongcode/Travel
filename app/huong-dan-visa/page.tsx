@@ -133,6 +133,7 @@ export const metadata: Metadata = {
     title: "Hướng dẫn visa du lịch | TimesGreen",
     description: "Tổng hợp giấy tờ, quy trình và lưu ý quan trọng khi chuẩn bị hồ sơ visa du lịch.",
     url: "/huong-dan-visa",
+    images: [{ url: "/uploads/logos/logo-1784804267099-cda8540c.png", width: 1774, height: 887, alt: "TimesGreen" }],
   },
 };
 

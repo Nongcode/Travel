@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PackageDetailPageProps) {
   const title = item.name + " | TimesGreen";
   const description = item.description || item.summary || "";
   const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/goi-du-lich/${item.slug}`;
-  const imageUrl = item.image || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/vietvista-logo.png`;
+  const imageUrl = item.image || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/uploads/logos/logo-1784804267099-cda8540c.png`;
 
   return {
     title,
@@ -96,7 +96,7 @@ export default async function PackageDetailPage({ params }: PackageDetailPagePro
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net";
   const canonicalUrl = `${baseUrl}/goi-du-lich/${item.slug}`;
-  const packageImage = item.image || `${baseUrl}/vietvista-logo.png`;
+  const packageImage = item.image || `${baseUrl}/uploads/logos/logo-1784804267099-cda8540c.png`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [

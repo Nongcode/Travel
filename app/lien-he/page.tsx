@@ -23,6 +23,7 @@ export const metadata: Metadata = {
     title: "Liên hệ tư vấn hành trình | TimesGreen",
     description: "Liên hệ TimesGreen để nhận tư vấn lịch trình du lịch Việt Nam, gói du lịch phù hợp và hỗ trợ phản hồi trong 24 giờ.",
     url: "/lien-he",
+    images: [{ url: "/uploads/logos/logo-1784804267099-cda8540c.png", width: 1774, height: 887, alt: "TimesGreen" }],
   },
 };
 

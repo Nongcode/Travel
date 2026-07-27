@@ -26,6 +26,7 @@ export const metadata: Metadata = {
     title: "Gói du lịch Việt Nam chọn lọc | TimesGreen",
     description: "Khám phá các gói du lịch Việt Nam chọn lọc theo điểm đến, phong cách chuyến đi và nhu cầu tư vấn riêng.",
     url: "/goi-du-lich",
+    images: [{ url: "/uploads/logos/logo-1784804267099-cda8540c.png", width: 1774, height: 887, alt: "TimesGreen" }],
   },
 };
 

@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: PostDetailPageProps) {
   const title = `${post.title} | Cẩm nang TimesGreen`;
   const description = post.seoDescription || post.summary || undefined;
   const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/tin-tuc/${post.id}`;
-  const imageUrl = post.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/vietvista-logo.png`;
+  const imageUrl = post.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/uploads/logos/logo-1784804267099-cda8540c.png`;
 
   return {
     title,
@@ -180,7 +180,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
       name: "TimesGreen",
       logo: {
         "@type": "ImageObject",
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/vietvista-logo.png`,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/uploads/logos/logo-1784804267099-cda8540c.png`,
       },
     },
   };

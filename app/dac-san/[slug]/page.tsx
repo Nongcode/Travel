@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: SpecialtyDetailPageProps) {
   const title = item.name + " | TimesGreen";
   const description = item.description || "";
   const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/dac-san/${item.slug}`;
-  const imageUrl = item.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/vietvista-logo.png`;
+  const imageUrl = item.imageUrl || `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/uploads/logos/logo-1784804267099-cda8540c.png`;
 
   return {
     title,
@@ -105,7 +105,7 @@ export default async function SpecialtyDetailPage({ params }: SpecialtyDetailPag
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net";
   const canonicalUrl = `${baseUrl}/dac-san/${item.slug}`;
-  const specialtyImage = item.imageUrl || `${baseUrl}/vietvista-logo.png`;
+  const specialtyImage = item.imageUrl || `${baseUrl}/uploads/logos/logo-1784804267099-cda8540c.png`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [

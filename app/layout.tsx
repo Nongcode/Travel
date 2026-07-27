@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/vietvista-logo.png",
+        url: "/uploads/logos/logo-1784804267099-cda8540c.png",
         width: 1200,
         height: 630,
         alt: "TimesGreen Logo",
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "TimesGreen | Blog du lịch Việt Nam",
     description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không yêu cầu thanh toán online.",
-    images: ["/vietvista-logo.png"],
+    images: ["/uploads/logos/logo-1784804267099-cda8540c.png"],
   },
 };
 

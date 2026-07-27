@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     title: "Đặc sản địa phương Việt Nam | TimesGreen",
     description: "Khám phá đặc sản địa phương, sản phẩm thủ công và hương vị vùng miền Việt Nam cùng TimesGreen.",
     url: "/dac-san",
+    images: [{ url: "/uploads/logos/logo-1784804267099-cda8540c.png", width: 1774, height: 887, alt: "TimesGreen" }],
   },
 };
 

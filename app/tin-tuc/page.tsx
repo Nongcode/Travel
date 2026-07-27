@@ -21,6 +21,7 @@ export const metadata: Metadata = {
     title: "Tin tức & Cẩm nang du lịch | TimesGreen",
     description: "Cập nhật cẩm nang du lịch, kinh nghiệm lịch trình và gợi ý điểm đến Việt Nam từ TimesGreen.",
     url: "/tin-tuc",
+    images: [{ url: "/uploads/logos/logo-1784804267099-cda8540c.png", width: 1774, height: 887, alt: "TimesGreen" }],
   },
 };
 
