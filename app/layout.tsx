@@ -31,12 +31,12 @@ export const metadata: Metadata = {
     : undefined,
   title: {
     template: "%s | TimesGreen",
-    default: "TimesGreen | Blog du lịch Việt Nam",
+    default: "TimesGreen - Blog du lịch Việt Nam, lịch trình và trải nghiệm bản địa",
   },
-  description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không yêu cầu thanh toán online.",
+  description: "TimesGreen truyền cảm hứng khám phá Việt Nam qua các cẩm nang du lịch thực tế, gợi ý lịch trình linh hoạt, đặc sản địa phương và những trải nghiệm bản địa đáng nhớ cho từng phong cách chuyến đi.",
   openGraph: {
-    title: "TimesGreen | Blog du lịch Việt Nam",
-    description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không yêu cầu thanh toán online.",
+    title: "TimesGreen - Blog du lịch Việt Nam, lịch trình và trải nghiệm bản địa",
+    description: "TimesGreen truyền cảm hứng khám phá Việt Nam qua các cẩm nang du lịch thực tế, gợi ý lịch trình linh hoạt, đặc sản địa phương và những trải nghiệm bản địa đáng nhớ cho từng phong cách chuyến đi.",
     url: "/",
     siteName: SITE_NAME,
     locale: "vi_VN",
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "TimesGreen | Blog du lịch Việt Nam",
-    description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không yêu cầu thanh toán online.",
+    title: "TimesGreen - Blog du lịch Việt Nam, lịch trình và trải nghiệm bản địa",
+    description: "TimesGreen truyền cảm hứng khám phá Việt Nam qua các cẩm nang du lịch thực tế, gợi ý lịch trình linh hoạt, đặc sản địa phương và những trải nghiệm bản địa đáng nhớ cho từng phong cách chuyến đi.",
     images: [DEFAULT_OG_IMAGE.url],
   },
 };

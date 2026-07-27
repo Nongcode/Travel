@@ -17,8 +17,8 @@ import { getPublicPackageCollections, getPublicPackages } from "@/lib/packages";
 export const dynamic = "force-dynamic";
 
 export const metadata = publicPageMetadata({
-  title: "TimesGreen | Blog du lịch & Hành trình chọn lọc",
-  description: "Khám phá Việt Nam qua lăng kính TimesGreen. Những chuyến đi, lịch trình, đặc sản và cẩm nang hữu ích.",
+  title: "TimesGreen - Blog du lịch Việt Nam, lịch trình và trải nghiệm bản địa",
+  description: "TimesGreen truyền cảm hứng khám phá Việt Nam qua các cẩm nang du lịch thực tế, gợi ý lịch trình linh hoạt, đặc sản địa phương và những trải nghiệm bản địa đáng nhớ cho từng phong cách chuyến đi.",
   path: "/",
 });
 
@@ -85,7 +85,7 @@ export default async function Home() {
         "@type": "WebSite",
         url: process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net",
         name: "TimesGreen",
-        description: "Blog du lịch hiện đại về điểm đến, lịch trình và tư vấn gói du lịch Việt Nam không thanh toán online.",
+        description: "TimesGreen truyền cảm hứng khám phá Việt Nam qua các cẩm nang du lịch thực tế, gợi ý lịch trình linh hoạt, đặc sản địa phương và những trải nghiệm bản địa đáng nhớ cho từng phong cách chuyến đi.",
         publisher: {
           "@id": `${process.env.NEXT_PUBLIC_SITE_URL || "https://timesgreen.net"}/#organization`
         }
