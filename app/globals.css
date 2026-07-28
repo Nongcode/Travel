@@ -3504,6 +3504,65 @@ h1 {
   font-size: 1.08rem;
 }
 
+.package-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 48px;
+}
+
+.package-pagination-arrow,
+.package-pagination-pages button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(21, 35, 30, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.package-pagination-arrow:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(21, 35, 30, 0.04);
+}
+
+.package-pagination-arrow:not(:disabled):hover,
+.package-pagination-pages button:hover {
+  border-color: rgba(15, 93, 76, 0.4);
+  background: rgba(15, 93, 76, 0.04);
+  color: var(--green-dark);
+}
+
+.package-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.package-pagination-pages button.active {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fffdf7;
+}
+
+.package-pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .empty-package-state {
   display: grid;
   justify-items: center;
