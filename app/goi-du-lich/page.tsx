@@ -19,7 +19,7 @@ type PackagesPageProps = {
 export const dynamic = "force-dynamic";
 export const metadata = publicPageMetadata({
   title: "Vietnam Tour Packages & Private Trip Ideas | TimesGreen",
-  description: "Explore flexible Vietnam tour packages by destination, travel style, group size and budget. TimesGreen helps international travelers plan family holidays, cultural trips and scenic journeys across Vietnam.",
+  description: "Khám phá các gói du lịch Việt Nam, tour nghỉ dưỡng và lịch trình thiết kế riêng từ TimesGreen. Đa dạng điểm đến từ Bắc chí Nam với chi phí tốt nhất.",
   path: "/goi-du-lich",
 });
 

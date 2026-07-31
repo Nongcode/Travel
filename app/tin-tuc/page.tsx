@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata = publicPageMetadata({
   title: "Vietnam Travel Guides, Tips & Local Stories | TimesGreen",
-  description: "Read practical Vietnam travel guides, local food stories, itinerary ideas, seasonal tips and cultural notes curated by TimesGreen for first-time and returning international travelers.",
+  description: "Đọc blog du lịch TimesGreen để cập nhật cẩm nang du lịch, review ẩm thực địa phương, kinh nghiệm phượt và các điểm đến mới lạ cho chuyến đi Việt Nam của bạn.",
   path: "/tin-tuc",
 });
 

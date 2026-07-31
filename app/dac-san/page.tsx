@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata = publicPageMetadata({
   title: "Vietnam Local Specialties, Food Gifts & Regional Flavors | TimesGreen",
-  description: "Discover Vietnam local specialties, regional food gifts, craft products and authentic flavors with TimesGreen travel stories and destination recommendations.",
+  description: "Khám phá thế giới đặc sản vùng miền Việt Nam, từ quà tặng ẩm thực đến sản phẩm thủ công truyền thống. Gợi ý điểm mua uy tín và câu chuyện văn hóa thú vị.",
   path: "/dac-san",
 });
 

@@ -125,7 +125,7 @@ const pageCopy = {
 export const dynamic = "force-dynamic";
 export const metadata = publicPageMetadata({
   title: "Vietnam Travel Visa Guide & Application Tips | TimesGreen",
-  description: "Prepare travel visa documents with TimesGreen's practical guide to checklists, timelines, destination notes and consultation support for smoother international trips.",
+  description: "Hướng dẫn chi tiết thủ tục xin Visa du lịch Việt Nam (E-visa), visa tại cửa khẩu và các quy định nhập cảnh mới nhất dành cho du khách quốc tế từ TimesGreen.",
   path: "/huong-dan-visa",
 });
 

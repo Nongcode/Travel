@@ -4091,7 +4091,7 @@ h1 {
     white-space: nowrap;
   }
 
-  .destination-tab-item input:focus-visible + .destination-tab-label {
+  .destination-tab-item input:focus-visible+.destination-tab-label {
     outline: 3px solid rgba(215, 162, 76, 0.58);
     outline-offset: 3px;
   }
@@ -4227,6 +4227,7 @@ h1 {
     padding-top: 64px;
     padding-bottom: 64px;
   }
+
   /* Keep package collections usable on narrow screens. The desktop marquee
      can place a card halfway outside the viewport while it is animating. */
   .package-showcase {
@@ -5932,6 +5933,7 @@ body>main {
     box-shadow: 0 14px 28px rgba(217, 79, 59, 0.22);
   }
 }
+
 @media (max-width: 640px) {
   .destination-result {
     min-width: 0;
@@ -5959,7 +5961,7 @@ body>main {
     display: none;
   }
 
-  .destination-package-grid > .package-card {
+  .destination-package-grid>.package-card {
     flex: 0 0 min(82vw, 320px) !important;
     width: min(82vw, 320px);
     min-width: min(82vw, 320px);
@@ -5973,6 +5975,7 @@ body>main {
 }
 
 @media (max-width: 640px) {
+
   .package-scroll-indicator,
   .destination-scroll-indicator {
     display: flex;
@@ -6024,7 +6027,7 @@ body>main {
     line-height: 1.08;
   }
 
-  .news-heading > p {
+  .news-heading>p {
     font-size: 0.95rem;
     line-height: 1.6;
   }
@@ -6096,12 +6099,13 @@ body>main {
     overflow-y: hidden;
   }
 
-  .news-section .post-grid.news-grid > .post-card {
+  .news-section .post-grid.news-grid>.post-card {
     flex: 0 0 min(82vw, 320px) !important;
     width: min(82vw, 320px);
     min-width: min(82vw, 320px);
   }
 }
+
 @media (max-width: 640px) {
   .package-finder {
     padding-right: max(14px, env(safe-area-inset-right));
@@ -6132,7 +6136,7 @@ body>main {
     min-width: 0;
   }
 
-  .package-grid.wide > .package-card {
+  .package-grid.wide>.package-card {
     width: 100%;
     min-width: 0;
   }
@@ -6271,6 +6275,7 @@ body>main {
     font-weight: 900;
   }
 }
+
 /* News page: featured story, responsive article grid, and pagination */
 .news-page .editorial-lead {
   padding-top: clamp(56px, 7vw, 86px);
@@ -6430,8 +6435,7 @@ body>main {
   }
 
   .news-page .section-shell {
-    padding: 50px max(14px, env(safe-area-inset-right)) 64px
-      max(14px, env(safe-area-inset-left));
+    padding: 50px max(14px, env(safe-area-inset-right)) 64px max(14px, env(safe-area-inset-left));
   }
 
   .news-page .section-heading.compact {
@@ -6501,6 +6505,7 @@ body>main {
     margin-top: 24px;
   }
 }
+
 /* Keep the news article grid two-column even if the page wrapper changes. */
 @media (max-width: 640px) {
   .post-grid.news-page-grid {
@@ -6511,11 +6516,12 @@ body>main {
     min-width: 0;
   }
 
-  .post-grid.news-page-grid > .post-card {
+  .post-grid.news-page-grid>.post-card {
     width: 100%;
     min-width: 0;
   }
 }
+
 /* Local specialties page: region explorer and mobile-first card grid */
 .specialty-page .offers-hero {
   min-height: 430px;
@@ -6546,7 +6552,7 @@ body>main {
   line-height: 1.08;
 }
 
-.specialty-heading > p {
+.specialty-heading>p {
   max-width: 560px;
   margin: 0;
   color: var(--muted);
@@ -6600,7 +6606,7 @@ body>main {
   box-shadow: 0 0 0 4px rgba(15, 93, 76, 0.08);
 }
 
-.specialty-filter-panel > button,
+.specialty-filter-panel>button,
 .specialty-empty-state button {
   min-height: 46px;
   border: 0;
@@ -6614,7 +6620,7 @@ body>main {
   white-space: nowrap;
 }
 
-.specialty-filter-panel > button:hover,
+.specialty-filter-panel>button:hover,
 .specialty-empty-state button:hover {
   background: var(--green-dark);
 }
@@ -6660,7 +6666,7 @@ body>main {
   -webkit-line-clamp: 2;
 }
 
-.specialty-grid .offer-body > p:not(.specialty-location) {
+.specialty-grid .offer-body>p:not(.specialty-location) {
   display: -webkit-box;
   min-height: calc(1rem * 1.65 * 3);
   overflow: hidden;
@@ -6790,8 +6796,7 @@ body>main {
   }
 
   .specialty-explorer {
-    padding: 50px max(14px, env(safe-area-inset-left)) 64px
-      max(14px, env(safe-area-inset-right));
+    padding: 50px max(14px, env(safe-area-inset-left)) 64px max(14px, env(safe-area-inset-right));
   }
 
   .specialty-heading {
@@ -6805,7 +6810,7 @@ body>main {
     line-height: 1.08;
   }
 
-  .specialty-heading > p {
+  .specialty-heading>p {
     font-size: 0.94rem;
     line-height: 1.6;
   }
@@ -6824,11 +6829,11 @@ body>main {
 
   .specialty-search-field input,
   .specialty-filter-field select,
-  .specialty-filter-panel > button {
+  .specialty-filter-panel>button {
     min-height: 44px;
   }
 
-  .specialty-filter-panel > button {
+  .specialty-filter-panel>button {
     width: 100%;
     padding: 0 12px;
   }
@@ -6848,7 +6853,7 @@ body>main {
     min-width: 0;
   }
 
-  .specialty-grid > .offer-card {
+  .specialty-grid>.offer-card {
     width: 100%;
     min-width: 0;
     min-height: 0;
@@ -6884,7 +6889,7 @@ body>main {
     line-height: 1.22;
   }
 
-  .specialty-grid .offer-body > p:not(.specialty-location) {
+  .specialty-grid .offer-body>p:not(.specialty-location) {
     min-height: calc(0.75rem * 1.45 * 3);
     font-size: 0.75rem;
     line-height: 1.45;
@@ -6911,6 +6916,7 @@ body>main {
     margin-top: 24px;
   }
 }
+
 /* Final mobile guard for the specialties explorer. */
 @media (max-width: 640px) {
   .specialty-explorer .specialty-filter-panel {
@@ -6935,7 +6941,7 @@ body>main {
 
   .specialty-explorer .specialty-search-field input,
   .specialty-explorer .specialty-filter-field select,
-  .specialty-explorer .specialty-filter-panel > button {
+  .specialty-explorer .specialty-filter-panel>button {
     display: block !important;
     width: 100% !important;
     box-sizing: border-box;
@@ -6949,12 +6955,13 @@ body>main {
     min-width: 0 !important;
   }
 
-  .specialty-explorer .offer-grid.specialty-grid > .offer-card {
+  .specialty-explorer .offer-grid.specialty-grid>.offer-card {
     display: flex !important;
     width: 100% !important;
     min-width: 0 !important;
   }
 }
+
 /* Customer reviews: horizontal swipe carousel on mobile */
 .review-scroll-indicator {
   display: none;
@@ -7016,7 +7023,7 @@ body>main {
     display: none;
   }
 
-  .reviews-section .review-carousel > .review-card {
+  .reviews-section .review-carousel>.review-card {
     flex: 0 0 min(82vw, 320px);
     width: min(82vw, 320px);
     min-width: min(82vw, 320px);
