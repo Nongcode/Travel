@@ -50,7 +50,7 @@ export async function generateMetadata({ params }: PostDetailPageProps) {
   }
 
   const title = `${post.title} | Cẩm nang TimesGreen`;
-  const description = post.seoDescription || post.summary || undefined;
+  const description = post.seoDescription || post.excerpt || post.summary || undefined;
   const path = `/tin-tuc/${post.id}`;
   const url = absoluteUrl(path);
   const imageUrl = post.imageUrl || absoluteUrl(DEFAULT_OG_IMAGE_PATH);
@@ -126,6 +126,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
       role: localizedDbPost.author?.role || "Travel Writer",
     },
     image: localizedDbPost.imageUrl || "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=85",
+    excerpt: localizedDbPost.excerpt || "",
     summary: localizedDbPost.summary || "",
     relatedPackageSlug: localizedDbPost.relatedPackage?.slug || null,
     blocks: (localizedDbPost.contentBlocks as unknown as ContentBlock[]) || [],
@@ -165,7 +166,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
-    description: post.summary,
+    description: post.excerpt || post.summary,
     image: [post.image],
     url: canonicalUrl,
     mainEntityOfPage: {
@@ -232,7 +233,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
           <PostSidebar headings={headings} title={post.title} />
 
           <article className="article-body">
-            <p className="article-lead-summary">{post.summary}</p>
+            {post.excerpt ? <p className="article-lead-summary">{post.excerpt}</p> : null}
 
             {post.blocks.map((block, index) => {
               switch (block.type) {
@@ -323,4 +324,3 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
     </main>
   );
 }
-
