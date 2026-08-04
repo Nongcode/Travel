@@ -103,7 +103,14 @@ export default async function NewsPage() {
           <p className="eyebrow">{leadPost.category}</p>
           <h2>{leadPost.title}</h2>
           <p>{leadPost.excerpt}</p>
-          <Link href={withLocalePrefix("/#consult", locale)}>{t("news", "lead_cta", "Cần tư vấn lịch trình này")}</Link>
+          <div className="editorial-actions">
+            {leadPost.id > 0 ? (
+              <Link className="editorial-read-more" href={withLocalePrefix(`/tin-tuc/${leadPost.id}`, locale)}>
+                {t("common", "read_more", "Đọc tiếp")}
+              </Link>
+            ) : null}
+            <Link href={withLocalePrefix("/#consult", locale)}>{t("news", "lead_cta", "Cần tư vấn lịch trình này")}</Link>
+          </div>
         </div>
       </section>
 

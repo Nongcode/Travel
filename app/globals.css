@@ -1370,6 +1370,21 @@ h1 {
   font-weight: 700;
 }
 
+.editorial-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.editorial-actions a {
+  margin-top: 0;
+}
+
+.editorial-actions .editorial-read-more {
+  background: var(--coral);
+}
+
 .package-grid,
 .offer-grid {
   display: grid;
@@ -6428,10 +6443,19 @@ body>main {
     line-height: 1.6;
   }
 
+  .news-page .editorial-actions {
+    flex-direction: column;
+    margin-top: 16px;
+  }
+
   .news-page .editorial-copy a {
     width: 100%;
     justify-content: center;
     margin-top: 16px;
+  }
+
+  .news-page .editorial-actions a {
+    margin-top: 0;
   }
 
   .news-page .section-shell {
@@ -6505,7 +6529,6 @@ body>main {
     margin-top: 24px;
   }
 }
-
 /* Keep the news article grid two-column even if the page wrapper changes. */
 @media (max-width: 640px) {
   .post-grid.news-page-grid {

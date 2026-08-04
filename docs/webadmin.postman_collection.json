@@ -1,0 +1,121 @@
+{
+  "info": {
+    "name": "TimesGreen WebAdmin API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Admin API collection for agent integration. Auth uses admin_token cookie from /api/admin/login."
+  },
+  "variable": [
+    { "key": "WEBADMIN_BASE_URL", "value": "https://notes-solomon-stress-stunning.trycloudflare.com" },
+    { "key": "ADMIN_EMAIL", "value": "ai-agent@timesgreen.net" },
+    { "key": "ADMIN_PASSWORD", "value": "CHANGE_ME" },
+    { "key": "admin_token", "value": "" },
+    { "key": "cf_access_client_id", "value": "" },
+    { "key": "cf_access_client_secret", "value": "" }
+  ],
+  "auth": { "type": "noauth" },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{WEBADMIN_BASE_URL}}/api/admin/login",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{ADMIN_EMAIL}}\",\n  \"password\": \"{{ADMIN_PASSWORD}}\"\n}" },
+            "description": "Saves admin_token as HTTP-only Set-Cookie. Copy it to collection variable if your agent cannot use cookie jar."
+          },
+          "response": [{
+            "name": "200 OK",
+            "originalRequest": { "method": "POST", "url": "{{WEBADMIN_BASE_URL}}/api/admin/login" },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"message\": \"Đăng nhập hệ thống thành công.\",\n  \"admin\": {\n    \"id\": 2,\n    \"email\": \"ai-agent@timesgreen.net\",\n    \"fullName\": \"TimesGreen AI Agent\",\n    \"role\": \"editor\"\n  }\n}"
+          }]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }],
+            "url": "{{WEBADMIN_BASE_URL}}/api/admin/me"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }],
+            "url": "{{WEBADMIN_BASE_URL}}/api/admin/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        { "name": "Get settings", "request": { "method": "GET", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/settings" } },
+        { "name": "Update settings", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/settings", "body": { "mode": "raw", "raw": "{\n  \"settings\": {\n    \"page_contact_status\": \"active\"\n  }\n}" } } }
+      ]
+    },
+    {
+      "name": "Navigation",
+      "item": [
+        { "name": "Get navigation", "request": { "method": "GET", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/navigation" } },
+        { "name": "Update header", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/navigation/header", "body": { "mode": "raw", "raw": "{\n  \"logoAlt\": \"TimesGreen\",\n  \"companyName\": \"TimesGreen\"\n}" } } },
+        { "name": "Update footer", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/navigation/footer", "body": { "mode": "raw", "raw": "{\n  \"brandName\": \"TimesGreen\",\n  \"description\": \"Vietnam travel blog and itinerary consultation channel.\"\n}" } } },
+        { "name": "Create menu", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/navigation/menus", "body": { "mode": "raw", "raw": "{\n  \"label\": \"Travel packages\",\n  \"url\": \"/goi-du-lich\",\n  \"location\": \"header\",\n  \"order\": 2,\n  \"isActive\": true\n}" } } },
+        { "name": "Update menu", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/navigation/menus/1", "body": { "mode": "raw", "raw": "{\n  \"label\": \"Tours\",\n  \"isActive\": true\n}" } } },
+        { "name": "Delete menu", "request": { "method": "DELETE", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/navigation/menus/1" } }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        { "name": "List posts", "request": { "method": "GET", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/posts" } },
+        { "name": "Create post", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/posts", "body": { "mode": "raw", "raw": "{\n  \"title\": \"New article\",\n  \"slug\": \"new-article\",\n  \"summary\": \"Short summary\",\n  \"content\": \"Article content\",\n  \"status\": \"Đã xuất bản\"\n}" } } },
+        { "name": "Update post", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/posts", "body": { "mode": "raw", "raw": "{\n  \"id\": 1,\n  \"title\": \"Updated article\"\n}" } } },
+        { "name": "Delete post", "request": { "method": "DELETE", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/posts?id=1" } }
+      ]
+    },
+    {
+      "name": "Packages",
+      "item": [
+        { "name": "List packages", "request": { "method": "GET", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/packages" } },
+        { "name": "Create package", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/packages", "body": { "mode": "raw", "raw": "{\n  \"name\": \"Ninh Binh Weekend\",\n  \"slug\": \"ninh-binh-weekend\",\n  \"duration\": \"2 days 1 night\",\n  \"priceText\": \"3,400,000 VND\",\n  \"summary\": \"Short trip for families\",\n  \"status\": \"Đang mở\"\n}" } } },
+        { "name": "Update package", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/packages", "body": { "mode": "raw", "raw": "{\n  \"id\": 1,\n  \"name\": \"Updated package\"\n}" } } },
+        { "name": "Delete package", "request": { "method": "DELETE", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/packages?id=1" } },
+        { "name": "Get package detail", "request": { "method": "GET", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/packages/1/detail" } },
+        { "name": "Update package detail", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/packages/1/detail", "body": { "mode": "raw", "raw": "{\n  \"overview\": \"Package overview\"\n}" } } }
+      ]
+    },
+    {
+      "name": "Local specialties",
+      "item": [
+        { "name": "List local specialties", "request": { "method": "GET", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/local-specialties" } },
+        { "name": "Create local specialty", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/local-specialties", "body": { "mode": "raw", "raw": "{\n  \"name\": \"Thanh Hoa fermented pork roll\",\n  \"slug\": \"nem-chua-thanh-hoa\",\n  \"type\": \"FOOD\",\n  \"description\": \"A signature specialty.\",\n  \"status\": \"Hiển thị\"\n}" } } },
+        { "name": "Update local specialty", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/local-specialties", "body": { "mode": "raw", "raw": "{\n  \"id\": 14,\n  \"description\": \"Updated description\"\n}" } } },
+        { "name": "Delete local specialty", "request": { "method": "DELETE", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/local-specialties?id=14" } },
+        { "name": "Get local specialty detail", "request": { "method": "GET", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/local-specialties/14/detail" } },
+        { "name": "Update local specialty detail", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/local-specialties/14/detail", "body": { "mode": "raw", "raw": "{\n  \"overview\": \"Specialty overview\"\n}" } } }
+      ]
+    },
+    {
+      "name": "Translations",
+      "item": [
+        { "name": "List static translations", "request": { "method": "GET", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/static-translations" } },
+        { "name": "Upsert static translation", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/static-translations", "body": { "mode": "raw", "raw": "{\n  \"namespace\": \"nav\",\n  \"key\": \"home\",\n  \"description\": \"Home link\",\n  \"values\": {\n    \"vi\": \"Trang chủ\",\n    \"en\": \"Home\",\n    \"zh-CN\": \"首页\"\n  }\n}" } } },
+        { "name": "Get content translation", "request": { "method": "GET", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/content-translations?entityType=post&entityId=1&locale=en" } },
+        { "name": "Upsert content translation", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/content-translations", "body": { "mode": "raw", "raw": "{\n  \"entityType\": \"post\",\n  \"entityId\": 1,\n  \"locale\": \"en\",\n  \"fields\": {\n    \"title\": \"English title\"\n  },\n  \"status\": \"published\"\n}" } } },
+        { "name": "Export content translations", "request": { "method": "GET", "header": [{ "key": "Cookie", "value": "admin_token={{admin_token}}" }], "url": "{{WEBADMIN_BASE_URL}}/api/admin/content-translations/export" } }
+      ]
+    },
+    {
+      "name": "Upload",
+      "item": [
+        { "name": "Upload image", "request": { "method": "POST", "header": [], "url": "{{WEBADMIN_BASE_URL}}/api/upload", "body": { "mode": "formdata", "formdata": [{ "key": "file", "type": "file", "src": [] }] } } }
+      ]
+    }
+  ]
+}
